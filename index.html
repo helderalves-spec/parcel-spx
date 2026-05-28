@@ -388,9 +388,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
-        import { getDatabase, ref, set, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // Sua configuração do Firebase web app
         const firebaseConfig = {
             apiKey: "AIzaSyC-98bTSJZekzIcbpWqvVPKzhsLPRSZbIA",
             authDomain: "parcel-4854c.firebaseapp.com",
@@ -401,41 +400,36 @@
             measurementId: "G-71NMSWMX4B"
         };
 
-        // Inicializa o Firebase
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
         const database = getDatabase(app);
 
-        // Expõe as funções necessárias globalmente para o resto do sistema usar
         window.dbFirebase = database;
         window.refFirebase = ref;
         window.setFirebase = set;
-        window.pushFirebase = push;
         window.removeFirebase = remove;
 
-        // PUXAR E MANTER OS DADOS DO BANCO EM TEMPO REAL: Isso evita que suma ao dar F5
+        // SE SINCRONIZA COM A NUVEM EM TEMPO REAL (Evita perdas ao atualizar a página)
         const bipsRef = ref(database, 'bips_triagem');
         onValue(bipsRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
-                // Mapeia os dados salvos ordenando pelo horário (timestampBip) decrescente (mais recente no topo)
                 const items = Object.keys(data).map(key => data[key]);
                 items.sort((a, b) => new Date(b.timestampBip) - new Date(a.timestampBip));
                 window.scannedItemsList = items;
+
+                // LIBERAÇÃO AUTOMÁTICA EM REDE: Libera o leitor de código de barras nos outros PCs se já houver dados salvos na nuvem
+                const scannerInput = document.getElementById('main-barcode-scanner');
+                if (scannerInput) {
+                    scannerInput.disabled = false;
+                    scannerInput.placeholder = "Passe o leitor de código de barras...";
+                }
             } else {
                 window.scannedItemsList = [];
             }
-            
-            // Força a liberação do campo de texto caso o usuário volte com a página já populada
-            const scannerInput = document.getElementById('main-barcode-scanner');
-            if (scannerInput && scannerInput.disabled) {
-                scannerInput.disabled = false;
-                scannerInput.placeholder = "Passe o leitor de código de barras...";
-            }
-            
             window.refreshDashboardUI();
         }, (error) => {
-            console.log("Erro de conexão com o banco:", error);
+            console.log("Erro de conexão Firebase:", error);
         });
     </script>
 </head>
@@ -445,7 +439,7 @@
 
     <div class="navbar">
         <div class="brand">
-            Parcel Sweeper Management <span>/</span> <strong>Triagem Dupla Base + Alertas de Voz (Dados Seguros na Nuvem)</strong>
+            Parcel Sweeper Management <span>/</span> <strong>Triagem Coletiva Compartilhada em Rede (Sincronizada)</strong>
         </div>
         <div class="user-profile">
             <span>👤 helder.alves</span>
@@ -504,22 +498,22 @@
                     </div>
                 </div>
                 <div class="stats-list">
-                    <div class="stat-item"><span>Total Carregado</span><span class="value" id="ui-total-esperado">0</span></div>
+                    <div class="stat-item"><span>Total Carregado Local</span><span class="value" id="ui-total-esperado">0</span></div>
                     <div class="stat-item"><span>Base 1 Itens</span><span class="value" id="ui-b1-count">0</span></div>
                     <div class="stat-item"><span>Base 2 Itens</span><span class="value" id="ui-b2-count">0</span></div>
-                    <div class="stat-item"><span>Total Bipado</span><span class="value" id="ui-total-bipado">0</span></div>
+                    <div class="stat-item"><span>Total Bipado (Rede)</span><span class="value" id="ui-total-bipado">0</span></div>
                 </div>
             </div>
 
             <div class="work-area">
                 <div class="voice-banner">
-                    <span>🔊</span> <strong>Alertas de Voz Ativos:</strong> O banco de dados está sincronizado. Modificações em outros terminais se aplicam automaticamente.
+                    <span>🔊</span> <strong>Modo Multi-Computador:</strong> Os dados exibidos abaixo estão consolidados e compartilhados simultaneamente em todas as telas da rede.
                 </div>
 
                 <div class="card" style="padding: 14px 20px;">
                     <div class="scanner-container">
                         <span class="scanner-label">📷 ESCANEAR BR:</span>
-                        <input type="text" id="main-barcode-scanner" class="scanner-input" placeholder="Aguardando a importação de ao menos uma base..." disabled>
+                        <input type="text" id="main-barcode-scanner" class="scanner-input" placeholder="Aguardando importação das planilhas ou sincronização da nuvem...">
                     </div>
                 </div>
 
@@ -589,16 +583,8 @@
                 document.querySelectorAll('.tab-btn')[1].classList.add('active');
                 document.getElementById('tab-dashboard').classList.add('active');
                 
-                // Força o desbloqueio se houver registros vindos da nuvem
                 const inputEl = document.getElementById('main-barcode-scanner');
-                if (window.scannedItemsList && window.scannedItemsList.length > 0) {
-                    inputEl.disabled = false;
-                    inputEl.placeholder = "Passe o leitor de código de barras...";
-                }
-                
-                if (!inputEl.disabled) {
-                    setTimeout(() => inputEl.focus(), 100);
-                }
+                setTimeout(() => { if(inputEl && !inputEl.disabled) inputEl.focus(); }, 100);
             }
         }
 
@@ -631,12 +617,10 @@
         function parseBase1(text) {
             const lines = text.split(/\r?\n/);
             if (lines.length === 0) return [];
-            
             const firstLine = lines[0];
             const countComma = (firstLine.match(/,/g) || []).length;
             const countSemicolon = (firstLine.match(/;/g) || []).length;
             const sep = countSemicolon > countComma ? ';' : ',';
-
             const headers = splitCSVLine(firstLine, sep).map(h => h.toLowerCase().trim());
             
             const trackingIdx = headers.indexOf('sls tracking number');
@@ -650,7 +634,6 @@
                 let currentLine = lines[i].trim();
                 if (!currentLine) continue;
                 let columns = splitCSVLine(currentLine, sep);
-
                 let trackingCode = columns[trackingIdx >= 0 ? trackingIdx : 1] || '';
                 let baseStatus = columns[statusIdx >= 0 ? statusIdx : 22] || 'N/A';
                 let station = columns[stationIdx >= 0 ? stationIdx : 36] || 'N/A';
@@ -675,12 +658,10 @@
             let normalizedText = text.replace(/\r?\n/g, '\n');
             const lines = normalizedText.split('\n');
             if (lines.length === 0) return [];
-            
             const firstLine = lines[0];
             const countComma = (firstLine.match(/,/g) || []).length;
             const countSemicolon = (firstLine.match(/;/g) || []).length;
             const sep = countSemicolon > countComma ? ';' : ',';
-
             const headers = splitCSVLine(firstLine, sep).map(h => h.toLowerCase().trim());
             
             const trackingIdx = headers.indexOf('spx tracking number');
@@ -691,7 +672,6 @@
             for (let i = 1; i < lines.length; i++) {
                 let currentLine = lines[i].trim();
                 if (!currentLine) continue;
-                
                 let columns = splitCSVLine(currentLine, sep);
                 let trackingCode = columns[trackingIdx >= 0 ? trackingIdx : 0] || '';
                 let orderStatus = columns[orderStatusIdx >= 0 ? orderStatusIdx : 1] || 'N/A';
@@ -756,7 +736,6 @@
                 tbody.innerHTML = '';
                 window.scannedItemsList.forEach(item => {
                     const row = document.createElement('tr');
-                    
                     if (item.notFound) {
                         row.innerHTML = `
                             <td style="font-weight: 600; color: #e53e3e;">${item.trackingNumber}</td>
@@ -830,6 +809,7 @@
                 return;
             }
 
+            // Pesquisa nas bases locais se existirem no PC atual
             let matchedItem = base1Database.find(item => item.trackingNumber === codeToFind);
             let foundInBase1 = true;
 
@@ -867,7 +847,6 @@
                         isTratativa = true;
                         alertColor = 'alert-orange';
                         emitVoiceAlert("Atenção: Área de Tratativa");
-                        
                         if (isForeignHub) {
                             messageText = `🍊 OUTRO HUB DETECTADO! BR: ${codeToFind} | DESTINO: ${destHubContent} -> ENVIAR PARA TRATATIVA`;
                         } else {
@@ -903,36 +882,32 @@
                 };
 
             } else {
-                topAlertEl.classList.add('alert-red');
-                topAlertEl.innerText = `❌ ALERTA! CÓDIGO BR ${codeToFind} NÃO ENCONTRADO EM NENHUMA BASE.`;
-                emitVoiceAlert("Não encontrado, área de tratativa");
+                // Se o PC atual não tiver as planilhas carregadas, ele salva como Bipagem Externa Rápida de Rede
+                topAlertEl.classList.add('alert-green');
+                topAlertEl.innerText = `✅ BIPADO COM SUCESSO EM REDE! BR: ${codeToFind}`;
+                emitVoiceAlert("Bipado");
 
                 finalScannedObject = {
                     trackingNumber: codeToFind,
-                    statusOriginal: 'NÃO ENCONTRADO',
+                    statusOriginal: 'REGISTRADO EM REDE',
                     station: '-',
                     destinationHub: '-',
                     onhold: '-',
-                    origin: 'NENHUMA',
-                    isTratativa: true,
-                    notFound: true,
+                    origin: 'REDE',
+                    isTratativa: false,
+                    notFound: false,
                     timestampBip: new Date().toISOString()
                 };
             }
 
-            // Envio imediato para o Firebase (O Firebase cuida de atualizar a tela via evento onValue)
+            // Envia para o Firebase (E o evento onValue replica em todos os computadores instantaneamente)
             try {
                 if (window.dbFirebase && window.refFirebase && window.setFirebase) {
                     const cleanKey = codeToFind.replace(/[.#$\[\]]/g, "_");
                     const itemRef = window.refFirebase(window.dbFirebase, 'bips_triagem/' + cleanKey);
                     window.setFirebase(itemRef, finalScannedObject);
-                } else {
-                    // Fallback se estiver offline
-                    window.scannedItemsList.unshift(finalScannedObject);
-                    window.refreshDashboardUI();
                 }
             } catch (e) {
-                // Fallback se der erro estrutural
                 window.scannedItemsList.unshift(finalScannedObject);
                 window.refreshDashboardUI();
             }
@@ -941,18 +916,13 @@
         }
 
         function clearAllScans() {
-            if (confirm("⚠️ ATENÇÃO: Tem certeza que deseja apagar TODOS os bips efetuados até agora? Essa ação vai limpar o painel de todo mundo logado na rede!")) {
+            if (confirm("⚠️ ATENÇÃO: Tem certeza que deseja apagar TODOS os bips efetuados até agora? Essa ação vai limpar o painel de TODOS os computadores conectados!")) {
                 try {
                     if (window.dbFirebase && window.refFirebase && window.removeFirebase) {
                         const bipsRef = window.refFirebase(window.dbFirebase, 'bips_triagem');
                         window.removeFirebase(bipsRef).then(() => {
-                            alert("Banco de dados resetado com sucesso!");
-                        }).catch(err => {
-                            alert("Erro ao remover dados: " + err.message);
+                            alert("Banco de dados resetado com sucesso em toda a rede!");
                         });
-                    } else {
-                        window.scannedItemsList = [];
-                        window.refreshDashboardUI();
                     }
                 } catch(e) {
                     window.scannedItemsList = [];

@@ -409,7 +409,24 @@
         window.setFirebase = set;
         window.removeFirebase = remove;
 
-        // SE SINCRONIZA COM A NUVEM EM TEMPO REAL (Evita perdas ao atualizar a página)
+        // 1. ESCUTANDO AS BASES IMPORTADAS GLOBALMENTE NA NUVEM
+        const base1Ref = ref(database, 'planilha_base1');
+        onValue(base1Ref, (snapshot) => {
+            const data = snapshot.val();
+            window.base1Database = data ? Object.values(data) : [];
+            updateImportVisuals(1, window.base1Database.length);
+            checkAndUnlockScanner();
+        });
+
+        const base2Ref = ref(database, 'planilha_base2');
+        onValue(base2Ref, (snapshot) => {
+            const data = snapshot.val();
+            window.base2Database = data ? Object.values(data) : [];
+            updateImportVisuals(2, window.base2Database.length);
+            checkAndUnlockScanner();
+        });
+
+        // 2. ESCUTANDO OS BIPS EFETUADOS EM TEMPO REAL
         const bipsRef = ref(database, 'bips_triagem');
         onValue(bipsRef, (snapshot) => {
             const data = snapshot.val();
@@ -417,13 +434,6 @@
                 const items = Object.keys(data).map(key => data[key]);
                 items.sort((a, b) => new Date(b.timestampBip) - new Date(a.timestampBip));
                 window.scannedItemsList = items;
-
-                // LIBERAÇÃO AUTOMÁTICA EM REDE: Libera o leitor de código de barras nos outros PCs se já houver dados salvos na nuvem
-                const scannerInput = document.getElementById('main-barcode-scanner');
-                if (scannerInput) {
-                    scannerInput.disabled = false;
-                    scannerInput.placeholder = "Passe o leitor de código de barras...";
-                }
             } else {
                 window.scannedItemsList = [];
             }
@@ -431,6 +441,37 @@
         }, (error) => {
             console.log("Erro de conexão Firebase:", error);
         });
+
+        function updateImportVisuals(baseNum, count) {
+            const box = document.getElementById(`box-file-${baseNum}`);
+            const icon = document.getElementById(`icon-file-${baseNum}`);
+            const label = document.getElementById(`label-file-${baseNum}`);
+            if (count > 0) {
+                box.classList.add('loaded');
+                icon.innerText = '✔';
+                label.innerText = `Base ${baseNum}: ${count} itens na nuvem`;
+            } else {
+                box.classList.remove('loaded');
+                icon.innerText = '📥';
+                label.innerText = baseNum === 1 ? "Selecionar Base Forward" : "Selecionar Base Receive Task";
+            }
+        }
+
+        function checkAndUnlockScanner() {
+            const totalRecords = (window.base1Database ? window.base1Database.length : 0) + (window.base2Database ? window.base2Database.length : 0);
+            const scannerInput = document.getElementById('main-barcode-scanner');
+            if (totalRecords > 0 && scannerInput) {
+                scannerInput.disabled = false;
+                scannerInput.placeholder = "Passe o leitor de código de barras...";
+                document.getElementById('import-summary-card').style.display = 'block';
+                document.getElementById('import-summary-text').innerHTML = `
+                    <strong>Base 1 (Nuvem):</strong> ${window.base1Database ? window.base1Database.length : 0} registros ativos.<br>
+                    <strong>Base 2 (Nuvem):</strong> ${window.base2Database ? window.base2Database.length : 0} registros ativos.<br>
+                    <strong>Total Geral em Rede:</strong> ${totalRecords} ordens sincronizadas prontas.
+                `;
+            }
+            window.refreshDashboardUI();
+        }
     </script>
 </head>
 <body>
@@ -439,7 +480,7 @@
 
     <div class="navbar">
         <div class="brand">
-            Parcel Sweeper Management <span>/</span> <strong>Triagem Coletiva Compartilhada em Rede (Sincronizada)</strong>
+            Parcel Sweeper Management <span>/</span> <strong>Triagem Coletiva Compartilhada em Rede Realtime</strong>
         </div>
         <div class="user-profile">
             <span>👤 helder.alves</span>
@@ -453,7 +494,7 @@
 
     <div id="tab-import" class="tab-content active">
         <div style="max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
-            <h2 style="font-size: 18px;">Carregamento das Bases de Triagem</h2>
+            <h2 style="font-size: 18px;">Carregamento das Bases de Triagem (Sincroniza Automaticamente com a Rede)</h2>
             
             <div class="import-grid">
                 <div>
@@ -476,7 +517,7 @@
             </div>
 
             <div class="card" id="import-summary-card" style="display: none;">
-                <h4 style="color: #2e7d32;" id="summary-title">✔ Bases Prontas!</h4>
+                <h4 style="color: #2e7d32;" id="summary-title">✔ Sistema Ativo e Sincronizado em Rede!</h4>
                 <div style="font-size: 13px; margin-top: 5px; line-height: 1.5;" id="import-summary-text"></div>
                 <button class="btn btn-primary" style="margin-top: 15px; padding: 10px 20px; background-color: #e65100; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;" onclick="switchTab('dashboard')">Iniciar Bipagem Conjugada →</button>
             </div>
@@ -498,7 +539,7 @@
                     </div>
                 </div>
                 <div class="stats-list">
-                    <div class="stat-item"><span>Total Carregado Local</span><span class="value" id="ui-total-esperado">0</span></div>
+                    <div class="stat-item"><span>Total Sincronizado</span><span class="value" id="ui-total-esperado">0</span></div>
                     <div class="stat-item"><span>Base 1 Itens</span><span class="value" id="ui-b1-count">0</span></div>
                     <div class="stat-item"><span>Base 2 Itens</span><span class="value" id="ui-b2-count">0</span></div>
                     <div class="stat-item"><span>Total Bipado (Rede)</span><span class="value" id="ui-total-bipado">0</span></div>
@@ -507,13 +548,13 @@
 
             <div class="work-area">
                 <div class="voice-banner">
-                    <span>🔊</span> <strong>Modo Multi-Computador:</strong> Os dados exibidos abaixo estão consolidados e compartilhados simultaneamente em todas as telas da rede.
+                    <span>🔊</span> <strong>Sincronismo Ativo:</strong> Qualquer terminal da rede pode bipar agora. A inteligência do banco de dados está compartilhada de forma unificada.
                 </div>
 
                 <div class="card" style="padding: 14px 20px;">
                     <div class="scanner-container">
                         <span class="scanner-label">📷 ESCANEAR BR:</span>
-                        <input type="text" id="main-barcode-scanner" class="scanner-input" placeholder="Aguardando importação das planilhas ou sincronização da nuvem...">
+                        <input type="text" id="main-barcode-scanner" class="scanner-input" placeholder="Aguardando importação das planilhas ou sincronização da nuvem..." disabled>
                     </div>
                 </div>
 
@@ -525,7 +566,7 @@
                                 <span>📊</span> Exportar Relatório (.CSV)
                             </button>
                             <button class="reset-btn" onclick="clearAllScans()">
-                                <span>🗑️</span> Limpar Todos os Bips
+                                <span>🗑️</span> Limpar Banco e Bips
                             </button>
                         </div>
                     </div>
@@ -558,8 +599,8 @@
     </div>
 
     <script>
-        let base1Database = [];
-        let base2Database = [];
+        window.base1Database = [];
+        window.base2Database = [];
         window.scannedItemsList = []; 
 
         function emitVoiceAlert(messageText) {
@@ -582,7 +623,6 @@
             } else {
                 document.querySelectorAll('.tab-btn')[1].classList.add('active');
                 document.getElementById('tab-dashboard').classList.add('active');
-                
                 const inputEl = document.getElementById('main-barcode-scanner');
                 setTimeout(() => { if(inputEl && !inputEl.disabled) inputEl.focus(); }, 100);
             }
@@ -629,7 +669,7 @@
             const destinationHubIdx = headers.indexOf('destination hub');
             const onholdTimesIdx = headers.indexOf('total of on hold times');
 
-            let results = [];
+            let results = {};
             for (let i = 1; i < lines.length; i++) {
                 let currentLine = lines[i].trim();
                 if (!currentLine) continue;
@@ -641,14 +681,15 @@
                 let onholdQty = columns[onholdTimesIdx >= 0 ? onholdTimesIdx : 29] || '0';
 
                 if(trackingCode) {
-                    results.push({
+                    let cleanKey = trackingCode.replace(/[.#$\[\]]/g, "_");
+                    results[cleanKey] = {
                         trackingNumber: trackingCode,
                         statusOriginal: baseStatus,
                         station: station,
                         destinationHub: destHub,
                         onhold: onholdQty,
                         origin: 'Base 1'
-                    });
+                    };
                 }
             }
             return results;
@@ -668,7 +709,7 @@
             const orderStatusIdx = headers.indexOf('order status');
             const sellerNameIdx = headers.indexOf('seller name');
 
-            let results = [];
+            let results = {};
             for (let i = 1; i < lines.length; i++) {
                 let currentLine = lines[i].trim();
                 if (!currentLine) continue;
@@ -678,14 +719,15 @@
                 let sellerName = columns[sellerNameIdx >= 0 ? sellerNameIdx : 9] || '-';
 
                 if(trackingCode && trackingCode.toLowerCase() !== 'spx tracking number') {
-                    results.push({
+                    let cleanKey = trackingCode.replace(/[.#$\[\]]/g, "_");
+                    results[cleanKey] = {
                         trackingNumber: trackingCode,
                         statusOriginal: orderStatus,
                         station: 'N/A',
                         destinationHub: 'N/A',
                         onhold: 'Vendedor: ' + sellerName,
                         origin: 'Base 2'
-                    });
+                    };
                 }
             }
             return results;
@@ -697,32 +739,17 @@
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                if (baseNum === 1) {
-                    base1Database = parseBase1(e.target.result);
-                    document.getElementById('box-file-1').classList.add('loaded');
-                    document.getElementById('icon-file-1').innerText = '✔';
-                    document.getElementById('label-file-1').innerText = `Base 1: ${base1Database.length} itens`;
-                } else {
-                    base2Database = parseBase2(e.target.result);
-                    document.getElementById('box-file-2').classList.add('loaded');
-                    document.getElementById('icon-file-2').innerText = '✔';
-                    document.getElementById('label-file-2').innerText = `Base 2: ${base2Database.length} itens`;
+                if (window.dbFirebase && window.refFirebase && window.setFirebase) {
+                    if (baseNum === 1) {
+                        const parsedData = parseBase1(e.target.result);
+                        const nodeRef = window.refFirebase(window.dbFirebase, 'planilha_base1');
+                        window.setFirebase(nodeRef, parsedData);
+                    } else {
+                        const parsedData = parseBase2(e.target.result);
+                        const nodeRef = window.refFirebase(window.dbFirebase, 'planilha_base2');
+                        window.setFirebase(nodeRef, parsedData);
+                    }
                 }
-
-                const totalRecords = base1Database.length + base2Database.length;
-                if (totalRecords > 0) {
-                    const inputEl = document.getElementById('main-barcode-scanner');
-                    inputEl.disabled = false;
-                    inputEl.placeholder = "Passe o leitor de código de barras...";
-                    
-                    document.getElementById('import-summary-card').style.display = 'block';
-                    document.getElementById('import-summary-text').innerHTML = `
-                        <strong>Base 1 (Forward):</strong> ${base1Database.length} registros mapeados.<br>
-                        <strong>Base 2 (Receive Task):</strong> ${base2Database.length} registros mapeados.<br>
-                        <strong>Total Combinado:</strong> ${totalRecords} ordens prontas para busca cruzada.
-                    `;
-                }
-                refreshDashboardUI();
             };
             reader.readAsText(file, 'UTF-8');
         }
@@ -770,8 +797,8 @@
                 });
             }
 
-            const totalB1 = base1Database.length;
-            const totalB2 = base2Database.length;
+            const totalB1 = window.base1Database ? window.base1Database.length : 0;
+            const totalB2 = window.base2Database ? window.base2Database.length : 0;
             const totalRecords = totalB1 + totalB2;
             const totalBipados = window.scannedItemsList ? window.scannedItemsList.length : 0;
             const ratioPct = totalRecords > 0 ? ((totalBipados / totalRecords) * 100) : 0;
@@ -809,12 +836,12 @@
                 return;
             }
 
-            // Pesquisa nas bases locais se existirem no PC atual
-            let matchedItem = base1Database.find(item => item.trackingNumber === codeToFind);
+            // Pesquisa diretamente nas bases baixadas em tempo real da nuvem
+            let matchedItem = window.base1Database.find(item => item.trackingNumber === codeToFind);
             let foundInBase1 = true;
 
             if (!matchedItem) {
-                matchedItem = base2Database.find(item => item.trackingNumber === codeToFind);
+                matchedItem = window.base2Database.find(item => item.trackingNumber === codeToFind);
                 foundInBase1 = false;
             }
 
@@ -882,25 +909,24 @@
                 };
 
             } else {
-                // Se o PC atual não tiver as planilhas carregadas, ele salva como Bipagem Externa Rápida de Rede
-                topAlertEl.classList.add('alert-green');
-                topAlertEl.innerText = `✅ BIPADO COM SUCESSO EM REDE! BR: ${codeToFind}`;
-                emitVoiceAlert("Bipado");
+                topAlertEl.classList.add('alert-red');
+                topAlertEl.innerText = `❌ ALERTA! CÓDIGO BR ${codeToFind} NÃO ENCONTRADO EM NENHUMA BASE SINC.`;
+                emitVoiceAlert("Não encontrado, área de tratativa");
 
                 finalScannedObject = {
                     trackingNumber: codeToFind,
-                    statusOriginal: 'REGISTRADO EM REDE',
+                    statusOriginal: 'NÃO ENCONTRADO',
                     station: '-',
                     destinationHub: '-',
                     onhold: '-',
-                    origin: 'REDE',
-                    isTratativa: false,
-                    notFound: false,
+                    origin: 'NENHUMA',
+                    isTratativa: true,
+                    notFound: true,
                     timestampBip: new Date().toISOString()
                 };
             }
 
-            // Envia para o Firebase (E o evento onValue replica em todos os computadores instantaneamente)
+            // Envia para o Firebase
             try {
                 if (window.dbFirebase && window.refFirebase && window.setFirebase) {
                     const cleanKey = codeToFind.replace(/[.#$\[\]]/g, "_");
@@ -908,25 +934,23 @@
                     window.setFirebase(itemRef, finalScannedObject);
                 }
             } catch (e) {
-                window.scannedItemsList.unshift(finalScannedObject);
-                window.refreshDashboardUI();
+                console.log(e);
             }
 
             inputField.value = '';
         }
 
         function clearAllScans() {
-            if (confirm("⚠️ ATENÇÃO: Tem certeza que deseja apagar TODOS os bips efetuados até agora? Essa ação vai limpar o painel de TODOS os computadores conectados!")) {
+            if (confirm("⚠️ COMPLETO: Deseja apagar TODAS as planilhas da nuvem e os bips efetuados? Isso vai resetar o sistema para todos na rede!")) {
                 try {
                     if (window.dbFirebase && window.refFirebase && window.removeFirebase) {
-                        const bipsRef = window.refFirebase(window.dbFirebase, 'bips_triagem');
-                        window.removeFirebase(bipsRef).then(() => {
-                            alert("Banco de dados resetado com sucesso em toda a rede!");
-                        });
+                        window.removeFirebase(window.refFirebase(window.dbFirebase, 'bips_triagem'));
+                        window.removeFirebase(window.refFirebase(window.dbFirebase, 'planilha_base1'));
+                        window.removeFirebase(window.refFirebase(window.dbFirebase, 'planilha_base2'));
+                        alert("Sistema resetado completamente com sucesso!");
                     }
                 } catch(e) {
-                    window.scannedItemsList = [];
-                    window.refreshDashboardUI();
+                    console.log(e);
                 }
                 document.getElementById('master-top-alert').style.display = 'none';
             }

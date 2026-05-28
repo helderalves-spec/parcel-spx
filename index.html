@@ -286,6 +286,11 @@
             background-color: #fafbfe;
         }
 
+        .actions-group {
+            display: flex;
+            gap: 10px;
+        }
+
         .export-btn {
             background-color: #107c41;
             color: white;
@@ -303,6 +308,25 @@
 
         .export-btn:hover {
             background-color: #0b592e;
+        }
+
+        .reset-btn {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+
+        .reset-btn:hover {
+            background-color: #b71c1c;
         }
 
         .table-scroll {
@@ -364,7 +388,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
-        import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, set, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         // Sua configuração do Firebase web app
         const firebaseConfig = {
@@ -387,17 +411,22 @@
         window.refFirebase = ref;
         window.setFirebase = set;
         window.pushFirebase = push;
+        window.removeFirebase = remove;
 
-        // PUXAR DADOS DO BANCO AO LIGAR A TELA: Atualiza a lista na hora caso já existam bips salvos na nuvem
+        // PUXAR DADOS DO BANCO AO LIGAR A TELA
         const bipsRef = ref(database, 'bips_triagem');
         onValue(bipsRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
-                // Converte o objeto do Firebase de volta para a nossa lista local ordenada por mais recentes
                 const items = Object.keys(data).map(key => data[key]);
                 window.scannedItemsList = items.reverse(); 
                 window.refreshDashboardUI();
+            } else {
+                window.scannedItemsList = [];
+                window.refreshDashboardUI();
             }
+        }, (error) => {
+            console.log("Firebase sem permissão ou offline. Rodando em modo de fallback local.", error);
         });
     </script>
 </head>
@@ -407,7 +436,7 @@
 
     <div class="navbar">
         <div class="brand">
-            Parcel Sweeper Management <span>/</span> <strong>Triagem Dupla Base + Alertas de Voz Automatizados (Firebase Ativo)</strong>
+            Parcel Sweeper Management <span>/</span> <strong>Triagem Dupla Base + Alertas de Voz Automatizados</strong>
         </div>
         <div class="user-profile">
             <span>👤 helder.alves</span>
@@ -488,9 +517,14 @@
                 <div class="table-container">
                     <div class="table-header">
                         <strong style="font-size: 14px;">Controle Unificado de Triagem (Base 1 + Base 2)</strong>
-                        <button class="export-btn" onclick="exportToExcelXLSX()">
-                            <span>📊</span> Exportar Relatório (.XLSX)
-                        </button>
+                        <div class="actions-group">
+                            <button class="export-btn" onclick="exportToExcelXLSX()">
+                                <span>📊</span> Exportar Relatório (.CSV)
+                            </button>
+                            <button class="reset-btn" onclick="clearAllScans()">
+                                <span>🗑️</span> Limpar Todos os Bips
+                            </button>
+                        </div>
                     </div>
                     <div class="table-scroll">
                         <table id="operational-table">
@@ -523,7 +557,7 @@
     <script>
         let base1Database = [];
         let base2Database = [];
-        window.scannedItemsList = []; // Vinculado à janela global para comunicação com o Firebase
+        window.scannedItemsList = []; 
 
         function emitVoiceAlert(messageText) {
             if ('speechSynthesis' in window) {
@@ -869,19 +903,47 @@
                 };
             }
 
-            // GRAVAÇÃO SÍNCRONA NO FIREBASE (Se o Firebase estiver conectado)
-            if (window.dbFirebase && window.refFirebase && window.setFirebase) {
-                // Remove caracteres especiais que o Firebase não aceita nas chaves de registro
-                const cleanKey = codeToFind.replace(/[.#$\[\]]/g, "_");
-                const itemRef = window.refFirebase(window.dbFirebase, 'bips_triagem/' + cleanKey);
-                window.setFirebase(itemRef, finalScannedObject);
-            } else {
-                // Caso falte internet, mantém o fluxo local ativo temporariamente
-                window.scannedItemsList.unshift(finalScannedObject);
-                refreshDashboardUI();
+            // FALLBACK GARANTIDO: Adiciona imediatamente na tabela local ANTES de mandar pro banco
+            window.scannedItemsList.unshift(finalScannedObject);
+            window.refreshDashboardUI();
+
+            // Gravação assíncrona no Firebase protegida por bloco try/catch
+            try {
+                if (window.dbFirebase && window.refFirebase && window.setFirebase) {
+                    const cleanKey = codeToFind.replace(/[.#$\[\]]/g, "_");
+                    const itemRef = window.refFirebase(window.dbFirebase, 'bips_triagem/' + cleanKey);
+                    window.setFirebase(itemRef, finalScannedObject).catch(err => {
+                        console.log("Erro de permissão no Firebase. Mantendo dado apenas localmente.", err);
+                    });
+                }
+            } catch (e) {
+                console.error("Falha ao comunicar com o servidor do banco de dados:", e);
             }
 
             inputField.value = '';
+        }
+
+        // NOVA FUNÇÃO: Limpa os registros locais e limpa do Firebase se houver conexão
+        function clearAllScans() {
+            if (confirm("Tem certeza que deseja apagar TODOS os bips efetuados até agora? Essa ação não pode ser desfeita!")) {
+                window.scannedItemsList = [];
+                window.refreshDashboardUI();
+
+                try {
+                    if (window.dbFirebase && window.refFirebase && window.removeFirebase) {
+                        const bipsRef = window.refFirebase(window.dbFirebase, 'bips_triagem');
+                        window.removeFirebase(bipsRef).then(() => {
+                            alert("Histórico limpo com sucesso no banco de dados!");
+                        }).catch(err => {
+                            console.log("Erro ao limpar dados remotos:", err);
+                        });
+                    }
+                } catch(e) {
+                    console.error(e);
+                }
+                
+                document.getElementById('master-top-alert').style.display = 'none';
+            }
         }
 
         document.getElementById('main-barcode-scanner').addEventListener('keydown', function(event) {

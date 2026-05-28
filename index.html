@@ -35,6 +35,7 @@
         .alert-green { background-color: #2ed573 !important; color: #ffffff !important; }
         .alert-red { background-color: #ff4757 !important; color: #ffffff !important; }
         .alert-orange { background-color: #ffa502 !important; color: #ffffff !important; }
+        .alert-blue { background-color: #1e3799 !important; color: #ffffff !important; }
 
         /* Top Navbar */
         .navbar {
@@ -366,6 +367,7 @@
         .badge-scanned { background-color: #c6f6d5; color: #22543d; }
         .badge-notfound { background-color: #fed7d7; color: #9b2c2c; font-weight: bold; }
         .badge-danger-action { background-color: #fff5f5; color: #e53e3e; border: 1px solid #feb2b2; font-weight: bold; padding: 4px 10px; border-radius: 4px; font-size: 11px; }
+        .badge-assigning-action { background-color: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; font-weight: bold; padding: 4px 10px; border-radius: 4px; font-size: 11px; }
         .badge-file-origin { padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; }
         .origin-base1 { background-color: #e2e8f0; color: #4a5568; }
         .origin-base2 { background-color: #ebf8ff; color: #2b6cb0; }
@@ -763,7 +765,11 @@
                 tbody.innerHTML = '';
                 window.scannedItemsList.forEach(item => {
                     const row = document.createElement('tr');
+                    const statusText = item.statusOriginal || '';
+                    
+                    // REGRAS DE CORES DA LINHA NA TABELA
                     if (item.notFound) {
+                        row.style.backgroundColor = '#fff5f5';
                         row.innerHTML = `
                             <td style="font-weight: 600; color: #e53e3e;">${item.trackingNumber}</td>
                             <td><span class="badge badge-notfound">NENHUMA</span></td>
@@ -772,6 +778,34 @@
                             <td style="color: #cbd5e0;">-</td>
                             <td style="color: #cbd5e0;">-</td>
                             <td style="font-weight: bold; color: #e53e3e;">NÃO</td>
+                        `;
+                    } else if (statusText.toLowerCase() === 'lmhub_assigning') {
+                        row.style.backgroundColor = '#e3f2fd'; // Azul claro para linha
+                        let originBadge = item.origin === 'Base 1' 
+                            ? `<span class="badge badge-file-origin origin-base1">Base 1 (Forward)</span>`
+                            : `<span class="badge badge-file-origin origin-base2">Base 2 (Receive)</span>`;
+                        row.innerHTML = `
+                            <td style="font-weight: 600; color: #0d47a1;">${item.trackingNumber}</td>
+                            <td>${originBadge}</td>
+                            <td style="font-weight: bold; color: #0d47a1;">${item.statusOriginal}</td>
+                            <td><span class="badge-assigning-action">PROSSEGUIR (ASSIGNING)</span></td>
+                            <td style="font-weight: 500; color: #0d47a1;">${item.destinationHub !== 'N/A' ? item.destinationHub : item.station}</td>
+                            <td style="color: #0d47a1;">${item.onhold}</td>
+                            <td style="font-weight: bold; color: #0d47a1;">SIM</td>
+                        `;
+                    } else if (statusText.toLowerCase() === 'return_lmhub_received') {
+                        row.style.backgroundColor = '#fffaf0'; // Laranja claro para linha
+                        let originBadge = item.origin === 'Base 1' 
+                            ? `<span class="badge badge-file-origin origin-base1">Base 1 (Forward)</span>`
+                            : `<span class="badge badge-file-origin origin-base2">Base 2 (Receive)</span>`;
+                        row.innerHTML = `
+                            <td style="font-weight: 600; color: #c05621;">${item.trackingNumber}</td>
+                            <td>${originBadge}</td>
+                            <td style="font-weight: bold; color: #c05621;">${item.statusOriginal}</td>
+                            <td><span class="badge-danger-action" style="background-color: #feebc8; color: #c05621; border-color: #fbd38d;">ÁREA DE TRATATIVA</span></td>
+                            <td style="font-weight: 500; color: #c05621;">${item.destinationHub !== 'N/A' ? item.destinationHub : item.station}</td>
+                            <td style="color: #c05621;">${item.onhold}</td>
+                            <td style="font-weight: bold; color: #c05621;">SIM</td>
                         `;
                     } else {
                         let originBadge = item.origin === 'Base 1' 
@@ -853,7 +887,8 @@
                 let alertColor = 'alert-green';
                 let messageText = '';
 
-                if (!statusLower.includes("lmhub_received")) {
+                // Regra padrão de tratativa baseada no status anterior
+                if (!statusLower.includes("lmhub_received") && !statusLower.includes("lmhub_assigning")) {
                     isTratativa = true;
                 }
 
@@ -870,7 +905,17 @@
                         }
                     }
 
-                    if (isForeignHub || isTratativa) {
+                    // APLICAÇÃO DOS FILTROS NOVOS E ALERTAS SUPERIORES
+                    if (statusLower === 'lmhub_assigning') {
+                        alertColor = 'alert-blue';
+                        messageText = `🔵 STATUS: LMHub_Assigning | BR: ${codeToFind} | DESTINO PARCEL ACEITO`;
+                        emitVoiceAlert("Assigning");
+                    } else if (statusLower === 'return_lmhub_received') {
+                        isTratativa = true;
+                        alertColor = 'alert-orange';
+                        messageText = `🍊 DEVOLUÇÃO DETECTADA (Return_LMHub_Received)! BR: ${codeToFind} -> ENVIAR PARA TRATATIVA`;
+                        emitVoiceAlert("Atenção: Área de Tratativa");
+                    } else if (isForeignHub || isTratativa) {
                         isTratativa = true;
                         alertColor = 'alert-orange';
                         emitVoiceAlert("Atenção: Área de Tratativa");
@@ -883,7 +928,16 @@
                         messageText = `✅ BIPAGEM OK (Base 1)! BR: ${codeToFind} | DESTINO PARCEL ACEITO`;
                     }
                 } else {
-                    if (isTratativa) {
+                    if (statusLower === 'lmhub_assigning') {
+                        alertColor = 'alert-blue';
+                        messageText = `🔵 STATUS: LMHub_Assigning (Base 2) | BR: ${codeToFind}`;
+                        emitVoiceAlert("Assigning");
+                    } else if (statusLower === 'return_lmhub_received') {
+                        isTratativa = true;
+                        alertColor = 'alert-orange';
+                        messageText = `🍊 DEVOLUÇÃO NA BASE 2 (Return_LMHub_Received)! BR: ${codeToFind} -> ENVIAR PARA TRATATIVA`;
+                        emitVoiceAlert("Atenção: Área de Tratativa");
+                    } else if (isTratativa) {
                         alertColor = 'alert-orange';
                         messageText = `🍊 STATUS RETIDO / ADVERTÊNCIA NA BASE 2 (${matchedItem.statusOriginal})! BR: ${codeToFind} -> ENVIAR PARA TRATATIVA`;
                         emitVoiceAlert("Atenção: Área de Tratativa");

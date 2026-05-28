@@ -1,0 +1,892 @@
+
+
+1 de 793
+(sem assunto)
+Caixa de entrada
+
+Helder Goncalves Alves <helder.alves@shopee.com>
+Anexos
+07:53 (há 0 minuto)
+para mim
+
+
+ 1 anexo
+  •  Verificados pelo Gmail
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parcel Sweeper Hub - Sistema Avançado de Triagem Dupla Base com Voz</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* TOP DYNAMIC ALERT BAR */
+        .top-alert-bar {
+            padding: 20px 24px;
+            font-size: 24px;
+            font-weight: 800;
+            text-align: center;
+            color: #ffffff;
+            display: none; 
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.1s ease-in-out;
+        }
+        .alert-green { background-color: #2ed573 !important; color: #ffffff !important; }
+        .alert-red { background-color: #ff4757 !important; color: #ffffff !important; }
+        .alert-orange { background-color: #ffa502 !important; color: #ffffff !important; }
+
+        /* Top Navbar */
+        .navbar {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 14px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            font-size: 15px;
+            color: #4a5568;
+            font-weight: 600;
+        }
+
+        .brand span {
+            color: #cbd5e0;
+            margin: 0 6px;
+            font-weight: normal;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 13px;
+            color: #4a5568;
+        }
+
+        /* Tab Navigation Bar */
+        .tab-nav {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0 24px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .tab-btn {
+            padding: 14px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #718096;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            color: #e65100;
+        }
+
+        .tab-btn.active {
+            color: #e65100;
+            border-bottom-color: #e65100;
+        }
+
+        /* Main View Layout */
+        .tab-content {
+            display: none;
+            padding: 24px;
+            flex: 1;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Container Design */
+        .dashboard-layout {
+            display: flex;
+            gap: 24px;
+        }
+
+        /* Sidebar - Stats Layout */
+        .sidebar {
+            width: 300px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            height: fit-content;
+        }
+
+        .chart-box {
+            position: relative;
+            width: 170px;
+            height: 170px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .circle-bg {
+            fill: none;
+            stroke: #edf2f7;
+            stroke-width: 12;
+        }
+
+        .circle-progress {
+            fill: none;
+            stroke: #e65100;
+            stroke-width: 12;
+            stroke-dasharray: 440;
+            stroke-dashoffset: 440;
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+            transition: stroke-dashoffset 0.4s ease;
+        }
+
+        .chart-text {
+            position: absolute;
+            text-align: center;
+        }
+
+        .chart-percentage {
+            font-size: 26px;
+            font-weight: bold;
+            color: #1a202c;
+        }
+
+        .chart-label {
+            font-size: 11px;
+            color: #718096;
+            max-width: 110px;
+            margin-top: 2px;
+            line-height: 1.2;
+        }
+
+        .stats-list {
+            width: 100%;
+            border-top: 1px solid #edf2f7;
+            padding-top: 16px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 12px;
+            color: #4a5568;
+        }
+
+        .stat-item .value {
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        /* Main Workspace Content Area */
+        .work-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Floating Input field */
+        .card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .import-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .scanner-container {
+            background: #fffaf0;
+            border: 1px dashed #fbd38d;
+            padding: 16px;
+            border-radius: 6px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .scanner-label {
+            font-size: 13px;
+            font-weight: bold;
+            color: #c05621;
+        }
+
+        .scanner-input {
+            flex: 1;
+            padding: 12px 14px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .scanner-input:focus {
+            outline: none;
+            border-color: #e65100;
+            box-shadow: 0 0 0 3px rgba(230, 81, 0, 0.15);
+        }
+
+        /* Import Box */
+        .import-box {
+            border: 2px dashed #cbd5e0;
+            border-radius: 8px;
+            background-color: #ffffff;
+            padding: 35px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .import-box:hover {
+            border-color: #e65100;
+            background-color: #fffaf0;
+        }
+
+        .import-box.loaded {
+            border-color: #28a745;
+            background-color: #f6fff8;
+        }
+
+        /* Table Design */
+        .table-container {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 14px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fafbfe;
+        }
+
+        .export-btn {
+            background-color: #107c41;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+
+        .export-btn:hover {
+            background-color: #0b592e;
+        }
+
+        .table-scroll {
+            overflow-x: auto;
+            max-height: 550px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th {
+            background-color: #f7fafc;
+            color: #4a5568;
+            font-weight: 600;
+            padding: 12px 14px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #edf2f7;
+            white-space: nowrap;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 11px;
+        }
+        .badge-scanned { background-color: #c6f6d5; color: #22543d; }
+        .badge-notfound { background-color: #fed7d7; color: #9b2c2c; font-weight: bold; }
+        .badge-danger-action { background-color: #fff5f5; color: #e53e3e; border: 1px solid #feb2b2; font-weight: bold; padding: 4px 10px; border-radius: 4px; font-size: 11px; }
+        .badge-file-origin { padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; }
+        .origin-base1 { background-color: #e2e8f0; color: #4a5568; }
+        .origin-base2 { background-color: #ebf8ff; color: #2b6cb0; }
+
+        /* Voice settings banner */
+        .voice-banner {
+            background-color: #eef2f6;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #4a5568;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="master-top-alert" class="top-alert-bar"></div>
+
+    <div class="navbar">
+        <div class="brand">
+            Parcel Sweeper Management <span>/</span> <strong>Triagem Dupla Base + Alertas de Voz Automatizados</strong>
+        </div>
+        <div class="user-profile">
+            <span>👤 helder.alves</span>
+        </div>
+    </div>
+
+    <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('import')">1. Importar Arquivos (Bases)</button>
+        <button class="tab-btn" onclick="switchTab('dashboard')">2. Painel de Bipagem</button>
+    </div>
+
+    <div id="tab-import" class="tab-content active">
+        <div style="max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
+            <h2 style="font-size: 18px;">Carregamento das Bases de Triagem</h2>
+            
+            <div class="import-grid">
+                <div>
+                    <h3 style="font-size: 14px; margin-bottom: 8px; color: #4a5568;">Base 1: Arquivo Forward (Original)</h3>
+                    <div id="box-file-1" class="import-box" onclick="document.getElementById('csv-file-1').click()">
+                        <div id="icon-file-1" style="font-size: 32px; margin-bottom: 8px;">📥</div>
+                        <span id="label-file-1" style="font-size: 13px; font-weight: 600; color: #4a5568;">Selecionar Base Forward</span>
+                        <input type="file" id="csv-file-1" accept=".csv" style="display: none;" onchange="handleFileSelect(event, 1)">
+                    </div>
+                </div>
+
+                <div>
+                    <h3 style="font-size: 14px; margin-bottom: 8px; color: #4a5568;">Base 2: Arquivo Receive Task (Novo)</h3>
+                    <div id="box-file-2" class="import-box" onclick="document.getElementById('csv-file-2').click()">
+                        <div id="icon-file-2" style="font-size: 32px; margin-bottom: 8px;">📥</div>
+                        <span id="label-file-2" style="font-size: 13px; font-weight: 600; color: #2b6cb0;">Selecionar Base Receive Task</span>
+                        <input type="file" id="csv-file-2" accept=".csv" style="display: none;" onchange="handleFileSelect(event, 2)">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" id="import-summary-card" style="display: none;">
+                <h4 style="color: #2e7d32;" id="summary-title">✔ Bases Prontas!</h4>
+                <div style="font-size: 13px; margin-top: 5px; line-height: 1.5;" id="import-summary-text"></div>
+                <button class="btn btn-primary" style="margin-top: 15px; padding: 10px 20px; background-color: #e65100; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;" onclick="switchTab('dashboard')">Iniciar Bipagem Conjugada →</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-dashboard" class="tab-content">
+        <div class="dashboard-layout">
+            
+            <div class="sidebar">
+                <div class="chart-box">
+                    <svg width="170" height="170" viewBox="0 0 170 170">
+                        <circle class="circle-bg" cx="85" cy="85" r="70"/>
+                        <circle class="circle-progress" id="progress-circle" cx="85" cy="85" r="70"/>
+                    </svg>
+                    <div class="chart-text">
+                        <div class="chart-percentage" id="ui-percentage">0.00%</div>
+                        <div class="chart-label">Total Geral Escaneado</div>
+                    </div>
+                </div>
+                <div class="stats-list">
+                    <div class="stat-item"><span>Total Carregado</span><span class="value" id="ui-total-esperado">0</span></div>
+                    <div class="stat-item"><span>Base 1 Itens</span><span class="value" id="ui-b1-count">0</span></div>
+                    <div class="stat-item"><span>Base 2 Itens</span><span class="value" id="ui-b2-count">0</span></div>
+                    <div class="stat-item"><span>Total Bipado</span><span class="value" id="ui-total-bipado">0</span></div>
+                </div>
+            </div>
+
+            <div class="work-area">
+                <div class="voice-banner">
+                    <span>🔊</span> <strong>Alertas de Voz Ativos:</strong> O sistema anunciará verbalmente quando pacotes necessitarem de tratativa ou não forem encontrados.
+                </div>
+
+                <div class="card" style="padding: 14px 20px;">
+                    <div class="scanner-container">
+                        <span class="scanner-label">📷 ESCANEAR BR:</span>
+                        <input type="text" id="main-barcode-scanner" class="scanner-input" placeholder="Aguardando a importação de ao menos uma base..." disabled>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <strong style="font-size: 14px;">Controle Unificado de Triagem (Base 1 + Base 2)</strong>
+                        <button class="export-btn" onclick="exportToExcelXLSX()">
+                            <span>📊</span> Exportar Relatório (.XLSX)
+                        </button>
+                    </div>
+                    <div class="table-scroll">
+                        <table id="operational-table">
+                            <thead>
+                                <tr>
+                                    <th>SPX TN</th>
+                                    <th>Origem</th>
+                                    <th>Status Localizado</th>
+                                    <th>Próxima Ação</th>
+                                    <th>Sort Code / Destination Hub</th>
+                                    <th>Onhold / Detalhes</th>
+                                    <th>Esperado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="live-table-body">
+                                <tr>
+                                    <td colspan="7" style="text-align: center; color: #a0aec0; padding: 40px; font-style: italic;">
+                                        Nenhum registro exposto. Bipe um pacote para validar.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let base1Database = [];
+        let base2Database = [];
+        let scannedItemsList = [];
+
+        // Function to announce messages via Text-to-Speech
+        function emitVoiceAlert(messageText) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                
+                let utterance = new SpeechSynthesisUtterance(messageText);
+                utterance.lang = 'pt-BR';
+                utterance.rate = 1.0; 
+                utterance.pitch = 1.0;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Troca de abas
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            if(tabId === 'import') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('tab-import').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('tab-dashboard').classList.add('active');
+                if (!document.getElementById('main-barcode-scanner').disabled) {
+                    setTimeout(() => document.getElementById('main-barcode-scanner').focus(), 100);
+                }
+            }
+        }
+
+        // Função para split de linha CSV respeitando aspas
+        function splitCSVLine(line) {
+            let result = [];
+            let current = '';
+            let inQuotes = false;
+
+            for (let i = 0; i < line.length; i++) {
+                let char = line[i];
+                if (char === '"' || char === "'") {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            result.push(current.trim());
+            return result;
+        }
+
+        // Parse da Base 1
+        function parseBase1(text) {
+            const lines = text.split(/\r?\n/);
+            if (lines.length === 0) return [];
+            const headers = splitCSVLine(lines[0]).map(h => h.replace(/['"]/g, '').trim().toLowerCase());
+            
+            const trackingIdx = headers.indexOf('sls tracking number');
+            const statusIdx = headers.indexOf('status');
+            const stationIdx = headers.indexOf('current station');
+            const destinationHubIdx = headers.indexOf('destination hub');
+            const onholdTimesIdx = headers.indexOf('total of on hold times');
+
+            let results = [];
+            for (let i = 1; i < lines.length; i++) {
+                let currentLine = lines[i].trim();
+                if (!currentLine) continue;
+                let columns = splitCSVLine(currentLine);
+                if (columns.length < 2) continue;
+
+                let trackingCode = columns[trackingIdx >= 0 ? trackingIdx : 1] || '';
+                let baseStatus = columns[statusIdx >= 0 ? statusIdx : 22] || 'N/A';
+                let station = columns[stationIdx >= 0 ? stationIdx : 36] || 'N/A';
+                let destHub = columns[destinationHubIdx >= 0 ? destinationHubIdx : 44] || '';
+                let onholdQty = columns[onholdTimesIdx >= 0 ? onholdTimesIdx : 29] || '0';
+
+                trackingCode = trackingCode.replace(/['"]/g, '').trim();
+                if(trackingCode) {
+                    results.push({
+                        trackingNumber: trackingCode,
+                        statusOriginal: baseStatus.replace(/['"]/g, '').trim(),
+                        station: station.replace(/['"]/g, '').trim(),
+                        destinationHub: destHub.replace(/['"]/g, '').trim(),
+                        onhold: onholdQty.replace(/['"]/g, '').trim(),
+                        origin: 'Base 1'
+                    });
+                }
+            }
+            return results;
+        }
+
+        // Parse da Base 2
+        function parseBase2(text) {
+            const lines = text.split(/\r?\n/);
+            if (lines.length === 0) return [];
+            const headers = splitCSVLine(lines[0]).map(h => h.replace(/['"]/g, '').trim().toLowerCase());
+            
+            const trackingIdx = headers.indexOf('spx tracking number');
+            const orderStatusIdx = headers.indexOf('order status');
+            const sellerNameIdx = headers.indexOf('seller name');
+
+            let results = [];
+            for (let i = 1; i < lines.length; i++) {
+                let currentLine = lines[i].trim();
+                if (!currentLine) continue;
+                let columns = splitCSVLine(currentLine);
+                if (columns.length < 1) continue;
+
+                let trackingCode = columns[trackingIdx >= 0 ? trackingIdx : 0] || '';
+                let orderStatus = columns[orderStatusIdx >= 0 ? orderStatusIdx : 1] || 'N/A';
+                let sellerName = columns[sellerNameIdx >= 0 ? sellerNameIdx : 9] || '-';
+
+                trackingCode = trackingCode.replace(/['"]/g, '').trim();
+                if(trackingCode) {
+                    results.push({
+                        trackingNumber: trackingCode,
+                        statusOriginal: orderStatus.replace(/['"]/g, '').trim(),
+                        station: 'N/A',
+                        destinationHub: 'N/A',
+                        onhold: 'Vendedor: ' + sellerName.replace(/['"]/g, '').trim(),
+                        origin: 'Base 2'
+                    });
+                }
+            }
+            return results;
+        }
+
+        // Evento de seleção de arquivo
+        function handleFileSelect(event, baseNum) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                if (baseNum === 1) {
+                    base1Database = parseBase1(e.target.result);
+                    document.getElementById('box-file-1').classList.add('loaded');
+                    document.getElementById('icon-file-1').innerText = '✔';
+                    document.getElementById('label-file-1').innerText = `Base 1: ${base1Database.length} itens`;
+                } else {
+                    base2Database = parseBase2(e.target.result);
+                    document.getElementById('box-file-2').classList.add('loaded');
+                    document.getElementById('icon-file-2').innerText = '✔';
+                    document.getElementById('label-file-2').innerText = `Base 2: ${base2Database.length} itens`;
+                }
+
+                const totalRecords = base1Database.length + base2Database.length;
+                if (totalRecords > 0) {
+                    const inputEl = document.getElementById('main-barcode-scanner');
+                    inputEl.disabled = false;
+                    inputEl.placeholder = "Passe o leitor de código de barras...";
+                    
+                    document.getElementById('import-summary-card').style.display = 'block';
+                    document.getElementById('import-summary-text').innerHTML = `
+                        <strong>Base 1 (Forward):</strong> ${base1Database.length} registros mapeados.<br>
+                        <strong>Base 2 (Receive Task):</strong> ${base2Database.length} registros mapeados.<br>
+                        <strong>Total Combinado:</strong> ${totalRecords} ordens prontas para busca cruzada.
+                    `;
+                }
+                refreshDashboardUI();
+            };
+            reader.readAsText(file, 'UTF-8');
+        }
+
+        // Atualização dos componentes visuais do Painel
+        function refreshDashboardUI() {
+            const tbody = document.getElementById('live-table-body');
+            
+            if (scannedItemsList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #a0aec0; padding: 40px; font-style: italic;">Nenhum registro exposto. Bipe um pacote para validar.</td></tr>`;
+            } else {
+                tbody.innerHTML = '';
+                scannedItemsList.forEach(item => {
+                    const row = document.createElement('tr');
+                    
+                    if (item.notFound) {
+                        row.innerHTML = `
+                            <td style="font-weight: 600; color: #e53e3e;">${item.trackingNumber}</td>
+                            <td><span class="badge badge-notfound">NENHUMA</span></td>
+                            <td style="color: #e53e3e; font-weight: bold;">NÃO ENCONTRADO</td>
+                            <td style="color: #e53e3e; font-weight: bold;">ÁREA DE TRATATIVA</td>
+                            <td style="color: #cbd5e0;">-</td>
+                            <td style="color: #cbd5e0;">-</td>
+                            <td style="font-weight: bold; color: #e53e3e;">NÃO</td>
+                        `;
+                    } else {
+                        let originBadge = item.origin === 'Base 1' 
+                            ? `<span class="badge badge-file-origin origin-base1">Base 1 (Forward)</span>`
+                            : `<span class="badge badge-file-origin origin-base2">Base 2 (Receive)</span>`;
+
+                        let nextAction = "-";
+                        if (item.isTratativa) {
+                            nextAction = `<span class="badge-danger-action">ÁREA DE TRATATIVA</span>`;
+                        }
+
+                        row.innerHTML = `
+                            <td style="font-weight: 600;">${item.trackingNumber}</td>
+                            <td>${originBadge}</td>
+                            <td style="font-weight: 600; color: #2b6cb0;">${item.statusOriginal}</td>
+                            <td>${nextAction}</td>
+                            <td style="font-weight: 500; color: #2d3748;">${item.destinationHub !== 'N/A' ? item.destinationHub : item.station}</td>
+                            <td>${item.onhold}</td>
+                            <td style="font-weight: bold; color: #2f855a;">SIM</td>
+                        `;
+                    }
+                    tbody.appendChild(row);
+                });
+            }
+
+            const totalB1 = base1Database.length;
+            const totalB2 = base2Database.length;
+            const totalRecords = totalB1 + totalB2;
+            const totalBipados = scannedItemsList.length;
+            const ratioPct = totalRecords > 0 ? ((totalBipados / totalRecords) * 100) : 0;
+
+            document.getElementById('ui-total-esperado').innerText = totalRecords;
+            document.getElementById('ui-b1-count').innerText = totalB1;
+            document.getElementById('ui-b2-count').innerText = totalB2;
+            document.getElementById('ui-total-bipado').innerText = totalBipados;
+            document.getElementById('ui-percentage').innerText = ratioPct.toFixed(2) + '%';
+
+            const circle = document.getElementById('progress-circle');
+            const radius = 70;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference - (Math.min(ratioPct, 100) / 100) * circumference;
+            circle.style.strokeDasharray = circumference;
+            circle.style.strokeDashoffset = offset;
+        }
+
+        // Execução da bipagem com prioridade para a Base 1
+        function executeBarcodeBeep() {
+            const inputField = document.getElementById('main-barcode-scanner');
+            const codeToFind = inputField.value.trim();
+            const topAlertEl = document.getElementById('master-top-alert');
+
+            if (!codeToFind) return;
+
+            topAlertEl.className = 'top-alert-bar';
+            topAlertEl.style.display = 'block';
+
+            // Verifica duplicidade local nos itens já bipados
+            const alreadyScanned = scannedItemsList.find(item => item.trackingNumber === codeToFind);
+            if (alreadyScanned) {
+                topAlertEl.classList.add('alert-orange');
+                topAlertEl.innerText = `⚠️ CÓDIGO REPETIDO! A BR ${codeToFind} JÁ FOI BIPADA ANTES.`;
+                emitVoiceAlert("Código repetido");
+                inputField.value = '';
+                return;
+            }
+
+            // PRIORIDADE DE BUSCA: Procura primeiro na Base 1, depois Base 2
+            let matchedItem = base1Database.find(item => item.trackingNumber === codeToFind);
+            let foundInBase1 = true;
+
+            if (!matchedItem) {
+                matchedItem = base2Database.find(item => item.trackingNumber === codeToFind);
+                foundInBase1 = false;
+            }
+
+            if (matchedItem) {
+                const statusLower = matchedItem.statusOriginal.toLowerCase();
+                let isTratativa = false;
+                let alertColor = 'alert-green';
+                let messageText = '';
+
+                // CORREÇÃO: Força Área de Tratativa imediata se o status NÃO for lmhub_received
+                if (!statusLower.includes("lmhub_received")) {
+                    isTratativa = true;
+                }
+
+                if (foundInBase1) {
+                    // LÓGICA DA BASE 1 (Fluxo Forward)
+                    const destHubContent = matchedItem.destinationHub ? matchedItem.destinationHub.trim() : "";
+                    const destHubLower = destHubContent.toLowerCase();
+
+                    let isForeignHub = false;
+
+                    const allowedCities = ["uberaba", "monte carmelo", "catalão", "catalao"];
+                    if (destHubContent.length > 0) {
+                        let matchesCity = allowedCities.some(city => destHubLower.includes(city));
+                        if (!matchesCity) {
+                            isForeignHub = true;
+                        }
+                    }
+
+                    // Se for de outro Hub ou o status exigir tratativa, vira Alerta Laranja (Amarelo)
+                    if (isForeignHub || isTratativa) {
+                        isTratativa = true; // Garante a flag marcada
+                        alertColor = 'alert-orange';
+                        emitVoiceAlert("Atenção: Área de Tratativa");
+                        
+                        if (isForeignHub) {
+                            messageText = `🍊 OUTRO HUB DETECTADO! BR: ${codeToFind} | DESTINO: ${destHubContent} -> ENVIAR PARA TRATATIVA`;
+                        } else {
+                            messageText = `🍊 STATUS RETIDO / ADVERTÊNCIA (${matchedItem.statusOriginal})! BR: ${codeToFind} -> ENVIAR PARA TRATATIVA`;
+                        }
+                    } else {
+                        messageText = `✅ BIPAGEM OK (Base 1)! BR: ${codeToFind} | DESTINO PARCEL ACEITO`;
+                    }
+                } else {
+                    // LÓGICA DA BASE 2 (Fluxo Receive Task)
+                    if (isTratativa) {
+                        alertColor = 'alert-orange';
+                        messageText = `🍊 STATUS RETIDO / ADVERTÊNCIA NA BASE 2 (${matchedItem.statusOriginal})! BR: ${codeToFind} -> ENVIAR PARA TRATATIVA`;
+                        emitVoiceAlert("Atenção: Área de Tratativa");
+                    } else {
+                        alertColor = 'alert-green';
+                        messageText = `✅ LOCALIZADO NA BASE 2 (Receive Task)! STATUS: ${matchedItem.statusOriginal} | BR: ${codeToFind}`;
+                    }
+                }
+
+                topAlertEl.classList.add(alertColor);
+                topAlertEl.innerText = messageText;
+
+                scannedItemsList.unshift({
+                    trackingNumber: matchedItem.trackingNumber,
+                    statusOriginal: matchedItem.statusOriginal,
+                    station: matchedItem.station,
+                    destinationHub: matchedItem.destinationHub,
+                    onhold: matchedItem.onhold,
+                    origin: matchedItem.origin,
+                    isTratativa: isTratativa,
+                    notFound: false
+                });
+
+            } else {
+                // NÃO ENCONTRADO EM NENHUMA DAS DUAS BASES
+                topAlertEl.classList.add('alert-red');
+                topAlertEl.innerText = `❌ ALERTA! CÓDIGO BR ${codeToFind} NÃO ENCONTRADO EM NENHUMA BASE.`;
+                emitVoiceAlert("Não encontrado, área de tratativa");
+
+                scannedItemsList.unshift({
+                    trackingNumber: codeToFind,
+                    statusOriginal: 'NÃO ENCONTRADO',
+                    station: '-',
+                    destinationHub: '-',
+                    onhold: '-',
+                    origin: 'NENHUMA',
+                    isTratativa: true,
+                    notFound: true
+                });
+            }
+
+            inputField.value = '';
+            refreshDashboardUI();
+        }
+
+        // Evento para capturar o "Enter" do leitor de códigos
+        document.getElementById('main-barcode-scanner').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                executeBarcodeBeep();
+            }
+        });
+
+        // Função de Exportação para arquivo Excel (.CSV legível pelo Excel em PT-BR)
+        function exportToExcelXLSX() {
+            if (scannedItemsList.length === 0) {
+                alert("Nenhum item bipado para exportação.");
+                return;
+            }
+
+            let csvContent = "\uFEFF"; // UTF-8 BOM para abrir sem erros de caracteres
+            csvContent += "SPX Tracking Number,Origem da Base,Status Original,Filtro Próxima Ação,Destino Detectado,Detalhes / Seller,Encontrado em Base\n";
+
+            scannedItemsList.forEach(item => {
+                let row = [
+                    `"${item.trackingNumber}"`,
+                    `"${item.origin}"`,
+                    `"${item.statusOriginal}"`,
+                    `"${item.isTratativa ? 'ÁREA DE TRATATIVA' : 'PROSSEGUIR'}"`,
+                    `"${item.destinationHub !== 'N/A' && item.destinationHub !== '-' ? item.destinationHub : (item.station || '-')}"`,
+                    `"${item.onhold}"`,
+                    `"${item.notFound ? 'NÃO' : 'SIM'}"`
+                ];
+                csvContent += row.join(",") + "\n";
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            
+            const timestamp = new Date().toISOString().slice(0,10);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Relatorio_Triagem_Unificado_${timestamp}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>

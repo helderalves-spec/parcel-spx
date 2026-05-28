@@ -413,20 +413,29 @@
         window.pushFirebase = push;
         window.removeFirebase = remove;
 
-        // PUXAR DADOS DO BANCO AO LIGAR A TELA
+        // PUXAR E MANTER OS DADOS DO BANCO EM TEMPO REAL: Isso evita que suma ao dar F5
         const bipsRef = ref(database, 'bips_triagem');
         onValue(bipsRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
+                // Mapeia os dados salvos ordenando pelo horário (timestampBip) decrescente (mais recente no topo)
                 const items = Object.keys(data).map(key => data[key]);
-                window.scannedItemsList = items.reverse(); 
-                window.refreshDashboardUI();
+                items.sort((a, b) => new Date(b.timestampBip) - new Date(a.timestampBip));
+                window.scannedItemsList = items;
             } else {
                 window.scannedItemsList = [];
-                window.refreshDashboardUI();
             }
+            
+            // Força a liberação do campo de texto caso o usuário volte com a página já populada
+            const scannerInput = document.getElementById('main-barcode-scanner');
+            if (scannerInput && scannerInput.disabled) {
+                scannerInput.disabled = false;
+                scannerInput.placeholder = "Passe o leitor de código de barras...";
+            }
+            
+            window.refreshDashboardUI();
         }, (error) => {
-            console.log("Firebase sem permissão ou offline. Rodando em modo de fallback local.", error);
+            console.log("Erro de conexão com o banco:", error);
         });
     </script>
 </head>
@@ -436,7 +445,7 @@
 
     <div class="navbar">
         <div class="brand">
-            Parcel Sweeper Management <span>/</span> <strong>Triagem Dupla Base + Alertas de Voz Automatizados</strong>
+            Parcel Sweeper Management <span>/</span> <strong>Triagem Dupla Base + Alertas de Voz (Dados Seguros na Nuvem)</strong>
         </div>
         <div class="user-profile">
             <span>👤 helder.alves</span>
@@ -504,7 +513,7 @@
 
             <div class="work-area">
                 <div class="voice-banner">
-                    <span>🔊</span> <strong>Alertas de Voz Ativos:</strong> O sistema anunciará verbalmente quando pacotes necessitarem de tratativa ou não forem encontrados.
+                    <span>🔊</span> <strong>Alertas de Voz Ativos:</strong> O banco de dados está sincronizado. Modificações em outros terminais se aplicam automaticamente.
                 </div>
 
                 <div class="card" style="padding: 14px 20px;">
@@ -579,8 +588,16 @@
             } else {
                 document.querySelectorAll('.tab-btn')[1].classList.add('active');
                 document.getElementById('tab-dashboard').classList.add('active');
-                if (!document.getElementById('main-barcode-scanner').disabled) {
-                    setTimeout(() => document.getElementById('main-barcode-scanner').focus(), 100);
+                
+                // Força o desbloqueio se houver registros vindos da nuvem
+                const inputEl = document.getElementById('main-barcode-scanner');
+                if (window.scannedItemsList && window.scannedItemsList.length > 0) {
+                    inputEl.disabled = false;
+                    inputEl.placeholder = "Passe o leitor de código de barras...";
+                }
+                
+                if (!inputEl.disabled) {
+                    setTimeout(() => inputEl.focus(), 100);
                 }
             }
         }
@@ -903,45 +920,44 @@
                 };
             }
 
-            // FALLBACK GARANTIDO: Adiciona imediatamente na tabela local ANTES de mandar pro banco
-            window.scannedItemsList.unshift(finalScannedObject);
-            window.refreshDashboardUI();
-
-            // Gravação assíncrona no Firebase protegida por bloco try/catch
+            // Envio imediato para o Firebase (O Firebase cuida de atualizar a tela via evento onValue)
             try {
                 if (window.dbFirebase && window.refFirebase && window.setFirebase) {
                     const cleanKey = codeToFind.replace(/[.#$\[\]]/g, "_");
                     const itemRef = window.refFirebase(window.dbFirebase, 'bips_triagem/' + cleanKey);
-                    window.setFirebase(itemRef, finalScannedObject).catch(err => {
-                        console.log("Erro de permissão no Firebase. Mantendo dado apenas localmente.", err);
-                    });
+                    window.setFirebase(itemRef, finalScannedObject);
+                } else {
+                    // Fallback se estiver offline
+                    window.scannedItemsList.unshift(finalScannedObject);
+                    window.refreshDashboardUI();
                 }
             } catch (e) {
-                console.error("Falha ao comunicar com o servidor do banco de dados:", e);
+                // Fallback se der erro estrutural
+                window.scannedItemsList.unshift(finalScannedObject);
+                window.refreshDashboardUI();
             }
 
             inputField.value = '';
         }
 
-        // NOVA FUNÇÃO: Limpa os registros locais e limpa do Firebase se houver conexão
         function clearAllScans() {
-            if (confirm("Tem certeza que deseja apagar TODOS os bips efetuados até agora? Essa ação não pode ser desfeita!")) {
-                window.scannedItemsList = [];
-                window.refreshDashboardUI();
-
+            if (confirm("⚠️ ATENÇÃO: Tem certeza que deseja apagar TODOS os bips efetuados até agora? Essa ação vai limpar o painel de todo mundo logado na rede!")) {
                 try {
                     if (window.dbFirebase && window.refFirebase && window.removeFirebase) {
                         const bipsRef = window.refFirebase(window.dbFirebase, 'bips_triagem');
                         window.removeFirebase(bipsRef).then(() => {
-                            alert("Histórico limpo com sucesso no banco de dados!");
+                            alert("Banco de dados resetado com sucesso!");
                         }).catch(err => {
-                            console.log("Erro ao limpar dados remotos:", err);
+                            alert("Erro ao remover dados: " + err.message);
                         });
+                    } else {
+                        window.scannedItemsList = [];
+                        window.refreshDashboardUI();
                     }
                 } catch(e) {
-                    console.error(e);
+                    window.scannedItemsList = [];
+                    window.refreshDashboardUI();
                 }
-                
                 document.getElementById('master-top-alert').style.display = 'none';
             }
         }

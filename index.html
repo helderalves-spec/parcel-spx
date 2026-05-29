@@ -585,8 +585,8 @@
                             <button class="export-btn" onclick="exportToExcelXLSX()">
                                 <span>📊</span> Exportar Relatório (.CSV)
                             </button>
-                            <button class="reset-btn" onclick="clearAllScans()">
-                                <span>🗑️</span> Limpar Banco e Bips
+                            <button class="reset-btn" onclick="clearOnlyScans()">
+                                <span>🗑️</span> Limpar Bips Efetuados
                             </button>
                         </div>
                     </div>
@@ -632,6 +632,7 @@
             }
         }
 
+        // ALTERNÂNCIA DE TELAS
         function switchTab(tabId) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -1076,14 +1077,13 @@
             }
         }
 
-        function clearAllScans() {
-            if (confirm("⚠️ COMPLETO: Deseja apagar TODAS as planilhas da nuvem e os bips efetuados? Isso vai resetar o sistema para todos na rede!")) {
+        // MUDANÇA PRINCIPAL: Ação focada apenas em limpar os bips (a tela de escaneamento)
+        function clearOnlyScans() {
+            if (confirm("⚠️ Deseja limpar TODOS os bips efetuados nesta página? As planilhas importadas continuarão salvas no servidor.")) {
                 try {
                     if (window.dbFirebase && window.refFirebase && window.removeFirebase) {
                         window.removeFirebase(window.refFirebase(window.dbFirebase, 'bips_triagem'));
-                        window.removeFirebase(window.refFirebase(window.dbFirebase, 'planilha_base1'));
-                        window.removeFirebase(window.refFirebase(window.dbFirebase, 'planilha_base2'));
-                        alert("Sistema resetado completamente com sucesso!");
+                        alert("Lista de bips limpa com sucesso!");
                     }
                 } catch(e) {
                     console.log(e);
@@ -1098,7 +1098,6 @@
             }
         });
 
-        // FUNÇÃO DE EXPORTAÇÃO RIGOROSAMENTE CORRIGIDA CONFORME A SUA REGRA
         function exportToExcelXLSX() {
             if (!window.scannedItemsList || window.scannedItemsList.length === 0) {
                 alert("Nenhum item bipado para exportação.");
@@ -1112,12 +1111,10 @@
                 let finalStatus = item.statusOriginal;
                 let acaoExportacao = item.isTratativa ? 'ÁREA DE TRATATIVA' : 'PROSSEGUIR';
 
-                // Aplica a nova regra no relatório para dados antigos salvos no Firebase
                 if (item.origin === 'Base 1' && item.destinationHub) {
                     const dhLower = item.destinationHub.toLowerCase();
                     const allowed = ["uberaba", "monte carmelo", "catalão", "catalao"];
                     
-                    // Se NÃO for uma das cidades permitidas e houver destino preenchido: vira OUTRO HUB
                     if (!allowed.some(city => dhLower.includes(city)) && item.destinationHub.trim().length > 0) {
                         finalStatus = "OUTRO HUB";
                         acaoExportacao = "ÁREA DE TRATATIVA";

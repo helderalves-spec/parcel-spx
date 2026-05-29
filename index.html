@@ -159,6 +159,7 @@
         .chart-text {
             position: absolute;
             text-align: center;
+            width: 100%;
         }
 
         .chart-percentage {
@@ -170,8 +171,8 @@
         .chart-label {
             font-size: 11px;
             color: #718096;
+            margin: 2px auto 0 auto;
             max-width: 110px;
-            margin-top: 2px;
             line-height: 1.2;
         }
 
@@ -779,6 +780,18 @@
                             <td style="color: #cbd5e0;">-</td>
                             <td style="font-weight: bold; color: #e53e3e;">NÃO</td>
                         `;
+                    } else if (item.isOutroHub) {
+                        row.style.backgroundColor = '#fffaf0'; // Laranja claro para Outro Hub mascarado
+                        let originBadge = `<span class="badge badge-file-origin origin-base1">Base 1 (Forward)</span>`;
+                        row.innerHTML = `
+                            <td style="font-weight: 600; color: #c05621;">${item.trackingNumber}</td>
+                            <td>${originBadge}</td>
+                            <td style="font-weight: bold; color: #c05621;">OUTRO HUB</td>
+                            <td><span class="badge-danger-action" style="background-color: #feebc8; color: #c05621; border-color: #fbd38d;">ÁREA DE TRATATIVA</span></td>
+                            <td style="font-weight: 500; color: #c05621;">${item.destinationHub}</td>
+                            <td style="color: #c05621;">${item.onhold}</td>
+                            <td style="font-weight: bold; color: #c05621;">SIM</td>
+                        `;
                     } else if (statusText.toLowerCase() === 'lmhub_assigning') {
                         row.style.backgroundColor = '#e3f2fd'; // Azul claro para linha
                         let originBadge = item.origin === 'Base 1' 
@@ -884,6 +897,7 @@
             if (matchedItem) {
                 const statusLower = matchedItem.statusOriginal.toLowerCase();
                 let isTratativa = false;
+                let isOutroHub = false;
                 let alertColor = 'alert-green';
                 let messageText = '';
 
@@ -895,18 +909,21 @@
                 if (foundInBase1) {
                     const destHubContent = matchedItem.destinationHub ? matchedItem.destinationHub.trim() : "";
                     const destHubLower = destHubContent.toLowerCase();
-                    let isForeignHub = false;
 
                     const allowedCities = ["uberaba", "monte carmelo", "catalão", "catalao"];
-                    if (destHubContent.length > 0) {
-                        let matchesCity = allowedCities.some(city => destHubLower.includes(city));
-                        if (!matchesCity) {
-                            isForeignHub = true;
-                        }
+                    let matchesCity = allowedCities.some(city => destHubLower.includes(city));
+
+                    // NOVA REGRA DE VALIDAÇÃO DE HUB DE DESTINO
+                    if (!matchesCity && destHubContent.length > 0) {
+                        isOutroHub = true;
+                        isTratativa = true;
                     }
 
-                    // APLICAÇÃO DOS FILTROS NOVOS E ALERTAS SUPERIORES
-                    if (statusLower === 'lmhub_assigning') {
+                    if (isOutroHub) {
+                        alertColor = 'alert-orange';
+                        messageText = `🍊 OUTRO HUB DETECTADO! BR: ${codeToFind} | DESTINO: ${destHubContent} -> ENVIAR PARA TRATATIVA`;
+                        emitVoiceAlert("Atenção: Área de Tratativa. Outro hub.");
+                    } else if (statusLower === 'lmhub_assigning') {
                         alertColor = 'alert-blue';
                         messageText = `🔵 STATUS: LMHub_Assigning | BR: ${codeToFind} | DESTINO PARCEL ACEITO`;
                         emitVoiceAlert("Assigning");
@@ -915,15 +932,10 @@
                         alertColor = 'alert-orange';
                         messageText = `🍊 DEVOLUÇÃO DETECTADA (Return_LMHub_Received)! BR: ${codeToFind} -> ENVIAR PARA TRATATIVA`;
                         emitVoiceAlert("Atenção: Área de Tratativa");
-                    } else if (isForeignHub || isTratativa) {
-                        isTratativa = true;
+                    } else if (isTratativa) {
                         alertColor = 'alert-orange';
+                        messageText = `🍊 STATUS RETIDO / ADVERTÊNCIA (${matchedItem.statusOriginal})! BR: ${codeToFind} -> ENVIAR PARA TRATATIVA`;
                         emitVoiceAlert("Atenção: Área de Tratativa");
-                        if (isForeignHub) {
-                            messageText = `🍊 OUTRO HUB DETECTADO! BR: ${codeToFind} | DESTINO: ${destHubContent} -> ENVIAR PARA TRATATIVA`;
-                        } else {
-                            messageText = `🍊 STATUS RETIDO / ADVERTÊNCIA (${matchedItem.statusOriginal})! BR: ${codeToFind} -> ENVIAR PARA TRATATIVA`;
-                        }
                     } else {
                         messageText = `✅ BIPAGEM OK (Base 1)! BR: ${codeToFind} | DESTINO PARCEL ACEITO`;
                     }
@@ -958,6 +970,7 @@
                     onhold: matchedItem.onhold,
                     origin: matchedItem.origin,
                     isTratativa: isTratativa,
+                    isOutroHub: isOutroHub,
                     notFound: false,
                     timestampBip: new Date().toISOString()
                 };
@@ -975,6 +988,7 @@
                     onhold: '-',
                     origin: 'NENHUMA',
                     isTratativa: true,
+                    isOutroHub: false,
                     notFound: true,
                     timestampBip: new Date().toISOString()
                 };
@@ -1026,10 +1040,11 @@
             csvContent += "SPX Tracking Number,Origem da Base,Status Original,Filtro Próxima Ação,Destino Detectado,Detalhes / Seller,Encontrado em Base\n";
 
             window.scannedItemsList.forEach(item => {
+                let statusExibido = item.isOutroHub ? "OUTRO HUB" : item.statusOriginal;
                 let row = [
                     `"${item.trackingNumber}"`,
                     `"${item.origin}"`,
-                    `"${item.statusOriginal}"`,
+                    `"${statusExibido}"`,
                     `"${item.isTratativa ? 'ÁREA DE TRATATIVA' : 'PROSSEGUIR'}"`,
                     `"${item.destinationHub !== 'N/A' && item.destinationHub !== '-' ? item.destinationHub : (item.station || '-')}"`,
                     `"${item.onhold}"`,

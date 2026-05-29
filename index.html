@@ -805,7 +805,6 @@
             reader.readAsText(file, 'UTF-8');
         }
 
-        // CORREÇÃO CRUCIAL AQUI: Força a tabela a re-filtrar e esconder o lmhub_received das outras cidades
         window.refreshDashboardUI = function() {
             const tbody = document.getElementById('live-table-body');
             
@@ -818,7 +817,6 @@
                 itemsToRender.forEach(item => {
                     const row = document.createElement('tr');
                     
-                    // RE-CHECA EM TEMPO REAL NA TABELA PARA CORRIGIR DADOS HISTÓRICOS DA NUVEM
                     let statusExibido = item.statusOriginal;
                     let isOutroHubReal = item.isOutroHub;
                     let isTratativaReal = item.isTratativa;
@@ -1100,6 +1098,7 @@
             }
         });
 
+        // FUNÇÃO DE EXPORTAÇÃO RIGOROSAMENTE CORRIGIDA CONFORME A SUA REGRA
         function exportToExcelXLSX() {
             if (!window.scannedItemsList || window.scannedItemsList.length === 0) {
                 alert("Nenhum item bipado para exportação.");
@@ -1111,19 +1110,30 @@
 
             window.scannedItemsList.forEach(item => {
                 let finalStatus = item.statusOriginal;
+                let acaoExportacao = item.isTratativa ? 'ÁREA DE TRATATIVA' : 'PROSSEGUIR';
+
+                // Aplica a nova regra no relatório para dados antigos salvos no Firebase
                 if (item.origin === 'Base 1' && item.destinationHub) {
                     const dhLower = item.destinationHub.toLowerCase();
                     const allowed = ["uberaba", "monte carmelo", "catalão", "catalao"];
+                    
+                    // Se NÃO for uma das cidades permitidas e houver destino preenchido: vira OUTRO HUB
                     if (!allowed.some(city => dhLower.includes(city)) && item.destinationHub.trim().length > 0) {
                         finalStatus = "OUTRO HUB";
+                        acaoExportacao = "ÁREA DE TRATATIVA";
                     }
+                }
+
+                if (item.notFound) {
+                    finalStatus = "NÃO ENCONTRADO";
+                    acaoExportacao = "ÁREA DE TRATATIVA";
                 }
 
                 let row = [
                     `"${item.trackingNumber}"`,
                     `"${item.origin}"`,
                     `"${finalStatus}"`,
-                    `"${(item.isTratativa || finalStatus === 'OUTRO HUB') ? 'ÁREA DE TRATATIVA' : 'PROSSEGUIR'}"`,
+                    `"${acaoExportacao}"`,
                     `"${item.destinationHub !== 'N/A' && item.destinationHub !== '-' ? item.destinationHub : (item.station || '-')}"`,
                     `"${item.onhold}"`,
                     `"${item.notFound ? 'NÃO' : 'SIM'}"`

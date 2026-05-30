@@ -513,7 +513,7 @@
 
     <div id="tab-import" class="tab-content active">
         <div style="max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
-            <h2 style="font-size: 18px;">Carregamento das Bases (Suporta múltiplos arquivos .csv ou pastas compactadas em .zip)</h2>
+            <h2 style="font-size: 18px;">Carregamento das Bases (Suporta múltiplos arquivos .csv ou pastas compactadas in .zip)</h2>
             
             <div class="import-grid">
                 <div>
@@ -602,7 +602,7 @@
                                     <th>Status Localizado</th>
                                     <th>Próxima Ação</th>
                                     <th>Sort Code / Destination Hub</th>
-                                    <th>Onhold / Detalhes</th>
+                                    <th>Coluna K (Base 1)</th>
                                     <th>Esperado</th>
                                 </tr>
                             </thead>
@@ -690,7 +690,9 @@
             const statusIdx = headers.indexOf('status');
             const stationIdx = headers.indexOf('current station');
             const destinationHubIdx = headers.indexOf('destination hub');
-            const onholdTimesIdx = headers.indexOf('total of on hold times');
+            
+            // Índice 10 representa de forma absoluta a coluna 11 (Coluna K)
+            const colunaKIdx = 10; 
 
             let results = {};
             for (let i = 1; i < lines.length; i++) {
@@ -701,7 +703,9 @@
                 let baseStatus = columns[statusIdx >= 0 ? statusIdx : 22] || 'N/A';
                 let station = columns[stationIdx >= 0 ? stationIdx : 36] || 'N/A';
                 let destHub = columns[destinationHubIdx >= 0 ? destinationHubIdx : 44] || '';
-                let onholdQty = columns[onholdTimesIdx >= 0 ? onholdTimesIdx : 29] || '0';
+                
+                // Puxa o dado exato da Coluna K (Índice 10)
+                let dadoColunaK = columns[colunaKIdx] || '';
 
                 if(trackingCode) {
                     let cleanKey = trackingCode.replace(/[.#$\[\]]/g, "_");
@@ -710,7 +714,7 @@
                         statusOriginal: baseStatus,
                         station: station,
                         destinationHub: destHub,
-                        onhold: onholdQty,
+                        colunaK: dadoColunaK,
                         origin: 'Base 1'
                     };
                 }
@@ -731,7 +735,6 @@
 
             const trackingIdx = headers.indexOf('spx tracking number');
             const orderStatusIdx = headers.indexOf('order status');
-            const sellerNameIdx = headers.indexOf('seller name');
 
             let results = {};
             for (let i = 1; i < lines.length; i++) {
@@ -740,7 +743,6 @@
                 let columns = splitCSVLine(currentLine, sep);
                 let trackingCode = columns[trackingIdx >= 0 ? trackingIdx : 0] || '';
                 let orderStatus = columns[orderStatusIdx >= 0 ? orderStatusIdx : 1] || 'N/A';
-                let sellerName = columns[sellerNameIdx >= 0 ? sellerNameIdx : 9] || '-';
 
                 if(trackingCode && trackingCode.toLowerCase() !== 'spx tracking number') {
                     let cleanKey = trackingCode.replace(/[.#$\[\]]/g, "_");
@@ -749,7 +751,7 @@
                         statusOriginal: orderStatus,
                         station: 'N/A',
                         destinationHub: 'N/A',
-                        onhold: 'Vendedor: ' + sellerName,
+                        colunaK: '-', // Não existe Coluna K nativa na Base 2
                         origin: 'Base 2'
                     };
                 }
@@ -770,7 +772,6 @@
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 
-                // Se for arquivo ZIP
                 if (file.name.endsWith('.zip')) {
                     try {
                         const zip = await JSZip.loadAsync(file);
@@ -788,7 +789,6 @@
                         alert("Falha ao processar arquivo ZIP válido.");
                     }
                 } 
-                // Se for arquivo CSV comum
                 else if (file.name.endsWith('.csv')) {
                     const textData = await new Promise((resolve) => {
                         const reader = new FileReader();
@@ -800,7 +800,6 @@
                 }
             }
 
-            // Envia para o Firebase usando UPDATE (Lógica Incremental: Mantém antigos e adiciona/atualiza novos)
             if (Object.keys(accumulatedData).length > 0) {
                 if (window.dbFirebase && window.refFirebase && window.updateFirebase) {
                     const targetNode = baseNum === 1 ? 'planilha_base1' : 'planilha_base2';
@@ -853,7 +852,7 @@
                             <td style="color: #e53e3e; font-weight: bold;">NÃO ENCONTRADO</td>
                             <td style="color: #e53e3e; font-weight: bold;">ÁREA DE TRATATIVA</td>
                             <td style="color: #cbd5e0;">-</td>
-                            <td style="color: #cbd5e0;">-</td>
+                            <td style="color: #cbd5e0; font-weight: bold;">-</td>
                             <td style="font-weight: bold; color: #e53e3e;">NÃO</td>
                         `;
                     } else if (isOutroHubReal || statusExibido === "OUTRO HUB") {
@@ -865,7 +864,7 @@
                             <td style="font-weight: bold; color: #c05621;">OUTRO HUB</td>
                             <td><span class="badge-danger-action" style="background-color: #feebc8; color: #c05621; border-color: #fbd38d;">ÁREA DE TRATATIVA</span></td>
                             <td style="font-weight: 500; color: #c05621;">${item.destinationHub}</td>
-                            <td style="color: #c05621;">${item.onhold}</td>
+                            <td style="color: #c05621; font-weight: 600;">${item.colunaK || '-'}</td>
                             <td style="font-weight: bold; color: #c05621;">SIM</td>
                         `;
                     } else if (statusExibido.toLowerCase() === 'lmhub_assigning') {
@@ -879,7 +878,7 @@
                             <td style="font-weight: bold; color: #0d47a1;">${statusExibido}</td>
                             <td><span class="badge-assigning-action">PROSSEGUIR (ASSIGNING)</span></td>
                             <td style="font-weight: 500; color: #0d47a1;">${item.destinationHub !== 'N/A' ? item.destinationHub : item.station}</td>
-                            <td style="color: #0d47a1;">${item.onhold}</td>
+                            <td style="color: #0d47a1; font-weight: 600;">${item.colunaK || '-'}</td>
                             <td style="font-weight: bold; color: #0d47a1;">SIM</td>
                         `;
                     } else if (statusExibido.toLowerCase() === 'return_lmhub_received' || isTratativaReal) {
@@ -893,7 +892,7 @@
                             <td style="font-weight: bold; color: #c05621;">${statusExibido}</td>
                             <td><span class="badge-danger-action" style="background-color: #feebc8; color: #c05621; border-color: #fbd38d;">ÁREA DE TRATATIVA</span></td>
                             <td style="font-weight: 500; color: #c05621;">${item.destinationHub !== 'N/A' ? item.destinationHub : item.station}</td>
-                            <td style="color: #c05621;">${item.onhold}</td>
+                            <td style="color: #c05621; font-weight: 600;">${item.colunaK || '-'}</td>
                             <td style="font-weight: bold; color: #c05621;">SIM</td>
                         `;
                     } else {
@@ -907,7 +906,7 @@
                             <td style="font-weight: 600; color: #2f855a;">${statusExibido}</td>
                             <td>-</td>
                             <td style="font-weight: 500; color: #2d3748;">${item.destinationHub !== 'N/A' ? item.destinationHub : item.station}</td>
-                            <td>${item.onhold}</td>
+                            <td style="font-weight: 600; color: #2d3748;">${item.colunaK || '-'}</td>
                             <td style="font-weight: bold; color: #2f855a;">SIM</td>
                         `;
                     }
@@ -933,7 +932,6 @@
             circle.style.strokeDashoffset = offset;
         }
 
-        // MUDANÇA PRINCIPAL: LÓGICA DE DETECÇÃO E PRIORIZAÇÃO DA BASE 1 SOBRE A BASE 2
         function executeBarcodeBeep() {
             const inputField = document.getElementById('main-barcode-scanner');
             const codeToFind = inputField.value.trim();
@@ -946,7 +944,6 @@
 
             let cleanKey = codeToFind.replace(/[.#$\[\]]/g, "_");
             
-            // Busca nas variáveis locais sincronizadas
             let matchedItem = window.base1Map[cleanKey];
             let foundInBase1 = true;
 
@@ -955,18 +952,15 @@
                 foundInBase1 = false;
             }
 
-            // Verifica se a BR já foi gravada na lista de bips feitos
             const existingScanIndex = window.scannedItemsList.findIndex(item => item.trackingNumber === codeToFind);
             const isAlreadyScanned = existingScanIndex !== -1;
 
             if (isAlreadyScanned) {
                 const existingScanObject = window.scannedItemsList[existingScanIndex];
                 
-                // CRITÉRIO DE ATUALIZAÇÃO: Se ela foi salva antes como "Base 2" ou "NENHUMA", mas AGORA está na Base 1, permite a sobrescrita!
                 if (existingScanObject.origin !== 'Base 1' && foundInBase1 && matchedItem) {
-                    console.log(`Re-processando BR ${codeToFind}: Migrando dados da Base 2/Não Encontrado para a Base 1.`);
+                    console.log(`Re-processando BR ${codeToFind}: Migrando dados para a Base 1.`);
                 } else {
-                    // Caso contrário, é um bip verdadeiramente repetido (mesma base ou duplicado sem novidades)
                     topAlertEl.classList.add('alert-orange');
                     topAlertEl.innerText = `⚠️ CÓDIGO REPETIDO! A BR ${codeToFind} JÁ FOI BIPADA ANTES.`;
                     emitVoiceAlert("Código repetido");
@@ -1049,7 +1043,7 @@
                     statusOriginal: statusOriginalReal, 
                     station: matchedItem.station,
                     destinationHub: matchedItem.destinationHub,
-                    onhold: matchedItem.onhold,
+                    colunaK: matchedItem.colunaK || '-',
                     origin: matchedItem.origin,
                     isTratativa: isTratativa,
                     isOutroHub: isOutroHub,
@@ -1067,7 +1061,7 @@
                     statusOriginal: 'NÃO ENCONTRADO',
                     station: '-',
                     destinationHub: '-',
-                    onhold: '-',
+                    colunaK: '-',
                     origin: 'NENHUMA',
                     isTratativa: true,
                     isOutroHub: false,
@@ -1130,7 +1124,7 @@
             }
 
             let csvContent = "\uFEFF"; 
-            csvContent += "SPX Tracking Number,Origem da Base,Status Original,Filtro Próxima Ação,Destino Detectado,Detalhes / Seller,Encontrado em Base\n";
+            csvContent += "SPX Tracking Number,Origem da Base,Status Original,Filtro Próxima Ação,Destino Detectado,Coluna K (Base 1),Encontrado em Base\n";
 
             window.scannedItemsList.forEach(item => {
                 let finalStatus = item.statusOriginal;
@@ -1157,7 +1151,7 @@
                     `"${finalStatus}"`,
                     `"${acaoExportacao}"`,
                     `"${item.destinationHub !== 'N/A' && item.destinationHub !== '-' ? item.destinationHub : (item.station || '-')}"`,
-                    `"${item.onhold}"`,
+                    `"${item.colunaK || '-'}"`,
                     `"${item.notFound ? 'NÃO' : 'SIM'}"`
                 ];
                 csvContent += row.join(",") + "\n";

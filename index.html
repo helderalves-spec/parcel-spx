@@ -933,6 +933,7 @@
             circle.style.strokeDashoffset = offset;
         }
 
+        // MUDANÇA PRINCIPAL: LÓGICA DE DETECÇÃO E PRIORIZAÇÃO DA BASE 1 SOBRE A BASE 2
         function executeBarcodeBeep() {
             const inputField = document.getElementById('main-barcode-scanner');
             const codeToFind = inputField.value.trim();
@@ -943,22 +944,35 @@
             topAlertEl.className = 'top-alert-bar';
             topAlertEl.style.display = 'block';
 
-            const alreadyScanned = window.scannedItemsList.some(item => item.trackingNumber === codeToFind);
-            if (alreadyScanned) {
-                topAlertEl.classList.add('alert-orange');
-                topAlertEl.innerText = `⚠️ CÓDIGO REPETIDO! A BR ${codeToFind} JÁ FOI BIPADA ANTES.`;
-                emitVoiceAlert("Código repetido");
-                inputField.value = '';
-                return;
-            }
-
             let cleanKey = codeToFind.replace(/[.#$\[\]]/g, "_");
+            
+            // Busca nas variáveis locais sincronizadas
             let matchedItem = window.base1Map[cleanKey];
             let foundInBase1 = true;
 
             if (!matchedItem) {
                 matchedItem = window.base2Map[cleanKey];
                 foundInBase1 = false;
+            }
+
+            // Verifica se a BR já foi gravada na lista de bips feitos
+            const existingScanIndex = window.scannedItemsList.findIndex(item => item.trackingNumber === codeToFind);
+            const isAlreadyScanned = existingScanIndex !== -1;
+
+            if (isAlreadyScanned) {
+                const existingScanObject = window.scannedItemsList[existingScanIndex];
+                
+                // CRITÉRIO DE ATUALIZAÇÃO: Se ela foi salva antes como "Base 2" ou "NENHUMA", mas AGORA está na Base 1, permite a sobrescrita!
+                if (existingScanObject.origin !== 'Base 1' && foundInBase1 && matchedItem) {
+                    console.log(`Re-processando BR ${codeToFind}: Migrando dados da Base 2/Não Encontrado para a Base 1.`);
+                } else {
+                    // Caso contrário, é um bip verdadeiramente repetido (mesma base ou duplicado sem novidades)
+                    topAlertEl.classList.add('alert-orange');
+                    topAlertEl.innerText = `⚠️ CÓDIGO REPETIDO! A BR ${codeToFind} JÁ FOI BIPADA ANTES.`;
+                    emitVoiceAlert("Código repetido");
+                    inputField.value = '';
+                    return;
+                }
             }
 
             let finalScannedObject = null;
@@ -1064,7 +1078,6 @@
 
             try {
                 if (window.dbFirebase && window.refFirebase && window.updateFirebase) {
-                    // Salva de forma incremental também os bips
                     let bipsUpdate = {};
                     bipsUpdate[cleanKey] = finalScannedObject;
                     window.updateFirebase(window.refFirebase(window.dbFirebase, 'bips_triagem'), bipsUpdate);

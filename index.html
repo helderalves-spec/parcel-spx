@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Parcel Sweeper Hub - Sistema Avançado de Triagem Dupla Base com Voz</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
     <style>
         * {
             box-sizing: border-box;
@@ -391,7 +394,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
-        import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, update, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC-98bTSJZekzIcbpWqvVPKzhsLPRSZbIA",
@@ -409,7 +412,7 @@
 
         window.dbFirebase = database;
         window.refFirebase = ref;
-        window.setFirebase = set;
+        window.updateFirebase = update;
         window.removeFirebase = remove;
 
         window.base1Map = {};
@@ -459,11 +462,11 @@
             if (count > 0) {
                 box.classList.add('loaded');
                 icon.innerText = '✔';
-                label.innerText = `Base ${baseNum}: ${count} itens na nuvem`;
+                label.innerText = `Base ${baseNum}: ${count} itens ativos na nuvem`;
             } else {
                 box.classList.remove('loaded');
                 icon.innerText = '📥';
-                label.innerText = baseNum === 1 ? "Selecionar Base Forward" : "Selecionar Base Receive Task";
+                label.innerText = baseNum === 1 ? "Selecionar Bases Forward (.csv ou .zip)" : "Selecionar Bases Receive Task (.csv ou .zip)";
             }
         }
 
@@ -476,9 +479,9 @@
                     scannerInput.placeholder = "Passe o leitor de código de barras...";
                     document.getElementById('import-summary-card').style.display = 'block';
                     document.getElementById('import-summary-text').innerHTML = `
-                        <strong>Base 1 (Nuvem):</strong> ${window.totalB1Count} registros ativos.<br>
-                        <strong>Base 2 (Nuvem):</strong> ${window.totalB2Count} registros ativos.<br>
-                        <strong>Total Geral em Rede:</strong> ${totalRecords} ordens sincronizadas prontas.
+                        <strong>Base 1 (Nuvem):</strong> ${window.totalB1Count} registros acumulados.<br>
+                        <strong>Base 2 (Nuvem):</strong> ${window.totalB2Count} registros acumulados.<br>
+                        <strong>Total Geral em Rede:</strong> ${totalRecords} ordens prontas para bpar.
                     `;
                 } else {
                     scannerInput.disabled = true;
@@ -496,7 +499,7 @@
 
     <div class="navbar">
         <div class="brand">
-            Parcel Sweeper Management <span>/</span> <strong>Triagem Coletiva Compartilhada em Rede Realtime</strong>
+            Parcel Sweeper Management <span>/</span> <strong>Triagem Coletiva Compartilhada Realtime (Múltiplos Arquivos & ZIP)</strong>
         </div>
         <div class="user-profile">
             <span>👤 helder.alves</span>
@@ -510,24 +513,24 @@
 
     <div id="tab-import" class="tab-content active">
         <div style="max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
-            <h2 style="font-size: 18px;">Carregamento das Bases de Triagem (Sincroniza/Atualiza Automaticamente)</h2>
+            <h2 style="font-size: 18px;">Carregamento das Bases (Suporta múltiplos arquivos .csv ou pastas compactadas em .zip)</h2>
             
             <div class="import-grid">
                 <div>
-                    <h3 style="font-size: 14px; margin-bottom: 8px; color: #4a5568;">Base 1: Arquivo Forward (Original)</h3>
+                    <h3 style="font-size: 14px; margin-bottom: 8px; color: #4a5568;">Base 1: Arquivos Forward</h3>
                     <div id="box-file-1" class="import-box" onclick="document.getElementById('csv-file-1').click()">
                         <div id="icon-file-1" style="font-size: 32px; margin-bottom: 8px;">📥</div>
-                        <span id="label-file-1" style="font-size: 13px; font-weight: 600; color: #4a5568;">Selecionar Base Forward</span>
-                        <input type="file" id="csv-file-1" accept=".csv" style="display: none;" onchange="handleFileSelect(event, 1)">
+                        <span id="label-file-1" style="font-size: 13px; font-weight: 600; color: #4a5568;">Selecionar Bases Forward (.csv ou .zip)</span>
+                        <input type="file" id="csv-file-1" accept=".csv,.zip" multiple style="display: none;" onchange="handleFileSelectUnified(event, 1)">
                     </div>
                 </div>
 
                 <div>
-                    <h3 style="font-size: 14px; margin-bottom: 8px; color: #4a5568;">Base 2: Arquivo Receive Task (Novo)</h3>
+                    <h3 style="font-size: 14px; margin-bottom: 8px; color: #4a5568;">Base 2: Arquivos Receive Task</h3>
                     <div id="box-file-2" class="import-box" onclick="document.getElementById('csv-file-2').click()">
                         <div id="icon-file-2" style="font-size: 32px; margin-bottom: 8px;">📥</div>
-                        <span id="label-file-2" style="font-size: 13px; font-weight: 600; color: #2b6cb0;">Selecionar Base Receive Task</span>
-                        <input type="file" id="csv-file-2" accept=".csv" style="display: none;" onchange="handleFileSelect(event, 2)">
+                        <span id="label-file-2" style="font-size: 13px; font-weight: 600; color: #2b6cb0;">Selecionar Bases Receive Task (.csv ou .zip)</span>
+                        <input type="file" id="csv-file-2" accept=".csv,.zip" multiple style="display: none;" onchange="handleFileSelectUnified(event, 2)">
                     </div>
                 </div>
             </div>
@@ -538,7 +541,7 @@
                 
                 <div style="margin-top: 15px; display: flex; gap: 12px;">
                     <button style="padding: 10px 20px; background-color: #e65100; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;" onclick="switchTab('dashboard')">Iniciar Bipagem Conjugada →</button>
-                    <button style="padding: 10px 20px; background-color: #718096; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;" onclick="clearOnlyBases()">🗑️ Limpar Apenas Planilhas/Bases</button>
+                    <button style="padding: 10px 20px; background-color: #718096; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;" onclick="clearOnlyBases()">🗑️ Resetar/Limpar Todas as Bases</button>
                 </div>
             </div>
         </div>
@@ -632,7 +635,6 @@
             }
         }
 
-        // ALTERNÂNCIA DE TELAS
         function switchTab(tabId) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -673,7 +675,17 @@
             return result;
         }
 
-        function parseBase1Async(lines, sep, headers, callback) {
+        // PROCESSAMENTO DE TEXTO - BASE 1
+        function parseBase1Text(text) {
+            const lines = text.split(/\r?\n/);
+            if (lines.length < 2) return {};
+
+            const firstLine = lines[0];
+            const countComma = (firstLine.match(/,/g) || []).length;
+            const countSemicolon = (firstLine.match(/;/g) || []).length;
+            const sep = countSemicolon > countComma ? ';' : ',';
+            const headers = splitCSVLine(firstLine, sep).map(h => h.toLowerCase().trim());
+
             const trackingIdx = headers.indexOf('sls tracking number');
             const statusIdx = headers.indexOf('status');
             const stationIdx = headers.indexOf('current station');
@@ -681,129 +693,128 @@
             const onholdTimesIdx = headers.indexOf('total of on hold times');
 
             let results = {};
-            let index = 1;
-            const chunkSize = 2500; 
+            for (let i = 1; i < lines.length; i++) {
+                let currentLine = lines[i].trim();
+                if (!currentLine) continue;
+                let columns = splitCSVLine(currentLine, sep);
+                let trackingCode = columns[trackingIdx >= 0 ? trackingIdx : 1] || '';
+                let baseStatus = columns[statusIdx >= 0 ? statusIdx : 22] || 'N/A';
+                let station = columns[stationIdx >= 0 ? stationIdx : 36] || 'N/A';
+                let destHub = columns[destinationHubIdx >= 0 ? destinationHubIdx : 44] || '';
+                let onholdQty = columns[onholdTimesIdx >= 0 ? onholdTimesIdx : 29] || '0';
 
-            function doChunk() {
-                const end = Math.min(index + chunkSize, lines.length);
-                for (let i = index; i < end; i++) {
-                    let currentLine = lines[i].trim();
-                    if (!currentLine) continue;
-                    let columns = splitCSVLine(currentLine, sep);
-                    let trackingCode = columns[trackingIdx >= 0 ? trackingIdx : 1] || '';
-                    let baseStatus = columns[statusIdx >= 0 ? statusIdx : 22] || 'N/A';
-                    let station = columns[stationIdx >= 0 ? stationIdx : 36] || 'N/A';
-                    let destHub = columns[destinationHubIdx >= 0 ? destinationHubIdx : 44] || '';
-                    let onholdQty = columns[onholdTimesIdx >= 0 ? onholdTimesIdx : 29] || '0';
-
-                    if(trackingCode) {
-                        let cleanKey = trackingCode.replace(/[.#$\[\]]/g, "_");
-                        results[cleanKey] = {
-                            trackingNumber: trackingCode,
-                            statusOriginal: baseStatus,
-                            station: station,
-                            destinationHub: destHub,
-                            onhold: onholdQty,
-                            origin: 'Base 1'
-                        };
-                    }
-                }
-
-                if (end < lines.length) {
-                    index = end;
-                    setTimeout(doChunk, 1); 
-                } else {
-                    callback(results);
+                if(trackingCode) {
+                    let cleanKey = trackingCode.replace(/[.#$\[\]]/g, "_");
+                    results[cleanKey] = {
+                        trackingNumber: trackingCode,
+                        statusOriginal: baseStatus,
+                        station: station,
+                        destinationHub: destHub,
+                        onhold: onholdQty,
+                        origin: 'Base 1'
+                    };
                 }
             }
-            doChunk();
+            return results;
         }
 
-        function parseBase2Async(lines, sep, headers, callback) {
+        // PROCESSAMENTO DE TEXTO - BASE 2
+        function parseBase2Text(text) {
+            const lines = text.split(/\r?\n/);
+            if (lines.length < 2) return {};
+
+            const firstLine = lines[0];
+            const countComma = (firstLine.match(/,/g) || []).length;
+            const countSemicolon = (firstLine.match(/;/g) || []).length;
+            const sep = countSemicolon > countComma ? ';' : ',';
+            const headers = splitCSVLine(firstLine, sep).map(h => h.toLowerCase().trim());
+
             const trackingIdx = headers.indexOf('spx tracking number');
             const orderStatusIdx = headers.indexOf('order status');
             const sellerNameIdx = headers.indexOf('seller name');
 
             let results = {};
-            let index = 1;
-            const chunkSize = 2500;
+            for (let i = 1; i < lines.length; i++) {
+                let currentLine = lines[i].trim();
+                if (!currentLine) continue;
+                let columns = splitCSVLine(currentLine, sep);
+                let trackingCode = columns[trackingIdx >= 0 ? trackingIdx : 0] || '';
+                let orderStatus = columns[orderStatusIdx >= 0 ? orderStatusIdx : 1] || 'N/A';
+                let sellerName = columns[sellerNameIdx >= 0 ? sellerNameIdx : 9] || '-';
 
-            function doChunk() {
-                const end = Math.min(index + chunkSize, lines.length);
-                for (let i = index; i < end; i++) {
-                    let currentLine = lines[i].trim();
-                    if (!currentLine) continue;
-                    let columns = splitCSVLine(currentLine, sep);
-                    let trackingCode = columns[trackingIdx >= 0 ? trackingIdx : 0] || '';
-                    let orderStatus = columns[orderStatusIdx >= 0 ? orderStatusIdx : 1] || 'N/A';
-                    let sellerName = columns[sellerNameIdx >= 0 ? sellerNameIdx : 9] || '-';
-
-                    if(trackingCode && trackingCode.toLowerCase() !== 'spx tracking number') {
-                        let cleanKey = trackingCode.replace(/[.#$\[\]]/g, "_");
-                        results[cleanKey] = {
-                            trackingNumber: trackingCode,
-                            statusOriginal: orderStatus,
-                            station: 'N/A',
-                            destinationHub: 'N/A',
-                            onhold: 'Vendedor: ' + sellerName,
-                            origin: 'Base 2'
-                        };
-                    }
-                }
-
-                if (end < lines.length) {
-                    index = end;
-                    setTimeout(doChunk, 1);
-                } else {
-                    callback(results);
+                if(trackingCode && trackingCode.toLowerCase() !== 'spx tracking number') {
+                    let cleanKey = trackingCode.replace(/[.#$\[\]]/g, "_");
+                    results[cleanKey] = {
+                        trackingNumber: trackingCode,
+                        statusOriginal: orderStatus,
+                        station: 'N/A',
+                        destinationHub: 'N/A',
+                        onhold: 'Vendedor: ' + sellerName,
+                        origin: 'Base 2'
+                    };
                 }
             }
-            doChunk();
+            return results;
         }
 
-        function handleFileSelect(event, baseNum) {
-            const file = event.target.files[0];
-            if (!file) return;
+        // GERENCIADOR UNIFICADO DE IMPORTAÇÃO (MÚLTIPLOS CSVs OU ZIP)
+        async function handleFileSelectUnified(event, baseNum) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
 
             const label = document.getElementById(`label-file-${baseNum}`);
-            label.innerText = "Processando dados pesados... Aguarde.";
+            label.innerText = "Lendo e unificando arquivos... Aguarde.";
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const text = e.target.result;
-                const lines = text.split(/\r?\n/);
-                if (lines.length === 0) {
-                    label.innerText = "Arquivo Vazio!";
-                    return;
-                }
+            let accumulatedData = {};
 
-                const firstLine = lines[0];
-                const countComma = (firstLine.match(/,/g) || []).length;
-                const countSemicolon = (firstLine.match(/;/g) || []).length;
-                const sep = countSemicolon > countComma ? ';' : ',';
-                const headers = splitCSVLine(firstLine, sep).map(h => h.toLowerCase().trim());
-
-                if (baseNum === 1) {
-                    parseBase1Async(lines, sep, headers, function(parsedData) {
-                        if (window.dbFirebase && window.refFirebase && window.setFirebase) {
-                            const nodeRef = window.refFirebase(window.dbFirebase, 'planilha_base1');
-                            window.setFirebase(nodeRef, parsedData).then(() => {
-                                event.target.value = '';
-                            });
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                
+                // Se for arquivo ZIP
+                if (file.name.endsWith('.zip')) {
+                    try {
+                        const zip = await JSZip.loadAsync(file);
+                        const fileNames = Object.keys(zip.files);
+                        
+                        for (let fileName of fileNames) {
+                            if (fileName.endsWith('.csv') && !zip.files[fileName].dir) {
+                                const textData = await zip.files[fileName].async("text");
+                                let parsed = baseNum === 1 ? parseBase1Text(textData) : parseBase2Text(textData);
+                                Object.assign(accumulatedData, parsed);
+                            }
                         }
+                    } catch (err) {
+                        console.error("Erro ao ler ZIP:", err);
+                        alert("Falha ao processar arquivo ZIP válido.");
+                    }
+                } 
+                // Se for arquivo CSV comum
+                else if (file.name.endsWith('.csv')) {
+                    const textData = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => resolve(e.target.result);
+                        reader.readAsText(file, 'UTF-8');
                     });
-                } else {
-                    parseBase2Async(lines, sep, headers, function(parsedData) {
-                        if (window.dbFirebase && window.refFirebase && window.setFirebase) {
-                            const nodeRef = window.refFirebase(window.dbFirebase, 'planilha_base2');
-                            window.setFirebase(nodeRef, parsedData).then(() => {
-                                event.target.value = '';
-                            });
-                        }
+                    let parsed = baseNum === 1 ? parseBase1Text(textData) : parseBase2Text(textData);
+                    Object.assign(accumulatedData, parsed);
+                }
+            }
+
+            // Envia para o Firebase usando UPDATE (Lógica Incremental: Mantém antigos e adiciona/atualiza novos)
+            if (Object.keys(accumulatedData).length > 0) {
+                if (window.dbFirebase && window.refFirebase && window.updateFirebase) {
+                    const targetNode = baseNum === 1 ? 'planilha_base1' : 'planilha_base2';
+                    const nodeRef = window.refFirebase(window.dbFirebase, targetNode);
+                    
+                    window.updateFirebase(nodeRef, accumulatedData).then(() => {
+                        event.target.value = '';
+                        alert(`Sucesso! Novos dados integrados e atualizados na Base ${baseNum}.`);
                     });
                 }
-            };
-            reader.readAsText(file, 'UTF-8');
+            } else {
+                alert("Nenhum dado CSV válido foi extraído dos arquivos selecionados.");
+                updateImportVisuals(baseNum, baseNum === 1 ? window.totalB1Count : window.totalB2Count);
+            }
         }
 
         window.refreshDashboardUI = function() {
@@ -1052,9 +1063,11 @@
             }
 
             try {
-                if (window.dbFirebase && window.refFirebase && window.setFirebase) {
-                    const itemRef = window.refFirebase(window.dbFirebase, 'bips_triagem/' + cleanKey);
-                    window.setFirebase(itemRef, finalScannedObject);
+                if (window.dbFirebase && window.refFirebase && window.updateFirebase) {
+                    // Salva de forma incremental também os bips
+                    let bipsUpdate = {};
+                    bipsUpdate[cleanKey] = finalScannedObject;
+                    window.updateFirebase(window.refFirebase(window.dbFirebase, 'bips_triagem'), bipsUpdate);
                 }
             } catch (e) {
                 console.log(e);
@@ -1064,12 +1077,12 @@
         }
 
         function clearOnlyBases() {
-            if (confirm("⚠️ Deseja apagar do servidor os dados das planilhas importadas para carregar novos arquivos? Os bips de conferência atuais não serão deletados.")) {
+            if (confirm("⚠️ Deseja apagar DEFINITIVAMENTE todos os dados das planilhas na nuvem para recomeçar do zero? Os bips de conferência atuais não serão deletados.")) {
                 try {
                     if (window.dbFirebase && window.refFirebase && window.removeFirebase) {
                         window.removeFirebase(window.refFirebase(window.dbFirebase, 'planilha_base1'));
                         window.removeFirebase(window.refFirebase(window.dbFirebase, 'planilha_base2'));
-                        alert("Bases de referência limpas! Você já pode selecionar os novos arquivos.");
+                        alert("Bases limpas com sucesso!");
                     }
                 } catch(e) {
                     console.log(e);
@@ -1077,7 +1090,6 @@
             }
         }
 
-        // MUDANÇA PRINCIPAL: Ação focada apenas em limpar os bips (a tela de escaneamento)
         function clearOnlyScans() {
             if (confirm("⚠️ Deseja limpar TODOS os bips efetuados nesta página? As planilhas importadas continuarão salvas no servidor.")) {
                 try {

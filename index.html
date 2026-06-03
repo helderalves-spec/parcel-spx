@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Parcel Sweeper Hub - Executive Suite</title>
     
+    <!-- Dependências Externas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <style>
@@ -23,7 +24,7 @@
             min-height: 100vh;
         }
 
-        /* BARRA DE ALERTA DINÂMICA PREMIUM */
+        /* BARRA DE ALERTA DINÂMICA PREMIUM (PERSISTENTE) */
         .top-alert-bar {
             padding: 16px 24px;
             font-size: 20px;
@@ -33,11 +34,11 @@
             display: none;
             letter-spacing: -0.3px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            transition: all 0.2s ease-in-out;
             position: sticky;
             top: 0;
             z-index: 1000;
         }
+        /* Definição de Cores da Tarja Superior */
         .alert-green { background: linear-gradient(135deg, #10b981, #059669) !important; }
         .alert-red { background: linear-gradient(135deg, #ef4444, #dc2626) !important; }
         .alert-orange { background: linear-gradient(135deg, #f59e0b, #d97706) !important; }
@@ -203,25 +204,25 @@
 
         tr:hover td { background-color: #f8fafc; }
 
-        /* BADGES OPERACIONAIS */
-        .badge { display: inline-flex; align-items: center; justify-content: center; padding: 6px 10px; border-radius: 6px; font-weight: 700; font-size: 11px; width: 100%; text-align: center; text-transform: uppercase; letter-spacing: 0.3px; }
-        
-        /* 1. DELIVERING / DELIVERED -> TARJA ROXO ESCURO */
-        .badge-roja { background-color: #581c87; color: #f3e8ff; border: 1px solid #7e22ce; }
-        
-        /* 2. OUTRO HUB / RETURN -> TARJA AMARELA */
-        .badge-amarelo { background-color: #fef08a; color: #854d0e; border: 1px solid #facc15; }
-        
-        /* 3. LMHUB_ASSIGNING / LMHUB_RECEIVED -> TARJA AZUL */
-        .badge-azul { background-color: #dbeafe; color: #1e40af; border: 1px solid #60a5fa; }
-        
-        /* 4. DIVERGENTE / NÃO ENCONTRADO -> TARJA VERMELHA */
-        .badge-vermelho { background-color: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+        /* MUDANÇA CORPORATIVA: REMOÇÃO DE CORES DA TABELA DE ACORDO COM image_d8d73b.png */
+        .badge { 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 6px 10px; 
+            border-radius: 6px; 
+            font-weight: 600; 
+            font-size: 11px; 
+            width: 100%; 
+            text-align: center; 
+            text-transform: uppercase; 
+            letter-spacing: 0.3px;
+            background-color: #f1f5f9; 
+            color: #334155; 
+            border: 1px solid #cbd5e1;
+        }
 
-        .badge-file-origin { padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 11px; display: inline-block; width: 80px; text-align: center; }
-        .origin-base1 { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
-        .origin-base2 { background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
-        .origin-ambas { background-color: #fae8ff; color: #86198f; border: 1px solid #e879f9; }
+        .badge-file-origin { padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 11px; display: inline-block; width: 80px; text-align: center; background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
 
         .voice-banner { background-color: #e0f2fe; border: 1px solid #bae6fd; padding: 12px 18px; border-radius: 8px; font-size: 13px; color: #0369a1; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
 
@@ -239,6 +240,7 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 
+    <!-- Script Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
@@ -357,7 +359,7 @@
             }
         });
 
-        // CORREÇÃO EXCLUSIVA: MAPEAMENTO DINÂMICO DE CORES E PRESERVAÇÃO DO TEXTO DO STATUS ORIGINAL DA COLUNA B
+        // REGRAS ATUALIZADAS DE COR DA TARJA E MAPEAMENTO DA REGIAO BR
         function processBarcodeBip(barcode) {
             let b1Data = window.base1Map ? window.base1Map[barcode] : null;
             let b2Data = window.base2Map ? window.base2Map[barcode] : null;
@@ -371,7 +373,6 @@
             let alertColor = 'alert-red';
             let voiceMessage = 'Não encontrado, ir para área de tratativa';
 
-            // PRIORIDADE 1: Busca e validação na Base 1
             if (b1Data) {
                 isFound = 'SIM';
                 originLabel = b2Data ? 'Ambas' : 'Base 1';
@@ -379,7 +380,6 @@
                 destHub = b1Data.destinationHub || b1Data.destination_hub || b1Data.destinationHubName || 'N/A';
                 locType = b1Data.locationType || b1Data.location_type || (b2Data ? b2Data.locationType : '-');
             } 
-            // PRIORIDADE 2: Contingência na Base 2
             else if (b2Data) {
                 isFound = 'SIM';
                 originLabel = 'Base 2';
@@ -391,28 +391,36 @@
             if (isFound === 'SIM') {
                 const hubLower = destHub.toLowerCase();
                 const statusLower = statusText.toLowerCase();
-                const belongsToRegion = hubLower.includes('uberaba') || hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
+                
+                // Validação exata da Região Solicitada
+                const isOurRegion = hubLower.includes('uberaba') || hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
+                const isLMHubReceived = (statusText === 'LMHub_Received' || statusLower === 'lmhub_received');
 
-                // 1. REGRA: DELIVERING OU DELIVERED -> TARJA ROXA
-                if (statusLower.includes('delivering') || statusLower.includes('delivered')) {
-                    actionText = 'IR PARA ÁREA DE TRATATIVA';
-                    alertColor = 'alert-purple';
-                    voiceMessage = 'Pacote em rota ou entregue, ir para área de tratativa';
+                // 1. REGRA PRINCIPAL: SE FOR LMHub_Received E DA REGIAO (UBERABA, MONTE CARMELO, CATALÃO) -> TARJA VERDE DA BR
+                if (isLMHubReceived && isOurRegion) {
+                    actionText = 'MANTER FLUXO';
+                    alertColor = 'alert-green';
+                    voiceMessage = 'Manter fluxo';
                 }
-                // 2. REGRA: PERTENCE A OUTRO HUB OU CONTÉM RETURN -> TARJA AMARELA
-                else if (!belongsToRegion || statusLower.includes('return')) {
-                    actionText = 'IR PARA ÁREA DE TRATATIVA';
-                    alertColor = 'alert-orange';
-                    voiceMessage = !belongsToRegion ? 'Outro hub, ir para área de tratativa' : 'Retorno, ir para área de tratativa';
-                    // Nota: O statusText preserva o nome real do arquivo (ex: LMHub_LHTransported) ao invés de ser alterado para "OUTRO HUB"
-                }
-                // 3. REGRA: LMHUB_ASSIGNING OU LMHUB_RECEIVED -> TARJA AZUL (FLUXO NORMAL)
-                else if (statusText === 'LMHub_Assigning' || statusText === 'LMHub_Received' || statusLower.includes('assigning') || statusLower.includes('received')) {
+                // 2. REGRA OUTROS STATUS DA REGIAO (Ex: LMHub_Assigning normal) -> TARJA AZUL
+                else if (isOurRegion && (statusText === 'LMHub_Assigning' || statusLower.includes('assigning') || statusLower.includes('received'))) {
                     actionText = 'MANTER FLUXO';
                     alertColor = 'alert-blue';
                     voiceMessage = 'Manter fluxo';
                 }
-                // 4. REGRA: Qualquer outro status do arquivo (Transições/Divergentes) -> Segue para Tratativa
+                // 3. REGRA DELIVERING OU DELIVERED -> TARJA ROXA
+                else if (statusLower.includes('delivering') || statusLower.includes('delivered')) {
+                    actionText = 'IR PARA ÁREA DE TRATATIVA';
+                    alertColor = 'alert-purple';
+                    voiceMessage = 'Pacote em rota ou entregue, ir para área de tratativa';
+                }
+                // 4. REGRA OUTRO HUB OU CONTÉM RETURN -> TARJA AMARELA
+                else if (!isOurRegion || statusLower.includes('return')) {
+                    actionText = 'IR PARA ÁREA DE TRATATIVA';
+                    alertColor = 'alert-orange';
+                    voiceMessage = !isOurRegion ? 'Outro hub, ir para área de tratativa' : 'Retorno, ir para área de tratativa';
+                }
+                // 5. REGRA CONTINGÊNCIA GERAL -> TARJA ALARANJADA
                 else {
                     actionText = 'IR PARA ÁREA DE TRATATIVA';
                     alertColor = 'alert-orange';
@@ -441,13 +449,13 @@
             window.firebaseActions.updateData('bips_triagem/' + barcode, newBip);
         }
 
+        // MUDANÇA OPERACIONAL: A TARJA AGORA É FIXA E PERSISTENTE (NÃO POSSUI TIMEOUT PARA SUMIR)
         window.showAlertTop = function(msg, cssClass) {
             const bar = document.getElementById('master-top-alert');
             if (bar) {
                 bar.className = `top-alert-bar ${cssClass}`;
                 bar.innerText = msg;
                 bar.style.display = 'block';
-                setTimeout(() => { bar.style.display = 'none'; }, 4000);
             }
         };
     </script>
@@ -476,6 +484,7 @@
         <button class="tab-btn" onclick="switchTab('report')">3. Relatório Executivo Diário</button>
     </div>
 
+    <!-- ABA 1: IMPORTAÇÃO -->
     <div id="tab-import" class="tab-content">
         <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px;">
             <div>
@@ -517,6 +526,7 @@
         </div>
     </div>
 
+    <!-- ABA 2: MONITOR REALTIME -->
     <div id="tab-dashboard" class="tab-content active">
         <div class="dashboard-layout">
             
@@ -541,7 +551,7 @@
 
             <div class="work-area" style="flex: 1; min-width: 0;">
                 <div class="voice-banner">
-                    <span>⚡</span> <span><strong>Controle de Status Ativo:</strong> Mapeamento dinâmico e direto da Coluna B para preservação total das nomenclaturas originais das tabelas.</span>
+                    <span>⚡</span> <span><strong>Controle de Status Ativo:</strong> Layout limpo sem cores nas linhas de acordo com o padrão corporativo. Foco visual total no Alerta Superior.</span>
                 </div>
 
                 <div class="card" style="padding: 20px;">
@@ -605,6 +615,7 @@
         </div>
     </div>
 
+    <!-- ABA 3: RELATÓRIOS -->
     <div id="tab-report" class="tab-content">
         <div style="max-width: 1100px; margin: 0 auto;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px;">
@@ -654,6 +665,7 @@
         </div>
     </div>
 
+    <!-- Regras Logísticas e Controle Operacional da UI -->
     <script>
         window.scannedItemsList = []; 
         window.filteredItemsList = [];
@@ -869,7 +881,7 @@
             renderTableData();
         };
 
-        // CORREÇÃO EXCLUSIVA DE RENDERIZAÇÃO: Mantém o nome exato do status do arquivo e altera as cores de acordo com as regras operacionais
+        // RENDERIZAÇÃO DA TABELA 100% NEUTRA (SEM CORES DISCREPANTES CONFORME SOLICITADO)
         function renderTableData() {
             let query = window.currentSearchQuery ? window.currentSearchQuery.toLowerCase() : "";
             if(window.scannedItemsList) {
@@ -910,55 +922,21 @@
             sliceItems.forEach(item => {
                 let row = document.createElement('tr');
                 let st = item.statusOriginal || 'N/A';
-                let stLower = st.toLowerCase();
                 let hub = item.destinationHub || 'N/A';
-                let hubLower = hub.toLowerCase();
                 
-                // Validação de região
-                const belongsToRegion = hubLower.includes('uberaba') || hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
-
-                let badgeClass = "badge-vermelho"; 
-                let badgeAction = "TRATATIVA";
-
-                // REGRA 1: Rota/Entregue -> Tarja Roxa
-                if (stLower.includes('delivering') || stLower.includes('delivered')) {
-                    badgeClass = "badge-roja";
-                    badgeAction = "TRATATIVA";
-                } 
-                // REGRA 2: Fora da região ou retorno -> Tarja Amarela (Mantendo o texto real do status!)
-                else if (!belongsToRegion || stLower.includes('return')) {
-                    badgeClass = "badge-amarelo";
-                    badgeAction = "TRATATIVA";
-                } 
-                // REGRA 3: Triagem Interna Correta -> Tarja Azul
-                else if (st === 'LMHub_Assigning' || st === 'LMHub_Received' || stLower.includes('assigning') || stLower.includes('received')) {
-                    badgeClass = "badge-azul";
-                    badgeAction = "FLUXO OK";
-                }
-                // REGRA 4: Status desconhecido/divergente -> Tarja Alaranjada/Vermelha
-                else {
-                    badgeClass = "badge-vermelho";
-                    badgeAction = "TRATATIVA";
-                }
-
-                // Se não foi encontrado em nenhuma base
-                if(item.encontrado !== 'SIM') {
-                    badgeClass = "badge-vermelho";
-                    badgeAction = "TRATATIVA";
-                }
-
-                let bScanned = item.encontrado === 'SIM' ? `<span class="badge badge-azul">Sincronizado</span>` : `<span class="badge badge-vermelho">Divergente</span>`;
-                
-                let bOrigin = `<span class="badge badge-file-origin origin-base1">Base 1</span>`;
-                if(item.origin === 'Base 2') bOrigin = `<span class="badge badge-file-origin origin-base2">Base 2</span>`;
-                if(item.origin === 'Ambas') bOrigin = `<span class="badge badge-file-origin origin-ambas">Ambas</span>`;
+                // Mapeamento textual da ação correspondente
+                let badgeAction = item.action || "TRATATIVA";
+                let bScanned = item.encontrado === 'SIM' ? `<span class="badge">Sincronizado</span>` : `<span class="badge">Divergente</span>`;
+                let bOrigin = `<span class="badge">Base 1</span>`;
+                if(item.origin === 'Base 2') bOrigin = `<span class="badge">Base 2</span>`;
+                if(item.origin === 'Ambas') bOrigin = `<span class="badge">Ambas</span>`;
 
                 row.innerHTML = `
                     <td style="font-weight:700; color: #111827;">${item.trackingNumber}</td>
-                    <td><span class="badge ${badgeClass}">${st}</span></td>
+                    <td><span class="badge">${st}</span></td>
                     <td>${hub}</td>
                     <td style="font-weight:600; color: #475569; text-align: center;">${item.locationType || '-'}</td>
-                    <td><span class="badge ${badgeClass}">${badgeAction}</span></td>
+                    <td><span class="badge">${badgeAction}</span></td>
                     <td style="text-align: center;">${bOrigin}</td>
                     <td>${bScanned}</td>
                 `;

@@ -332,6 +332,37 @@
             background-color: #4a5568;
         }
 
+        /* Estilo para a área dos botões de Gerenciamento de Reset */
+        .management-box {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+            background: #f7fafc;
+            padding: 16px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-danger-reset {
+            padding: 10px 16px;
+            background-color: #e53e3e;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-danger-reset:hover {
+            background-color: #c53030;
+        }
+
         .table-scroll {
             overflow-x: auto;
             max-height: 550px;
@@ -391,7 +422,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
-        import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, set, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC-98bTSJZekzIcbpWqvVPKzhsLPRSZbIA",
@@ -411,24 +442,27 @@
         window.refFirebase = ref;
         window.setFirebase = set;
         window.removeFirebase = remove;
+        window.updateFirebase = update; // Adicionado para gerenciar múltiplos envios sem travamentos
 
-        // NOVO: Ouvinte em Tempo Real para persistência da Base 1 (Forward) na Nuvem
+        // Ouvinte em Tempo Real para persistência da Base 1 (Forward) na Nuvem
         const base1Ref = ref(database, 'base1_importada');
         onValue(base1Ref, (snapshot) => {
             const data = snapshot.val();
             if (data) {
-                // Firebase armazena objetos indexados por chaves; converte de volta para lista
                 window.base1Database = Object.keys(data).map(key => data[key]);
                 document.getElementById('box-file-1').classList.add('loaded');
                 document.getElementById('icon-file-1').innerText = '✔';
                 document.getElementById('label-file-1').innerText = `Base 1: ${window.base1Database.length} itens`;
             } else {
                 window.base1Database = [];
+                document.getElementById('box-file-1').classList.remove('loaded');
+                document.getElementById('icon-file-1').innerText = '📥';
+                document.getElementById('label-file-1').innerText = `Selecionar Base Forward`;
             }
             window.updateBasesSummaryUI();
         });
 
-        // NOVO: Ouvinte em Tempo Real para persistência da Base 2 (Receive Task) na Nuvem
+        // Ouvinte em Tempo Real para persistência da Base 2 (Receive Task) na Nuvem
         const base2Ref = ref(database, 'base2_importada');
         onValue(base2Ref, (snapshot) => {
             const data = snapshot.val();
@@ -439,6 +473,9 @@
                 document.getElementById('label-file-2').innerText = `Base 2: ${window.base2Database.length} itens`;
             } else {
                 window.base2Database = [];
+                document.getElementById('box-file-2').classList.remove('loaded');
+                document.getElementById('icon-file-2').innerText = '📥';
+                document.getElementById('label-file-2').innerText = `Selecionar Base Receive Task`;
             }
             window.updateBasesSummaryUI();
         });
@@ -506,6 +543,12 @@
                         <input type="file" id="csv-file-2" accept=".csv,.zip" style="display: none;" onchange="handleFileSelect(event, 2)">
                     </div>
                 </div>
+            </div>
+
+            <div class="management-box">
+                <button class="btn-danger-reset" onclick="resetBaseNuvem(1)">⚠️ Resetar Base 1</button>
+                <button class="btn-danger-reset" onclick="resetBaseNuvem(2)">⚠️ Resetar Base 2</button>
+                <button class="btn-danger-reset" style="background-color: #b7791f;" onclick="resetBaseNuvem('ambas')">🔥 Resetar Ambas as Bases</button>
             </div>
 
             <div class="card" id="import-summary-card" style="display: none;">
@@ -591,7 +634,6 @@
     </div>
 
     <script>
-        // Mapeamento global das bases para escopo de leitura
         window.base1Database = [];
         window.base2Database = [];
         window.scannedItemsList = []; 
@@ -759,61 +801,103 @@
             }
         }
 
+        // CORREÇÃO: Função modificada para dar suporte a arquivos massivos dividindo o upload em blocos (evita truncamento)
         function executeParsing(text, baseNum, displayName) {
             let parsedList = [];
+            let targetNode = (baseNum === 1) ? 'base1_importada' : 'base2_importada';
+            
             if (baseNum === 1) {
                 parsedList = parseBase1(text);
-                // NOVO: Envia o lote decodificado estruturado direto para a Nuvem Firebase
-                if (window.dbFirebase && window.refFirebase && window.setFirebase) {
-                    let uploadObj = {};
-                    parsedList.forEach(item => {
-                        const cleanKey = item.trackingNumber.replace(/[.#$\[\]]/g, "_");
-                        uploadObj[cleanKey] = item;
-                    });
-                    const targetRef = window.refFirebase(window.dbFirebase, 'base1_importada');
-                    window.setFirebase(targetRef, uploadObj);
-                } else {
-                    window.base1Database = parsedList;
-                    window.updateBasesSummaryUI();
-                }
             } else {
                 parsedList = parseBase2(text);
-                // NOVO: Envia o lote decodificado estruturado direto para a Nuvem Firebase
-                if (window.dbFirebase && window.refFirebase && window.setFirebase) {
+            }
+
+            if (window.dbFirebase && window.refFirebase && window.updateFirebase) {
+                // Notificação visual de processamento em lote grande
+                let originalLabel = document.getElementById(`label-file-${baseNum}`).innerText;
+                document.getElementById(`label-file-${baseNum}`).innerText = `Salvando ${parsedList.length} itens na nuvem...`;
+
+                let chunks = [];
+                let chunkSize = 4000; // Dividir em partes menores para suportar arquivos massivos de 10k, 20k, 50k+ com segurança
+                for (let i = 0; i < parsedList.length; i += chunkSize) {
+                    chunks.push(parsedList.slice(i, i + chunkSize));
+                }
+
+                let chunkIndex = 0;
+                function sendNextChunk() {
+                    if (chunkIndex >= chunks.length) {
+                        // Concluído com sucesso total
+                        if(baseNum === 1) { window.base1Database = parsedList; } else { window.base2Database = parsedList; }
+                        window.updateBasesSummaryUI();
+                        return;
+                    }
+
                     let uploadObj = {};
-                    parsedList.forEach(item => {
+                    chunks[chunkIndex].forEach(item => {
                         const cleanKey = item.trackingNumber.replace(/[.#$\[\]]/g, "_");
                         uploadObj[cleanKey] = item;
                     });
-                    const targetRef = window.refFirebase(window.dbFirebase, 'base2_importada');
-                    window.setFirebase(targetRef, uploadObj);
-                } else {
-                    window.base2Database = parsedList;
-                    window.updateBasesSummaryUI();
+
+                    const targetRef = window.refFirebase(window.dbFirebase, targetNode);
+                    window.updateFirebase(targetRef, uploadObj)
+                        .then(() => {
+                            chunkIndex++;
+                            sendNextChunk(); // Envia o próximo bloco
+                        })
+                        .catch(err => {
+                            alert("Erro no upload do lote Firebase: " + err.message);
+                            document.getElementById(`label-file-${baseNum}`).innerText = originalLabel;
+                        });
                 }
+                sendNextChunk();
+            } else {
+                if (baseNum === 1) { window.base1Database = parsedList; } else { window.base2Database = parsedList; }
+                window.updateBasesSummaryUI();
             }
         }
 
-        // NOVO: Atualiza o painel de resumo e habilita o scanner baseado na resposta unificada do Firebase
+        // NOVO: Função para deletar as bases remotamente no Firebase de acordo com o botão clicado
+        window.resetBaseNuvem = function(tipo) {
+            if (!window.dbFirebase || !window.removeFirebase || !window.refFirebase) {
+                alert("Erro: Firebase não inicializado corretamente.");
+                return;
+            }
+
+            let confirmacao = confirm(`Tem certeza que deseja deletar a(s) base(s) selecionada(s)? Esta ação limpará os dados de triagem esperados em todos os computadores.`);
+            if (!confirmacao) return;
+
+            if (tipo === 1 || tipo === 'ambas') {
+                const targetRef1 = window.refFirebase(window.dbFirebase, 'base1_importada');
+                window.removeFirebase(targetRef1);
+            }
+            if (tipo === 2 || tipo === 'ambas') {
+                const targetRef2 = window.refFirebase(window.dbFirebase, 'base2_importada');
+                window.removeFirebase(targetRef2);
+            }
+        }
+
         window.updateBasesSummaryUI = function() {
-            const totalRecords = window.base1Database.length + window.base2Database.length;
+            const totalRecords = (window.base1Database ? window.base1Database.length : 0) + (window.base2Database ? window.base2Database.length : 0);
+            
+            const summaryCard = document.getElementById('import-summary-card');
+            const summaryText = document.getElementById('import-summary-text');
+            const inputEl = document.getElementById('main-barcode-scanner');
+
             if (totalRecords > 0) {
-                const inputEl = document.getElementById('main-barcode-scanner');
                 if(inputEl) {
                     inputEl.disabled = false;
                     inputEl.placeholder = "Passe o leitor de código de barras...";
                 }
-                
-                const summaryCard = document.getElementById('import-summary-card');
-                const summaryText = document.getElementById('import-summary-text');
                 if(summaryCard && summaryText) {
                     summaryCard.style.display = 'block';
                     summaryText.innerHTML = `
-                        <strong>Base 1 (Forward):</strong> ${window.base1Database.length} registros mapeados na nuvem.<br>
-                        <strong>Base 2 (Receive Task):</strong> ${window.base2Database.length} registros mapeados na nuvem.<br>
+                        <strong>Base 1 (Forward):</strong> ${window.base1Database ? window.base1Database.length : 0} registros mapeados na nuvem.<br>
+                        <strong>Base 2 (Receive Task):</strong> ${window.base2Database ? window.base2Database.length : 0} registros mapeados na nuvem.<br>
                         <strong>Total Combinado Ativo:</strong> ${totalRecords} ordens prontas para busca cruzada.
                     `;
                 }
+            } else {
+                if(summaryCard) summaryCard.style.display = 'none';
             }
             refreshDashboardUI();
         }
@@ -897,8 +981,8 @@
                 });
             }
 
-            const totalB1 = window.base1Database.length;
-            const totalB2 = window.base2Database.length;
+            const totalB1 = window.base1Database ? window.base1Database.length : 0;
+            const totalB2 = window.base2Database ? window.base2Database.length : 0;
             const totalRecords = totalB1 + totalB2;
             const totalBipados = window.scannedItemsList ? window.scannedItemsList.length : 0;
             const ratioPct = totalRecords > 0 ? ((totalBipados / totalRecords) * 100) : 0;
@@ -938,12 +1022,11 @@
                 return;
             }
 
-            // AJUSTE: Mapeia a busca usando as variáveis globais sincronizadas da nuvem
-            let matchedItem = window.base1Database.find(item => item.trackingNumber === codeToFind);
+            let matchedItem = window.base1Database ? window.base1Database.find(item => item.trackingNumber === codeToFind) : null;
             let foundInBase1 = true;
 
             if (!matchedItem) {
-                matchedItem = window.base2Database.find(item => item.trackingNumber === codeToFind);
+                matchedItem = window.base2Database ? window.base2Database.find(item => item.trackingNumber === codeToFind) : null;
                 foundInBase1 = false;
             }
 

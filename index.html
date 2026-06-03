@@ -1128,7 +1128,7 @@
                                     <td>${acaoHtml}</td>
                                     <td>${originBadge}</td>
                                     <td style="font-weight: bold; color: #c05621;">SIM</td>
-                                `;
+                                reply`;
                             } else if (statusLower === 'lmhub_assigning') {
                                 row.style.backgroundColor = '#e3f2fd'; 
                                 acaoHtml = `<span class="badge-assigning-action">PROSSEGUIR (ASSIGNING)</span>`;
@@ -1192,10 +1192,26 @@
 
         function executeBarcodeBeep() {
             const inputField = document.getElementById('main-barcode-scanner');
-            const codeToFind = inputField.value.trim();
+            let rawCode = inputField.value.trim();
             const topAlertEl = document.getElementById('master-top-alert');
 
-            if (!codeToFind) return;
+            if (!rawCode) return;
+
+            // --- CORREÇÃO DO ERRO DO LEITOR ---
+            // Limpa o input imediatamente para que bips consecutivos não concatenem no buffer do HTML
+            inputField.value = '';
+
+            // Lógica inteligente de quebra: Se o código repetiu exatamente o padrão (Ex: BR...BR...), pega apenas a primeira metade
+            if (rawCode.length >= 20 && rawCode.length % 2 === 0) {
+                let halfLength = rawCode.length / 2;
+                let firstHalf = rawCode.substring(0, halfLength);
+                let secondHalf = rawCode.substring(halfLength);
+                if (firstHalf === secondHalf) {
+                    rawCode = firstHalf; // Corrige dinamicamente
+                }
+            }
+            const codeToFind = rawCode;
+            // ----------------------------------
 
             topAlertEl.className = 'top-alert-bar';
             topAlertEl.style.display = 'block';
@@ -1222,7 +1238,6 @@
                     topAlertEl.classList.add('alert-orange');
                     topAlertEl.innerText = `⚠️ CÓDIGO REPETIDO! A BR ${codeToFind} JÁ FOI BIPADA ANTES.`;
                     emitVoiceAlert("Código repetido");
-                    inputField.value = '';
                     return;
                 }
             }
@@ -1346,8 +1361,7 @@
                 console.log(e);
             }
 
-            inputField.value = '';
-            inputField.focus();
+            setTimeout(() => { inputField.focus(); }, 10);
         }
 
         // LIMPEZA INDIVIDUAL DE ACORDO COM O NODE INFORMADO

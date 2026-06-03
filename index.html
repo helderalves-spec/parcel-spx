@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Parcel Sweeper Hub - Sistema Avançado de Triagem Dupla Base com Voz</title>
     
+    <!-- Biblioteca JSZip para descompactar arquivos .zip direto no navegador -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <style>
@@ -282,33 +283,11 @@
             justify-content: space-between;
             align-items: center;
             background-color: #fafbfe;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .table-search-box {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .table-search-input {
-            padding: 6px 12px;
-            border: 1px solid #cbd5e0;
-            border-radius: 4px;
-            font-size: 13px;
-            width: 240px;
-        }
-
-        .table-search-input:focus {
-            outline: none;
-            border-color: #e65100;
         }
 
         .actions-group {
             display: flex;
             gap: 10px;
-            align-items: center;
         }
 
         .export-btn {
@@ -347,50 +326,6 @@
 
         .reset-btn:hover {
             background-color: #b71c1c;
-        }
-
-        /* Controles de Paginação */
-        .pagination-container {
-            padding: 12px 20px;
-            background: #fafbfe;
-            border-top: 1px solid #e2e8f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 13px;
-            color: #4a5568;
-        }
-
-        .pagination-buttons {
-            display: flex;
-            gap: 5px;
-            align-items: center;
-        }
-
-        .page-btn {
-            background: #ffffff;
-            border: 1px solid #cbd5e0;
-            padding: 5px 10px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: 4px;
-            color: #4a5568;
-        }
-
-        .page-btn:hover:not(:disabled) {
-            border-color: #e65100;
-            color: #e65100;
-        }
-
-        .page-btn:disabled {
-            background: #f7fafc;
-            color: #a0aec0;
-            cursor: not-allowed;
-        }
-
-        .page-info {
-            font-weight: 600;
         }
 
         .table-scroll {
@@ -450,6 +385,7 @@
 
     </style>
 
+    <!-- CARREGAMENTO DOS JAVASCRIPTS DO FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
@@ -578,11 +514,13 @@
         <button class="tab-btn" onclick="switchTab('dashboard')">2. Painel de Bipagem</button>
     </div>
 
+    <!-- TAB 1 -->
     <div id="tab-import" class="tab-content active">
         <div style="max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
             <h2 style="font-size: 18px;">Carregamento das Bases (Suporta múltiplos arquivos .csv ou pastas compactadas in .zip)</h2>
             
             <div class="import-grid">
+                <!-- BASE 1 -->
                 <div>
                     <h3 style="font-size: 14px; margin-bottom: 8px; color: #4a5568;">Base 1: Arquivos Forward</h3>
                     <div id="box-file-1" class="import-box" onclick="document.getElementById('csv-file-1').click()">
@@ -592,6 +530,7 @@
                     </div>
                 </div>
 
+                <!-- BASE 2 -->
                 <div>
                     <h3 style="font-size: 14px; margin-bottom: 8px; color: #4a5568;">Base 2: Arquivos Receive Task</h3>
                     <div id="box-file-2" class="import-box" onclick="document.getElementById('csv-file-2').click()">
@@ -606,16 +545,15 @@
                 <h4 style="color: #2e7d32;" id="summary-title">✔ Sistema Ativo e Sincronizado em Rede!</h4>
                 <div style="font-size: 13px; margin-top: 5px; line-height: 1.5;" id="import-summary-text"></div>
                 
-                <div style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 12px;">
+                <div style="margin-top: 15px; display: flex; gap: 12px;">
                     <button style="padding: 10px 20px; background-color: #e65100; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;" onclick="switchTab('dashboard')">Iniciar Bipagem Conjugada →</button>
-                    <button style="padding: 10px 14px; background-color: #4a5568; color: white; border: none; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer;" onclick="clearDatabaseNode('planilha_base1')">🗑️ Resetar Apenas Base 1</button>
-                    <button style="padding: 10px 14px; background-color: #2b6cb0; color: white; border: none; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer;" onclick="clearDatabaseNode('planilha_base2')">🗑️ Resetar Apenas Base 2</button>
-                    <button style="padding: 10px 14px; background-color: #d32f2f; color: white; border: none; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer;" onclick="clearOnlyBases()">🚨 Reset Geral de Todas as Bases</button>
+                    <button style="padding: 10px 20px; background-color: #718096; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;" onclick="clearOnlyBases()">🗑️ Resetar/Limpar Todas as Bases</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- TAB 2 -->
     <div id="tab-dashboard" class="tab-content">
         <div class="dashboard-layout">
             
@@ -638,7 +576,7 @@
                 </div>
             </div>
 
-            <div class="work-area" style="flex: 1; min-width: 0;">
+            <div class="work-area">
                 <div class="voice-banner">
                     <span>🔊</span> <strong>Sincronismo Ativo:</strong> Qualquer terminal da rede pode bipar agora. A inteligência do banco de dados está compartilhada de forma unificada.
                 </div>
@@ -650,14 +588,10 @@
                     </div>
                 </div>
 
-                <div class="table-container" style="margin-top: 20px;">
+                <div class="table-container">
                     <div class="table-header">
                         <strong style="font-size: 14px;">Controle Unificado de Triagem (Base 1 + Base 2)</strong>
-                        
                         <div class="actions-group">
-                            <div class="table-search-box">
-                                <input type="text" id="table-search" class="table-search-input" placeholder="🔎 Pesquisar BR, status ou destino..." oninput="handleSearch()">
-                            </div>
                             <button class="export-btn" onclick="exportToExcelXLSX()">
                                 <span>📊</span> Exportar Relatório (.CSV)
                             </button>
@@ -666,7 +600,6 @@
                             </button>
                         </div>
                     </div>
-                    
                     <div class="table-scroll">
                         <table id="operational-table">
                             <thead>
@@ -689,17 +622,6 @@
                             </tbody>
                         </table>
                     </div>
-
-                    <div class="pagination-container" id="pagination-bar" style="display: none;">
-                        <div id="pagination-info-text">Exibindo 0-0 de 0 registros</div>
-                        <div class="pagination-buttons">
-                            <button class="page-btn" id="btn-show-all" onclick="toggleShowAll()">👁️ Mostrar Todos</button>
-                            <button class="page-btn" id="btn-page-prev" onclick="changePage(-1)">◀ Anterior</button>
-                            <span class="page-info" id="span-page-current">Pág 1</span>
-                            <button class="page-btn" id="btn-page-next" onclick="changePage(1)">Próximo ▶</button>
-                        </div>
-                    </div>
-
                 </div>
             </div>
 
@@ -708,11 +630,6 @@
 
     <script>
         window.scannedItemsList = []; 
-        window.filteredItemsList = [];
-        window.currentPage = 1;
-        window.itemsPerPage = 50;
-        window.showAllItems = false;
-        window.currentSearchQuery = "";
 
         function emitVoiceAlert(messageText) {
             if ('speechSynthesis' in window) {
@@ -901,6 +818,7 @@
             }
         }
 
+        // REPROCESSAMENTO RETROATIVO AUTOMÁTICO EM MASSA (BASE 1 E BASE 2)
         window.reprocessScansWithNewBases = function() {
             let updatesToPush = {};
             let countMigrated = 0;
@@ -908,6 +826,7 @@
             Object.keys(window.rawScannedFirebaseObject).forEach(key => {
                 let currentScan = window.rawScannedFirebaseObject[key];
                 
+                // Prioridade 1: Encontrou na Base 1
                 if (currentScan.origin !== 'Base 1' && window.base1Map[key]) {
                     let matchedItemB1 = window.base1Map[key];
                     let statusOriginalReal = matchedItemB1.statusOriginal;
@@ -948,6 +867,7 @@
                     };
                     countMigrated++;
                 }
+                // Prioridade 2: Se não estava na Base 1, mas agora foi achado na Base 2
                 else if (currentScan.origin === 'NENHUMA' && window.base2Map[key]) {
                     let matchedItemB2 = window.base2Map[key];
                     let statusOriginalReal = matchedItemB2.statusOriginal;
@@ -982,194 +902,122 @@
             }
         };
 
-        // FUNÇÃO DE FILTRO/PESQUISA
-        window.handleSearch = function() {
-            const query = document.getElementById('table-search').value.toLowerCase().trim();
-            window.currentSearchQuery = query;
-            window.currentPage = 1; // Reseta para a primeira página ao pesquisar
-            window.refreshDashboardUI();
-        };
-
-        // CONTROLES DE PAGINAÇÃO
-        window.changePage = function(direction) {
-            window.currentPage += direction;
-            window.refreshDashboardUI();
-        };
-
-        window.toggleShowAll = function() {
-            window.showAllItems = !window.showAllItems;
-            const btn = document.getElementById('btn-show-all');
-            if(window.showAllItems) {
-                btn.innerText = "📄 Paginar (50 itens)";
-            } else {
-                btn.innerText = "👁️ Mostrar Todos";
-                window.currentPage = 1;
-            }
-            window.refreshDashboardUI();
-        };
-
         window.refreshDashboardUI = function() {
             const tbody = document.getElementById('live-table-body');
-            const paginationBar = document.getElementById('pagination-bar');
             
             if (!window.scannedItemsList || window.scannedItemsList.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #a0aec0; padding: 40px; font-style: italic;">Nenhum registro exposto. Bipe um pacote para validar.</td></tr>`;
-                paginationBar.style.display = 'none';
             } else {
-                // Aplicar Filtro de Busca se houver
-                if (window.currentSearchQuery) {
-                    window.filteredItemsList = window.scannedItemsList.filter(item => {
-                        let tracking = (item.trackingNumber || '').toLowerCase();
-                        let status = (item.statusOriginal || '').toLowerCase();
-                        let destino = (item.destinationHub || item.station || '').toLowerCase();
-                        return tracking.includes(window.currentSearchQuery) || 
-                               status.includes(window.currentSearchQuery) || 
-                               destino.includes(window.currentSearchQuery);
-                    });
-                } else {
-                    window.filteredItemsList = [...window.scannedItemsList];
-                }
+                tbody.innerHTML = '';
+                const itemsToRender = window.scannedItemsList.slice(0, 50);
 
-                const totalFiltered = window.filteredItemsList.length;
-
-                // Lógica de Paginação ou Mostrar Tudo
-                let itemsToRender = [];
-                if (window.showAllItems) {
-                    itemsToRender = window.filteredItemsList;
-                    paginationBar.style.display = 'flex';
-                    document.getElementById('btn-page-prev').disabled = true;
-                    document.getElementById('btn-page-next').disabled = true;
-                    document.getElementById('span-page-current').innerText = "Tudo";
-                    document.getElementById('pagination-info-text').innerText = `Exibindo todos os ${totalFiltered} registros encontrados`;
-                } else {
-                    paginationBar.style.display = 'flex';
-                    const totalPages = Math.ceil(totalFiltered / window.itemsPerPage) || 1;
-                    if (window.currentPage > totalPages) window.currentPage = totalPages;
-                    if (window.currentPage < 1) window.currentPage = 1;
-
-                    const startIndex = (window.currentPage - 1) * window.itemsPerPage;
-                    const endIndex = Math.min(startIndex + window.itemsPerPage, totalFiltered);
+                itemsToRender.forEach(item => {
+                    const row = document.createElement('tr');
                     
-                    itemsToRender = window.filteredItemsList.slice(startIndex, endIndex);
+                    let statusExibido = item.statusOriginal;
+                    let isOutroHubReal = item.isOutroHub;
+                    let isTratativaReal = item.isTratativa;
+                    let destinoDetectado = item.destinationHub !== 'N/A' && item.destinationHub !== '-' ? item.destinationHub : (item.station !== 'N/A' ? item.station : '-');
+                    
+                    let acaoHtml = '-';
+                    let originBadge = item.origin === 'Base 1' 
+                        ? `<span class="badge badge-file-origin origin-base1">Base 1</span>`
+                        : (item.origin === 'Base 2' ? `<span class="badge badge-file-origin origin-base2">Base 2</span>` : `<span class="badge badge-notfound">NENHUMA</span>`);
 
-                    document.getElementById('btn-page-prev').disabled = window.currentPage === 1;
-                    document.getElementById('btn-page-next').disabled = window.currentPage === totalPages;
-                    document.getElementById('span-page-current').innerText = `Pág ${window.currentPage} de ${totalPages}`;
-                    document.getElementById('pagination-info-text').innerText = `Exibindo ${totalFiltered === 0 ? 0 : startIndex + 1}-${endIndex} de ${totalFiltered} registros`;
-                }
-
-                if(itemsToRender.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #a0aec0; padding: 40px; font-style: italic;">Nenhum registro corresponde à sua pesquisa.</td></tr>`;
-                } else {
-                    tbody.innerHTML = '';
-                    itemsToRender.forEach(item => {
-                        const row = document.createElement('tr');
+                    if (item.origin === 'Base 1' && item.destinationHub) {
+                        const dhLower = item.destinationHub.toLowerCase();
+                        const allowed = ["uberaba", "monte carmelo", "catalão", "catalao"];
+                        let matchesAllowed = allowed.some(city => dhLower.includes(city));
                         
-                        let statusExibido = item.statusOriginal;
-                        let isOutroHubReal = item.isOutroHub;
-                        let isTratativaReal = item.isTratativa;
-                        let destinoDetectado = item.destinationHub !== 'N/A' && item.destinationHub !== '-' ? item.destinationHub : (item.station !== 'N/A' ? item.station : '-');
-                        
-                        let acaoHtml = '-';
-                        let originBadge = item.origin === 'Base 1' 
-                            ? `<span class="badge badge-file-origin origin-base1">Base 1</span>`
-                            : (item.origin === 'Base 2' ? `<span class="badge badge-file-origin origin-base2">Base 2</span>` : `<span class="badge badge-notfound">NENHUMA</span>`);
-
-                        if (item.origin === 'Base 1' && item.destinationHub) {
-                            const dhLower = item.destinationHub.toLowerCase();
-                            const allowed = ["uberaba", "monte carmelo", "catalão", "catalao"];
-                            let matchesAllowed = allowed.some(city => dhLower.includes(city));
-                            
-                            if (!matchesAllowed && item.destinationHub.trim().length > 0) {
-                                statusExibido = "OUTRO HUB";
-                                isOutroHubReal = true;
-                                isTratativaReal = true;
-                            }
+                        if (!matchesAllowed && item.destinationHub.trim().length > 0) {
+                            statusExibido = "OUTRO HUB";
+                            isOutroHubReal = true;
+                            isTratativaReal = true;
                         }
+                    }
 
-                        let statusLower = statusExibido.toLowerCase();
+                    let statusLower = statusExibido.toLowerCase();
 
-                        if (item.notFound) {
-                            row.style.backgroundColor = '#fff5f5';
-                            acaoHtml = `<span class="badge-danger-action">ÁREA DE TRATATIVA</span>`;
+                    if (item.notFound) {
+                        row.style.backgroundColor = '#fff5f5';
+                        acaoHtml = `<span class="badge-danger-action">ÁREA DE TRATATIVA</span>`;
+                        
+                        row.innerHTML = `
+                            <td style="font-weight: 600; color: #e53e3e;">${item.trackingNumber}</td>
+                            <td style="color: #e53e3e; font-weight: bold;">NÃO ENCONTRADO</td>
+                            <td style="color: #cbd5e0;">-</td>
+                            <td style="color: #cbd5e0; font-weight: bold;">-</td>
+                            <td>${acaoHtml}</td>
+                            <td>${originBadge}</td>
+                            <td style="font-weight: bold; color: #e53e3e;">NÃO</td>
+                        `;
+                    } else if (statusLower.includes("delivered") || statusLower.includes("delivering")) {
+                        row.style.backgroundColor = '#f3e5f5'; 
+                        acaoHtml = `<span class="badge" style="background-color: #8e44ad; color: white;">FINALIZADO / ROTA</span>`;
+                        
+                        row.innerHTML = `
+                            <td style="font-weight: 600; color: #8e44ad;">${item.trackingNumber}</td>
+                            <td style="font-weight: bold; color: #8e44ad;">${statusExibido}</td>
+                            <td style="font-weight: 500; color: #8e44ad;">${destinoDetectado}</td>
+                            <td style="color: #8e44ad; font-weight: 600;">${item.colunaK || '-'}</td>
+                            <td>${acaoHtml}</td>
+                            <td>${originBadge}</td>
+                            <td style="font-weight: bold; color: #8e44ad;">SIM</td>
+                        `;
+                    } else {
+                        if (isOutroHubReal || statusExibido === "OUTRO HUB") {
+                            row.style.backgroundColor = '#fffaf0'; 
+                            acaoHtml = `<span class="badge-danger-action" style="background-color: #feebc8; color: #c05621; border-color: #fbd38d;">ÁREA DE TRATATIVA</span>`;
                             
                             row.innerHTML = `
-                                <td style="font-weight: 600; color: #e53e3e;">${item.trackingNumber}</td>
-                                <td style="color: #e53e3e; font-weight: bold;">NÃO ENCONTRADO</td>
-                                <td style="color: #cbd5e0;">-</td>
-                                <td style="color: #cbd5e0; font-weight: bold;">-</td>
+                                <td style="font-weight: 600; color: #c05621;">${item.trackingNumber}</td>
+                                <td style="font-weight: bold; color: #c05621;">OUTRO HUB</td>
+                                <td style="font-weight: 500; color: #c05621;">${destinoDetectado}</td>
+                                <td style="color: #c05621; font-weight: 600;">${item.colunaK || '-'}</td>
                                 <td>${acaoHtml}</td>
                                 <td>${originBadge}</td>
-                                <td style="font-weight: bold; color: #e53e3e;">NÃO</td>
+                                <td style="font-weight: bold; color: #c05621;">SIM</td>
                             `;
-                        } else if (statusLower.includes("delivered") || statusLower.includes("delivering")) {
-                            row.style.backgroundColor = '#f3e5f5'; 
-                            acaoHtml = `<span class="badge" style="background-color: #8e44ad; color: white;">FINALIZADO / ROTA</span>`;
+                        } else if (statusLower === 'lmhub_assigning') {
+                            row.style.backgroundColor = '#e3f2fd'; 
+                            acaoHtml = `<span class="badge-assigning-action">PROSSEGUIR (ASSIGNING)</span>`;
                             
                             row.innerHTML = `
-                                <td style="font-weight: 600; color: #8e44ad;">${item.trackingNumber}</td>
-                                <td style="font-weight: bold; color: #8e44ad;">${statusExibido}</td>
-                                <td style="font-weight: 500; color: #8e44ad;">${destinoDetectado}</td>
-                                <td style="color: #8e44ad; font-weight: 600;">${item.colunaK || '-'}</td>
+                                <td style="font-weight: 600; color: #0d47a1;">${item.trackingNumber}</td>
+                                <td style="font-weight: bold; color: #0d47a1;">${statusExibido}</td>
+                                <td style="font-weight: 500; color: #0d47a1;">${destinoDetectado}</td>
+                                <td style="color: #0d47a1; font-weight: 600;">${item.colunaK || '-'}</td>
                                 <td>${acaoHtml}</td>
                                 <td>${originBadge}</td>
-                                <td style="font-weight: bold; color: #8e44ad;">SIM</td>
+                                <td style="font-weight: bold; color: #0d47a1;">SIM</td>
+                            `;
+                        } else if (statusLower === 'return_lmhub_received' || isTratativaReal) {
+                            row.style.backgroundColor = '#fffaf0'; 
+                            acaoHtml = `<span class="badge-danger-action" style="background-color: #feebc8; color: #c05621; border-color: #fbd38d;">ÁREA DE TRATATIVA</span>`;
+                            
+                            row.innerHTML = `
+                                <td style="font-weight: 600; color: #c05621;">${item.trackingNumber}</td>
+                                <td style="font-weight: bold; color: #c05621;">${statusExibido}</td>
+                                <td style="font-weight: 500; color: #c05621;">${destinoDetectado}</td>
+                                <td style="color: #c05621; font-weight: 600;">${item.colunaK || '-'}</td>
+                                <td>${acaoHtml}</td>
+                                <td>${originBadge}</td>
+                                <td style="font-weight: bold; color: #c05621;">SIM</td>
                             `;
                         } else {
-                            if (isOutroHubReal || statusExibido === "OUTRO HUB") {
-                                row.style.backgroundColor = '#fffaf0'; 
-                                acaoHtml = `<span class="badge-danger-action" style="background-color: #feebc8; color: #c05621; border-color: #fbd38d;">ÁREA DE TRATATIVA</span>`;
-                                
-                                row.innerHTML = `
-                                    <td style="font-weight: 600; color: #c05621;">${item.trackingNumber}</td>
-                                    <td style="font-weight: bold; color: #c05621;">OUTRO HUB</td>
-                                    <td style="font-weight: 500; color: #c05621;">${destinoDetectado}</td>
-                                    <td style="color: #c05621; font-weight: 600;">${item.colunaK || '-'}</td>
-                                    <td>${acaoHtml}</td>
-                                    <td>${originBadge}</td>
-                                    <td style="font-weight: bold; color: #c05621;">SIM</td>
-                                reply`;
-                            } else if (statusLower === 'lmhub_assigning') {
-                                row.style.backgroundColor = '#e3f2fd'; 
-                                acaoHtml = `<span class="badge-assigning-action">PROSSEGUIR (ASSIGNING)</span>`;
-                                
-                                row.innerHTML = `
-                                    <td style="font-weight: 600; color: #0d47a1;">${item.trackingNumber}</td>
-                                    <td style="font-weight: bold; color: #0d47a1;">${statusExibido}</td>
-                                    <td style="font-weight: 500; color: #0d47a1;">${destinoDetectado}</td>
-                                    <td style="color: #0d47a1; font-weight: 600;">${item.colunaK || '-'}</td>
-                                    <td>${acaoHtml}</td>
-                                    <td>${originBadge}</td>
-                                    <td style="font-weight: bold; color: #0d47a1;">SIM</td>
-                                `;
-                            } else if (statusLower === 'return_lmhub_received' || isTratativaReal) {
-                                row.style.backgroundColor = '#fffaf0'; 
-                                acaoHtml = `<span class="badge-danger-action" style="background-color: #feebc8; color: #c05621; border-color: #fbd38d;">ÁREA DE TRATATIVA</span>`;
-                                
-                                row.innerHTML = `
-                                    <td style="font-weight: 600; color: #c05621;">${item.trackingNumber}</td>
-                                    <td style="font-weight: bold; color: #c05621;">${statusExibido}</td>
-                                    <td style="font-weight: 500; color: #c05621;">${destinoDetectado}</td>
-                                    <td style="color: #c05621; font-weight: 600;">${item.colunaK || '-'}</td>
-                                    <td>${acaoHtml}</td>
-                                    <td>${originBadge}</td>
-                                    <td style="font-weight: bold; color: #c05621;">SIM</td>
-                                `;
-                            } else {
-                                row.innerHTML = `
-                                    <td style="font-weight: 600;">${item.trackingNumber}</td>
-                                    <td style="font-weight: 600; color: #2f855a;">${statusExibido}</td>
-                                    <td style="font-weight: 500; color: #2d3748;">${destinoDetectado}</td>
-                                    <td style="font-weight: 600; color: #2d3748;">${item.colunaK || '-'}</td>
-                                    <td>-</td>
-                                    <td>${originBadge}</td>
-                                    <td style="font-weight: bold; color: #2f855a;">SIM</td>
-                                `;
-                            }
+                            row.innerHTML = `
+                                <td style="font-weight: 600;">${item.trackingNumber}</td>
+                                <td style="font-weight: 600; color: #2f855a;">${statusExibido}</td>
+                                <td style="font-weight: 500; color: #2d3748;">${destinoDetectado}</td>
+                                <td style="font-weight: 600; color: #2d3748;">${item.colunaK || '-'}</td>
+                                <td>-</td>
+                                <td>${originBadge}</td>
+                                <td style="font-weight: bold; color: #2f855a;">SIM</td>
+                            `;
                         }
-                        tbody.appendChild(row);
-                    });
-                }
+                    }
+                    tbody.appendChild(row);
+                });
             }
 
             const totalRecords = window.totalB1Count + window.totalB2Count;
@@ -1350,28 +1198,13 @@
             inputField.focus();
         }
 
-        // LIMPEZA INDIVIDUAL DE ACORDO COM O NODE INFORMADO
-        window.clearDatabaseNode = function(nodeName) {
-            let labelBase = nodeName === 'planilha_base1' ? 'Base 1 (Forward)' : 'Base 2 (Receive Task)';
-            if (confirm(`⚠️ Deseja apagar DEFINITIVAMENTE todos os dados da ${labelBase} na nuvem?`)) {
-                try {
-                    if (window.dbFirebase && window.refFirebase && window.removeFirebase) {
-                        window.removeFirebase(window.refFirebase(window.dbFirebase, nodeName));
-                        alert(`${labelBase} limpa com sucesso!`);
-                    }
-                } catch(e) {
-                    console.log(e);
-                }
-            }
-        };
-
         function clearOnlyBases() {
-            if (confirm("🚨 ATENÇÃO OPERACIONAL! Deseja apagar TODAS as planilhas (Base 1 + Base 2) salvas na nuvem de uma vez só?")) {
+            if (confirm("⚠️ Deseja apagar DEFINITIVAMENTE todos os dados das planilhas na nuvem para recomeçar do zero? Os bips de conferência atuais não serão deletados.")) {
                 try {
                     if (window.dbFirebase && window.refFirebase && window.removeFirebase) {
                         window.removeFirebase(window.refFirebase(window.dbFirebase, 'planilha_base1'));
                         window.removeFirebase(window.refFirebase(window.dbFirebase, 'planilha_base2'));
-                        alert("Todas as bases foram zeradas na nuvem!");
+                        alert("Bases limpas com sucesso!");
                     }
                 } catch(e) {
                     console.log(e);

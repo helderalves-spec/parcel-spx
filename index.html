@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Parcel Sweeper Hub - Sistema Avançado de Triagem Dupla Base com Voz</title>
     
+    <!-- Biblioteca JSZip para descompactar arquivos .zip direto no navegador -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <style>
@@ -391,6 +392,7 @@
 
     </style>
 
+    <!-- CARREGAMENTO DOS JAVASCRIPTS DO FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
@@ -419,7 +421,7 @@
         window.base2Map = {};
         window.totalB1Count = 0;
         window.totalB2Count = 0;
-        window.rawScannedFirebaseObject = {}; // Guarda o estado bruto vindo da nuvem
+        window.rawScannedFirebaseObject = {}; 
 
         // 1. ESCUTANDO AS BASES IMPORTADAS GLOBALMENTE NA NUVEM
         const base1Ref = ref(database, 'planilha_base1');
@@ -430,7 +432,6 @@
             updateImportVisuals(1, window.totalB1Count);
             checkAndUnlockScanner();
             
-            // MODIFICAÇÃO CHAVE: Sempre que a Base 1 for atualizada, varre os bips antigos da Base 2 e força o upgrade!
             if (window.totalB1Count > 0 && Object.keys(window.rawScannedFirebaseObject).length > 0) {
                 window.reprocessScansWithNewBases();
             }
@@ -516,11 +517,13 @@
         <button class="tab-btn" onclick="switchTab('dashboard')">2. Painel de Bipagem</button>
     </div>
 
+    <!-- TAB 1 -->
     <div id="tab-import" class="tab-content active">
         <div style="max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
-            <h2 style="font-size: 18px;">Carregamento das Bases (Suporta múltiplos arquivos .csv ou pastas compactadas em .zip)</h2>
+            <h2 style="font-size: 18px;">Carregamento das Bases (Suporta múltiplos arquivos .csv ou pastas compactadas in .zip)</h2>
             
             <div class="import-grid">
+                <!-- BASE 1 -->
                 <div>
                     <h3 style="font-size: 14px; margin-bottom: 8px; color: #4a5568;">Base 1: Arquivos Forward</h3>
                     <div id="box-file-1" class="import-box" onclick="document.getElementById('csv-file-1').click()">
@@ -530,6 +533,7 @@
                     </div>
                 </div>
 
+                <!-- BASE 2 -->
                 <div>
                     <h3 style="font-size: 14px; margin-bottom: 8px; color: #4a5568;">Base 2: Arquivos Receive Task</h3>
                     <div id="box-file-2" class="import-box" onclick="document.getElementById('csv-file-2').click()">
@@ -552,6 +556,7 @@
         </div>
     </div>
 
+    <!-- TAB 2 -->
     <div id="tab-dashboard" class="tab-content">
         <div class="dashboard-layout">
             
@@ -602,13 +607,14 @@
                         <table id="operational-table">
                             <thead>
                                 <tr>
-                                    <th>SPX TN</th>
-                                    <th>Origem</th>
-                                    <th>Status Localizado</th>
-                                    <th>Próxima Ação</th>
-                                    <th>Sort Code / Destination Hub</th>
-                                    <th>Coluna K (Base 1)</th>
-                                    <th>Esperado</th>
+                                    <!-- ORDENAÇÃO DE COLUNAS CONFIGURADA IGUAL A SOLICITADA NA IMAGE_0399B7 -->
+                                    <th>SPX Tracking Number</th>
+                                    <th>Filtro Próxima Ação</th>
+                                    <th>Destino Detectado</th>
+                                    <th>Office / home</th>
+                                    <th>Status Original</th>
+                                    <th>Encontrado em Base</th>
+                                    <th>Origem da Base</th>
                                 </tr>
                             </thead>
                             <tbody id="live-table-body">
@@ -819,7 +825,7 @@
             }
         }
 
-        // NOVA FUNÇÃO: REPROCESSAMENTO RETROATIVO AUTOMÁTICO EM MASSA
+        // REPROCESSAMENTO RETROATIVO AUTOMÁTICO EM MASSA
         window.reprocessScansWithNewBases = function() {
             let updatesToPush = {};
             let countMigrated = 0;
@@ -827,7 +833,6 @@
             Object.keys(window.rawScannedFirebaseObject).forEach(key => {
                 let currentScan = window.rawScannedFirebaseObject[key];
                 
-                // Se o item foi salvo como Base 2 ou Não Encontrado, mas AGORA ele consta na recém-chegada Base 1
                 if (currentScan.origin !== 'Base 1' && window.base1Map[key]) {
                     let matchedItemB1 = window.base1Map[key];
                     let statusOriginalReal = matchedItemB1.statusOriginal;
@@ -852,7 +857,6 @@
                         isTratativa = true;
                     }
 
-                    // Monta o novo payload corrigido com a prioridade da Base 1
                     updatesToPush[key] = {
                         trackingNumber: currentScan.trackingNumber,
                         statusOriginal: statusOriginalReal,
@@ -863,7 +867,7 @@
                         isTratativa: isTratativa,
                         isOutroHub: isOutroHub,
                         notFound: false,
-                        timestampBip: currentScan.timestampBip // Mantém a hora original que o operador bipou
+                        timestampBip: currentScan.timestampBip 
                     };
                     countMigrated++;
                 }
@@ -890,6 +894,12 @@
                     let statusExibido = item.statusOriginal;
                     let isOutroHubReal = item.isOutroHub;
                     let isTratativaReal = item.isTratativa;
+                    let destinoDetectado = item.destinationHub !== 'N/A' && item.destinationHub !== '-' ? item.destinationHub : (item.station !== 'N/A' ? item.station : '-');
+                    
+                    let acaoHtml = '-';
+                    let originBadge = item.origin === 'Base 1' 
+                        ? `<span class="badge badge-file-origin origin-base1">Base 1 (Forward)</span>`
+                        : (item.origin === 'Base 2' ? `<span class="badge badge-file-origin origin-base2">Base 2 (Receive)</span>` : `<span class="badge badge-notfound">NENHUMA</span>`);
 
                     if (item.origin === 'Base 1' && item.destinationHub) {
                         const dhLower = item.destinationHub.toLowerCase();
@@ -903,71 +913,71 @@
                         }
                     }
 
+                    // Configura as marcações de Ação e Cores
                     if (item.notFound) {
                         row.style.backgroundColor = '#fff5f5';
+                        acaoHtml = `<span class="badge-danger-action">ÁREA DE TRATATIVA</span>`;
+                        
                         row.innerHTML = `
                             <td style="font-weight: 600; color: #e53e3e;">${item.trackingNumber}</td>
-                            <td><span class="badge badge-notfound">NENHUMA</span></td>
-                            <td style="color: #e53e3e; font-weight: bold;">NÃO ENCONTRADO</td>
-                            <td style="color: #e53e3e; font-weight: bold;">ÁREA DE TRATATIVA</td>
+                            <td>${acaoHtml}</td>
                             <td style="color: #cbd5e0;">-</td>
                             <td style="color: #cbd5e0; font-weight: bold;">-</td>
+                            <td style="color: #e53e3e; font-weight: bold;">NÃO ENCONTRADO</td>
                             <td style="font-weight: bold; color: #e53e3e;">NÃO</td>
-                        `;
-                    } else if (isOutroHubReal || statusExibido === "OUTRO HUB") {
-                        row.style.backgroundColor = '#fffaf0'; 
-                        let originBadge = `<span class="badge badge-file-origin origin-base1">Base 1 (Forward)</span>`;
-                        row.innerHTML = `
-                            <td style="font-weight: 600; color: #c05621;">${item.trackingNumber}</td>
                             <td>${originBadge}</td>
-                            <td style="font-weight: bold; color: #c05621;">OUTRO HUB</td>
-                            <td><span class="badge-danger-action" style="background-color: #feebc8; color: #c05621; border-color: #fbd38d;">ÁREA DE TRATATIVA</span></td>
-                            <td style="font-weight: 500; color: #c05621;">${item.destinationHub}</td>
-                            <td style="color: #c05621; font-weight: 600;">${item.colunaK || '-'}</td>
-                            <td style="font-weight: bold; color: #c05621;">SIM</td>
-                        `;
-                    } else if (statusExibido.toLowerCase() === 'lmhub_assigning') {
-                        row.style.backgroundColor = '#e3f2fd'; 
-                        let originBadge = item.origin === 'Base 1' 
-                            ? `<span class="badge badge-file-origin origin-base1">Base 1 (Forward)</span>`
-                            : `<span class="badge badge-file-origin origin-base2">Base 2 (Receive)</span>`;
-                        row.innerHTML = `
-                            <td style="font-weight: 600; color: #0d47a1;">${item.trackingNumber}</td>
-                            <td>${originBadge}</td>
-                            <td style="font-weight: bold; color: #0d47a1;">${statusExibido}</td>
-                            <td><span class="badge-assigning-action">PROSSEGUIR (ASSIGNING)</span></td>
-                            <td style="font-weight: 500; color: #0d47a1;">${item.destinationHub !== 'N/A' ? item.destinationHub : item.station}</td>
-                            <td style="color: #0d47a1; font-weight: 600;">${item.colunaK || '-'}</td>
-                            <td style="font-weight: bold; color: #0d47a1;">SIM</td>
-                        `;
-                    } else if (statusExibido.toLowerCase() === 'return_lmhub_received' || isTratativaReal) {
-                        row.style.backgroundColor = '#fffaf0'; 
-                        let originBadge = item.origin === 'Base 1' 
-                            ? `<span class="badge badge-file-origin origin-base1">Base 1 (Forward)</span>`
-                            : `<span class="badge badge-file-origin origin-base2">Base 2 (Receive)</span>`;
-                        row.innerHTML = `
-                            <td style="font-weight: 600; color: #c05621;">${item.trackingNumber}</td>
-                            <td>${originBadge}</td>
-                            <td style="font-weight: bold; color: #c05621;">${statusExibido}</td>
-                            <td><span class="badge-danger-action" style="background-color: #feebc8; color: #c05621; border-color: #fbd38d;">ÁREA DE TRATATIVA</span></td>
-                            <td style="font-weight: 500; color: #c05621;">${item.destinationHub !== 'N/A' ? item.destinationHub : item.station}</td>
-                            <td style="color: #c05621; font-weight: 600;">${item.colunaK || '-'}</td>
-                            <td style="font-weight: bold; color: #c05621;">SIM</td>
                         `;
                     } else {
-                        let originBadge = item.origin === 'Base 1' 
-                            ? `<span class="badge badge-file-origin origin-base1">Base 1 (Forward)</span>`
-                            : `<span class="badge badge-file-origin origin-base2">Base 2 (Receive)</span>`;
-
-                        row.innerHTML = `
-                            <td style="font-weight: 600;">${item.trackingNumber}</td>
-                            <td>${originBadge}</td>
-                            <td style="font-weight: 600; color: #2f855a;">${statusExibido}</td>
-                            <td>-</td>
-                            <td style="font-weight: 500; color: #2d3748;">${item.destinationHub !== 'N/A' ? item.destinationHub : item.station}</td>
-                            <td style="font-weight: 600; color: #2d3748;">${item.colunaK || '-'}</td>
-                            <td style="font-weight: bold; color: #2f855a;">SIM</td>
-                        `;
+                        if (isOutroHubReal || statusExibido === "OUTRO HUB") {
+                            row.style.backgroundColor = '#fffaf0'; 
+                            acaoHtml = `<span class="badge-danger-action" style="background-color: #feebc8; color: #c05621; border-color: #fbd38d;">ÁREA DE TRATATIVA</span>`;
+                            
+                            row.innerHTML = `
+                                <td style="font-weight: 600; color: #c05621;">${item.trackingNumber}</td>
+                                <td>${acaoHtml}</td>
+                                <td style="font-weight: 500; color: #c05621;">${destinoDetectado}</td>
+                                <td style="color: #c05621; font-weight: 600;">${item.colunaK || '-'}</td>
+                                <td style="font-weight: bold; color: #c05621;">OUTRO HUB</td>
+                                <td style="font-weight: bold; color: #c05621;">SIM</td>
+                                <td>${originBadge}</td>
+                            `;
+                        } else if (statusExibido.toLowerCase() === 'lmhub_assigning') {
+                            row.style.backgroundColor = '#e3f2fd'; 
+                            acaoHtml = `<span class="badge-assigning-action">PROSSEGUIR (ASSIGNING)</span>`;
+                            
+                            row.innerHTML = `
+                                <td style="font-weight: 600; color: #0d47a1;">${item.trackingNumber}</td>
+                                <td>${acaoHtml}</td>
+                                <td style="font-weight: 500; color: #0d47a1;">${destinoDetectado}</td>
+                                <td style="color: #0d47a1; font-weight: 600;">${item.colunaK || '-'}</td>
+                                <td style="font-weight: bold; color: #0d47a1;">${statusExibido}</td>
+                                <td style="font-weight: bold; color: #0d47a1;">SIM</td>
+                                <td>${originBadge}</td>
+                            `;
+                        } else if (statusExibido.toLowerCase() === 'return_lmhub_received' || isTratativaReal) {
+                            row.style.backgroundColor = '#fffaf0'; 
+                            acaoHtml = `<span class="badge-danger-action" style="background-color: #feebc8; color: #c05621; border-color: #fbd38d;">ÁREA DE TRATATIVA</span>`;
+                            
+                            row.innerHTML = `
+                                <td style="font-weight: 600; color: #c05621;">${item.trackingNumber}</td>
+                                <td>${acaoHtml}</td>
+                                <td style="font-weight: 500; color: #c05621;">${destinoDetectado}</td>
+                                <td style="color: #c05621; font-weight: 600;">${item.colunaK || '-'}</td>
+                                <td style="font-weight: bold; color: #c05621;">${statusExibido}</td>
+                                <td style="font-weight: bold; color: #c05621;">SIM</td>
+                                <td>${originBadge}</td>
+                            `;
+                        } else {
+                            row.innerHTML = `
+                                <td style="font-weight: 600;">${item.trackingNumber}</td>
+                                <td>-</td>
+                                <td style="font-weight: 500; color: #2d3748;">${destinoDetectado}</td>
+                                <td style="font-weight: 600; color: #2d3748;">${item.colunaK || '-'}</td>
+                                <td style="font-weight: 600; color: #2f855a;">${statusExibido}</td>
+                                <td style="font-weight: bold; color: #2f855a;">SIM</td>
+                                <td>${originBadge}</td>
+                            `;
+                        }
                     }
                     tbody.appendChild(row);
                 });
@@ -1183,11 +1193,14 @@
             }
 
             let csvContent = "\uFEFF"; 
-            csvContent += "SPX Tracking Number,Origem da Base,Status Original,Filtro Próxima Ação,Destino Detectado,Coluna K (Base 1),Encontrado em Base\n";
+            
+            // CABEÇALHO ATUALIZADO EM ESTRUTURA IGUALMENTE AO EXPOSTO NA IMAGE_0399B7
+            csvContent += "SPX Tracking Number,Filtro Próxima Ação,Destino Detectado,Office / home,Status Original,Encontrado em Base,Origem da Base\n";
 
             window.scannedItemsList.forEach(item => {
                 let finalStatus = item.statusOriginal;
                 let acaoExportacao = item.isTratativa ? 'ÁREA DE TRATATIVA' : 'PROSSEGUIR';
+                let destinoDetectado = item.destinationHub !== 'N/A' && item.destinationHub !== '-' ? item.destinationHub : (item.station !== 'N/A' ? item.station : '-');
 
                 if (item.origin === 'Base 1' && item.destinationHub) {
                     const dhLower = item.destinationHub.toLowerCase();
@@ -1204,14 +1217,15 @@
                     acaoExportacao = "ÁREA DE TRATATIVA";
                 }
 
+                // INSERÇÃO DE ELEMENTOS SEGUINDO A NOVA ESTRUTURA REORGANIZADA DA SEGUNDA IMAGEM
                 let row = [
                     `"${item.trackingNumber}"`,
-                    `"${item.origin}"`,
-                    `"${finalStatus}"`,
                     `"${acaoExportacao}"`,
-                    `"${item.destinationHub !== 'N/A' && item.destinationHub !== '-' ? item.destinationHub : (item.station || '-')}"`,
+                    `"${destinoDetectado}"`,
                     `"${item.colunaK || '-'}"`,
-                    `"${item.notFound ? 'NÃO' : 'SIM'}"`
+                    `"${finalStatus}"`,
+                    `"${item.notFound ? 'NÃO' : 'SIM'}"`,
+                    `"${item.origin}"`
                 ];
                 csvContent += row.join(",") + "\n";
             });

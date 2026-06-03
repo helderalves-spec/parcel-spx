@@ -34,12 +34,13 @@
             letter-spacing: -0.3px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             transition: all 0.2s ease-in-out;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
         .alert-green { background: linear-gradient(135deg, #10b981, #059669) !important; }
         .alert-red { background: linear-gradient(135deg, #ef4444, #dc2626) !important; }
         .alert-orange { background: linear-gradient(135deg, #f59e0b, #d97706) !important; }
-        .alert-blue { background: linear-gradient(135deg, #2563eb, #1d4ed8) !important; }
-        .alert-purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed) !important; } 
 
         /* Top Navbar - Dark Mode Executive */
         .navbar {
@@ -80,7 +81,7 @@
             border: 1px solid #334155;
         }
 
-        /* Navigation Tabs - Clean Design */
+        /* Navigation Tabs */
         .tab-nav {
             background-color: #0f172a;
             padding: 0 32px;
@@ -125,7 +126,7 @@
         .dashboard-layout {
             display: flex;
             gap: 32px;
-            max-width: 100%; /* Expandido para usar a tela inteira */
+            max-width: 100%;
             margin: 0 auto;
             width: 100%;
         }
@@ -269,7 +270,7 @@
             box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
         }
 
-        /* Caixas de Importação Clean */
+        /* Caixas de Importação */
         .import-box {
             border: 2px dashed #cbd5e1;
             border-radius: 12px;
@@ -291,7 +292,7 @@
             border-style: solid;
         }
 
-        /* Tabelas Modernas Estilo SaaS - Responsividade Melhorada */
+        /* Tabelas Modernas */
         .table-container {
             background: #ffffff;
             border: 1px solid #e5e7eb;
@@ -322,19 +323,13 @@
             transition: all 0.2s;
         }
 
-        .table-search-input:focus {
-            outline: none;
-            border-color: #2563eb;
-            background-color: #ffffff;
-        }
-
         .actions-group {
             display: flex;
             gap: 12px;
             align-items: center;
         }
 
-        /* Botões Corporativos Executivos */
+        /* Botões */
         .export-btn, .pdf-btn, .reset-btn {
             padding: 10px 18px;
             border-radius: 6px;
@@ -348,24 +343,11 @@
             transition: all 0.2s ease;
         }
 
-        .export-btn {
-            background-color: #ffffff;
-            color: #374151;
-            border: 1px solid #e5e7eb;
-        }
+        .export-btn { background-color: #ffffff; color: #374151; border: 1px solid #e5e7eb; }
         .export-btn:hover { background-color: #f9fafb; border-color: #d1d5db; }
-
-        .pdf-btn {
-            background-color: #2563eb;
-            color: white;
-            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.15);
-        }
+        .pdf-btn { background-color: #2563eb; color: white; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.15); }
         .pdf-btn:hover { background-color: #1d4ed8; }
-
-        .reset-btn {
-            background-color: #ef4444;
-            color: white;
-        }
+        .reset-btn { background-color: #ef4444; color: white; }
         .reset-btn:hover { background-color: #dc2626; }
 
         /* Paginação */
@@ -380,10 +362,7 @@
             color: #4b5563;
         }
 
-        .pagination-buttons {
-            display: flex;
-            gap: 6px;
-        }
+        .pagination-buttons { display: flex; gap: 6px; }
 
         .page-btn {
             background: #ffffff;
@@ -397,72 +376,30 @@
             transition: all 0.15s;
         }
 
-        .page-btn:hover:not(:disabled) {
-            border-color: #2563eb;
-            color: #2563eb;
-        }
+        .page-btn:hover:not(:disabled) { border-color: #2563eb; color: #2563eb; }
+        .page-btn:disabled { background: #f3f4f6; color: #9ca3af; cursor: not-allowed; }
 
-        .page-btn:disabled {
-            background: #f3f4f6;
-            color: #9ca3af;
-            cursor: not-allowed;
-        }
+        .table-scroll { overflow-x: auto; max-height: 550px; }
 
-        .table-scroll {
-            overflow-x: auto;
-            max-height: 550px;
-        }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; table-layout: fixed; }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-            text-align: left;
-            table-layout: fixed; /* Força o respeito à largura das colunas */
-        }
+        th, td { padding: 16px 20px; border-bottom: 1px solid #f3f4f6; color: #374151; overflow: hidden; text-overflow: ellipsis; }
 
-        th, td {
-            padding: 16px 20px;
-            border-bottom: 1px solid #f3f4f6;
-            color: #374151;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+        th { background-color: #f8fafc; color: #475569; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
 
-        th {
-            background-color: #f8fafc;
-            color: #475569;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 11px;
-            letter-spacing: 0.5px;
-        }
+        /* Ajuste Dinâmico para impedir quebra do layout */
+        th:nth-child(1), td:nth-child(1) { width: 22%; white-space: normal; word-break: break-all; }
+        th:nth-child(2), td:nth-child(2) { width: 15%; }
+        th:nth-child(3), td:nth-child(3) { width: 15%; }
+        th:nth-child(4), td:nth-child(4) { width: 10%; text-align: center; }
+        th:nth-child(5), td:nth-child(5) { width: 15%; text-align: center; }
+        th:nth-child(6), td:nth-child(6) { width: 11%; text-align: center; }
+        th:nth-child(7), td:nth-child(7) { width: 12%; text-align: center; }
 
-        /* Dimensionamento inteligente para não esconder informações */
-        th:nth-child(1), td:nth-child(1) { width: 22%; white-space: normal; word-break: break-all; } /* Tracking ID */
-        th:nth-child(2), td:nth-child(2) { width: 15%; } /* Status na Base */
-        th:nth-child(3), td:nth-child(3) { width: 15%; } /* Hub Destino */
-        th:nth-child(4), td:nth-child(4) { width: 10%; text-align: center; } /* Office / Home */
-        th:nth-child(5), td:nth-child(5) { width: 15%; text-align: center; } /* Próxima Ação */
-        th:nth-child(6), td:nth-child(6) { width: 11%; text-align: center; } /* Origem Informação */
-        th:nth-child(7), td:nth-child(7) { width: 12%; text-align: center; } /* Validação */
+        tr:hover td { background-color: #f8fafc; }
 
-        tr:hover td {
-            background-color: #f8fafc;
-        }
-
-        /* Status Badges */
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 11px;
-            width: 100%;
-            text-align: center;
-        }
+        /* Badges */
+        .badge { display: inline-flex; align-items: center; justify-content: center; padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 11px; width: 100%; text-align: center; }
         .badge-scanned { background-color: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
         .badge-notfound { background-color: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; }
         .badge-danger-action { background-color: #fff5f5; color: #c53030; border: 1px solid #feb2b2; }
@@ -471,70 +408,37 @@
         .origin-base1 { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
         .origin-base2 { background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
 
-        /* Banner de Feedback Superior */
-        .voice-banner {
-            background-color: #e0f2fe;
-            border: 1px solid #bae6fd;
-            padding: 12px 18px;
-            border-radius: 8px;
-            font-size: 13px;
-            color: #0369a1;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .voice-banner { background-color: #e0f2fe; border: 1px solid #bae6fd; padding: 12px 18px; border-radius: 8px; font-size: 13px; color: #0369a1; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
 
-        /* GRID DE RELATÓRIO DO DIRETOR */
-        .report-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 24px;
-            margin-bottom: 32px;
-        }
-
-        .report-card {
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 28px 24px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
-            position: relative;
-        }
-
+        /* Report Grid */
+        .report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 32px; }
+        .report-card { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 28px 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); position: relative; }
         .report-card-blue { border-top: 4px solid #2563eb; }
         .report-card-purple { border-top: 4px solid #7c3aed; }
+        .report-card-title { font-size: 12px; color: #6b7280; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
+        .report-card-value { font-size: 36px; font-weight: 800; color: #111827; line-height: 1; letter-spacing: -1px; }
 
-        .report-card-title {
-            font-size: 12px;
-            color: #6b7280;
-            font-weight: 600;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-            letter-spacing: 0.5px;
+        /* Overlay de Loading do Processamento */
+        .loading-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.7); color: white; font-size: 18px; font-weight: bold;
+            display: none; align-items: center; justify-content: center; flex-direction: column; z-index: 9999;
         }
-
-        .report-card-value {
-            font-size: 36px;
-            font-weight: 800;
-            color: #111827;
-            line-height: 1;
-            letter-spacing: -1px;
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1); width: 50px; height: 50px;
+            border-radius: 50%; border-left-color: #38bdf8; animation: spin 1s linear infinite; margin-bottom: 16px;
         }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* IMPRESSÃO CLEAN PARA APRESENTAÇÃO / PDF */
         @media print {
             body { background: white; color: black; }
-            .navbar, .tab-nav, .actions-group, .voice-banner, .scanner-container, .sidebar, #import-summary-card, .pdf-btn, .export-btn, .reset-btn {
-                display: none !important;
-            }
+            .navbar, .tab-nav, .actions-group, .voice-banner, .scanner-container, .sidebar, #import-summary-card, .pdf-btn, .export-btn, .reset-btn { display: none !important; }
             .tab-content { display: none !important; }
             #tab-report { display: block !important; padding: 0 !important; }
             .card, .report-card, .table-container { border: none !important; box-shadow: none !important; }
             th { background-color: #f1f5f9 !important; color: #1e293b !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             td, th { border: 1px solid #e2e8f0 !important; padding: 12px !important; }
         }
-
     </style>
 
     <script type="module">
@@ -556,6 +460,7 @@
         const analytics = getAnalytics(app);
         const database = getDatabase(app);
 
+        // Deixando referências globais acessíveis pelas funções tradicionais do app
         window.dbFirebase = database;
         window.refFirebase = ref;
         window.updateFirebase = update;
@@ -567,6 +472,7 @@
         window.totalB2Count = 0;
         window.rawScannedFirebaseObject = {}; 
 
+        // Escuta Realtime Base 1
         const base1Ref = ref(database, 'planilha_base1');
         onValue(base1Ref, (snapshot) => {
             const data = snapshot.val();
@@ -576,6 +482,7 @@
             checkAndUnlockScanner();
         });
 
+        // Escuta Realtime Base 2
         const base2Ref = ref(database, 'planilha_base2');
         onValue(base2Ref, (snapshot) => {
             const data = snapshot.val();
@@ -585,6 +492,7 @@
             checkAndUnlockScanner();
         });
 
+        // Escuta Realtime das Bipagens
         const bipsRef = ref(database, 'bips_triagem');
         onValue(bipsRef, (snapshot) => {
             const data = snapshot.val() || {};
@@ -605,7 +513,7 @@
             if (count > 0) {
                 box.classList.add('loaded');
                 icon.innerText = '✔';
-                label.innerText = `Base ${baseNum}: ${count} registros ativos na nuvem`;
+                label.innerText = `Base ${baseNum}: ${count} ordens salvas na nuvem`;
             } else {
                 box.classList.remove('loaded');
                 icon.innerText = '📥';
@@ -635,7 +543,7 @@
             window.refreshDashboardUI();
         }
 
-        // LÓGICA DE EVENTO DO LEITOR DE CÓDIGO DE BARRAS (ENTER TRIGGER)
+        // LÓGICA DO INPUT DO LEITOR DE CÓDIGO DE BARRAS
         document.addEventListener('DOMContentLoaded', () => {
             const scannerInput = document.getElementById('main-barcode-scanner');
             if (scannerInput) {
@@ -647,13 +555,13 @@
                             if (code.length > 15) {
                                 showAlertTop(`❌ ERRO: CÓDIGO INVÁLIDO (${code.length} DÍGITOS). BIPAGEM NÃO PERMITIDA!`, 'alert-red');
                                 emitVoiceAlert('Código inválido');
-                                this.value = ''; // Reseta o campo imediatamente para não quebrar a operação
+                                this.value = ''; 
                                 e.preventDefault();
                                 return;
                             }
 
                             processBarcodeBip(code);
-                            this.value = ''; // Limpa imediatamente para o próximo pacote
+                            this.value = ''; 
                         }
                     }
                 });
@@ -682,7 +590,7 @@
             if (foundData) {
                 statusText = foundData.status || 'N/A';
                 destHub = foundData.destination_hub || foundData.destinationHub || 'N/A';
-                locType = foundData.location_type || foundData.locationType || foundData.segmento || '-';
+                locType = foundData.location_type || foundData.locationType || '-';
 
                 if (statusText === 'LMHub_Assigning' || statusText === 'LMHub_Received') {
                     actionText = 'MANTER FLUXO';
@@ -719,7 +627,6 @@
                 bar.className = `top-alert-bar ${cssClass}`;
                 bar.innerText = msg;
                 bar.style.display = 'block';
-                // Deixa o banner de erro visível por um pouco mais de tempo (5s) se for bloqueio
                 const delay = cssClass === 'alert-red' ? 5000 : 4000;
                 setTimeout(() => { bar.style.display = 'none'; }, delay);
             }
@@ -727,6 +634,11 @@
     </script>
 </head>
 <body>
+
+    <div id="loading-screen" class="loading-overlay">
+        <div class="spinner"></div>
+        <div id="loading-text">Processando arquivo, por favor aguarde...</div>
+    </div>
 
     <div id="master-top-alert" class="top-alert-bar"></div>
 
@@ -745,12 +657,11 @@
         <button class="tab-btn" onclick="switchTab('report')">3. Relatório Executivo Diário</button>
     </div>
 
-    <!-- ABA 1: IMPORTAR ARQUIVOS -->
     <div id="tab-import" class="tab-content">
         <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px;">
             <div>
                 <h2 style="font-size: 22px; font-weight: 700; color: #0f172a;">Carregamento Massivo de Dados</h2>
-                <p style="font-size: 14px; color: #64748b; margin-top: 4px;">Suporte unificado a arquivos estruturados nativos (.csv) e volumes compactados (.zip).</p>
+                <p style="font-size: 14px; color: #64748b; margin-top: 4px;">Selecione os arquivos exportados da plataforma (.csv) ou arquivos compactados (.zip).</p>
             </div>
             
             <div class="import-grid">
@@ -774,11 +685,11 @@
             </div>
 
             <div class="card" id="import-summary-card" style="display: none; border-left: 4px solid #10b981;">
-                <h4 style="color: #065f46; font-size: 16px;" id="summary-title">✔ Sistema Sincronizado e Conectado em Rede</h4>
+                <h4 style="color: #065f46; font-size: 16px;">✔ Sistema Sincronizado e Conectado em Rede</h4>
                 <div style="font-size: 13px; margin-top: 8px; color: #374151; line-height: 1.6;" id="import-summary-text"></div>
                 
                 <div style="margin-top: 20px; display: flex; flex-wrap: wrap; gap: 12px;">
-                    <button style="padding: 12px 24px; background-color: #2563eb; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(37,99,235,0.2);" onclick="switchTab('dashboard')">Iniciar Monitoramento →</button>
+                    <button style="padding: 12px 24px; background-color: #2563eb; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer;" onclick="switchTab('dashboard')">Iniciar Monitoramento →</button>
                     <button style="padding: 12px 16px; background-color: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;" onclick="clearDatabaseNode('planilha_base1')">Resetar Apenas Base 1</button>
                     <button style="padding: 12px 16px; background-color: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;" onclick="clearDatabaseNode('planilha_base2')">Resetar Apenas Base 2</button>
                     <button style="padding: 12px 16px; background-color: #fef2f2; color: #991b1b; border: 1px solid #fee2e2; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;" onclick="clearOnlyBases()">Limpar Banco de Dados</button>
@@ -787,7 +698,6 @@
         </div>
     </div>
 
-    <!-- ABA 2: PAINEL DE MONITORAMENTO ENHANCED -->
     <div id="tab-dashboard" class="tab-content active">
         <div class="dashboard-layout">
             
@@ -812,7 +722,7 @@
 
             <div class="work-area" style="flex: 1; min-width: 0;">
                 <div class="voice-banner">
-                    <span>⚡</span> <span><strong>Infraestrutura Nuvem Ativa:</strong> Segurança aprimorada contra erros de leitura e travamento de códigos Danfe/Nota Fiscal.</span>
+                    <span>⚡</span> <span><strong>Infraestrutura Nuvem Ativa:</strong> Segurança contra erros de leitura e travamento de chaves Danfe/Nota Fiscal.</span>
                 </div>
 
                 <div class="card" style="padding: 20px;">
@@ -876,7 +786,6 @@
         </div>
     </div>
 
-    <!-- ABA 3: RELATÓRIO DIÁRIO DE BIPAGEM -->
     <div id="tab-report" class="tab-content">
         <div style="max-width: 1100px; margin: 0 auto;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px;">
@@ -961,6 +870,121 @@
                 document.querySelectorAll('.tab-btn')[2].classList.add('active');
                 document.getElementById('tab-report').classList.add('active');
                 window.calculateAndRenderReport();
+            }
+        }
+
+        // LÓGICA DE DETECÇÃO E LEITURA DOS ARQUIVOS IMPORTADOS
+        window.handleFileSelectUnified = function(event, baseIndex) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
+            showLoading(true, "Lendo e processando arquivos carregados...");
+
+            Array.from(files).forEach(file => {
+                const extension = file.name.split('.').pop().toLowerCase();
+                
+                if (extension === 'zip') {
+                    // Trata pacotes compactados .zip
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        JSZip.loadAsync(e.target.result).then(function(zip) {
+                            let promises = [];
+                            zip.forEach(function(relativePath, zipEntry) {
+                                if (!zipEntry.dir && zipEntry.name.endsWith('.csv')) {
+                                    promises.push(zipEntry.async("string").then(content => {
+                                        parseAndStoreCSV(content, baseIndex);
+                                    }));
+                                }
+                            });
+                            Promise.all(promises).then(() => {
+                                showLoading(false);
+                            }).catch(err => {
+                                console.error(err);
+                                alert("Erro ao descompactar e processar os CSVs internos do ZIP.");
+                                showLoading(false);
+                            });
+                        });
+                    };
+                    reader.readAsArrayBuffer(file);
+                } else if (extension === 'csv') {
+                    // Trata arquivos estruturados brutos .csv
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        parseAndStoreCSV(e.target.result, baseIndex);
+                        showLoading(false);
+                    };
+                    reader.readAsText(file, "UTF-8");
+                } else {
+                    alert("Formato não suportado! Por favor, utilize apenas arquivos .csv ou .zip");
+                    showLoading(false);
+                }
+            });
+        };
+
+        // PARSER DE CSV INTELIGENTE COM TRATAMENTO DE CABEÇALHOS E CHUNKS DE ENVIO
+        function parseAndStoreCSV(text, baseIndex) {
+            // Divide o arquivo pelas quebras de linhas estruturadas
+            const lines = text.split(/\r?\n/);
+            if (lines.length === 0) return;
+
+            // Identifica o cabeçalho e limpa espaços e aspas extras
+            const headers = lines[0].split(';').map(h => h.trim().replace(/^["']|["']$/g, ''));
+            
+            // Busca dinâmica pelo índice correto das colunas chave
+            const trackingIdx = headers.findIndex(h => h.toLowerCase().includes('tracking') || h.toLowerCase().includes('id') || h.toLowerCase() === 'code');
+            const statusIdx = headers.findIndex(h => h.toLowerCase().includes('status'));
+            const hubIdx = headers.findIndex(h => h.toLowerCase().includes('hub') || h.toLowerCase().includes('destination'));
+            
+            // Localiza a Coluna K (11ª Coluna - Índice 10) para extrair o Segmento / Localização
+            const locationIdx = 10; 
+
+            if (trackingIdx === -1) {
+                alert("Falha na validação estrutural: Não encontramos a coluna identificadora de Tracking no cabeçalho.");
+                return;
+            }
+
+            let batchUpdateObject = {};
+            let processedLinesCount = 0;
+
+            for (let i = 1; i < lines.length; i++) {
+                if (!lines[i].trim()) continue;
+                
+                // Trata divisão mantendo integridade se houver valores entre aspas
+                const columns = lines[i].split(';').map(c => c.trim().replace(/^["']|["']$/g, ''));
+                const trackingNumber = columns[trackingIdx];
+
+                if (trackingNumber && trackingNumber.length <= 15) {
+                    batchUpdateObject[trackingNumber] = {
+                        trackingNumber: trackingNumber,
+                        status: statusIdx !== -1 ? (columns[statusIdx] || 'N/A') : 'N/A',
+                        destination_hub: hubIdx !== -1 ? (columns[hubIdx] || 'N/A') : 'N/A',
+                        location_type: columns[locationIdx] || '-'
+                    };
+                    processedLinesCount++;
+                }
+            }
+
+            // Realiza o upload massivo estruturado para o nó correto do Firebase
+            if (processedLinesCount > 0) {
+                const nodeName = baseIndex === 1 ? 'planilha_base1' : 'planilha_base2';
+                const uploadRef = window.refFirebase(window.dbFirebase, nodeName);
+                window.updateFirebase(uploadRef, batchUpdateObject)
+                    .then(() => {
+                        showAlertTop(`✔ ${processedLinesCount} registros da Base ${baseIndex} salvos com sucesso na nuvem!`, 'alert-green');
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert("Erro de comunicação ao sincronizar dados com o Firebase.");
+                    });
+            }
+        }
+
+        function showLoading(show, message = "") {
+            const overlay = document.getElementById('loading-screen');
+            const txt = document.getElementById('loading-text');
+            if (overlay) {
+                if(message) txt.innerText = message;
+                overlay.style.display = show ? 'flex' : 'none';
             }
         }
 
@@ -1091,6 +1115,39 @@
         window.toggleShowAll = function() {
             window.showAllItems = !window.showAllItems;
             renderTableData();
+        };
+
+        // EXPORTAÇÃO COMPATÍVEL DIRETAMENTE COM O EXCEL (UTF-8 COM BOM)
+        window.exportToExcelXLSX = function() {
+            if (window.scannedItemsList.length === 0) {
+                alert("Não existem dados bipados nesta sessão para exportar.");
+                return;
+            }
+
+            let csvContent = "Tracking ID;Status na Base;Hub Destino;Office / Home;Proxima Acao;Origem Informacao;Validacao\n";
+
+            window.scannedItemsList.forEach(item => {
+                let tracking = item.trackingNumber || "";
+                let status = item.statusOriginal || "";
+                let hub = item.destinationHub || "";
+                let segment = item.locationType || "-";
+                let action = item.action || "";
+                let origin = item.origin || "";
+                let validacao = item.encontrado === "SIM" ? "Sincronizado" : "Divergente";
+
+                csvContent += `${tracking};${status};${hub};${segment};${action};${origin};${validacao}\n`;
+            });
+
+            let blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: "text/csv;charset=utf-8;" });
+            let link = document.createElement("a");
+            
+            let dataAtual = new Date().toISOString().slice(0,10);
+            link.href = URL.createObjectURL(blob);
+            link.setAttribute("download", `Relatorio_Triagem_${dataAtual}.csv`);
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         };
 
         window.clearOnlyScans = function() {

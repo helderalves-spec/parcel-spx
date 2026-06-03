@@ -421,24 +421,15 @@
         /* Overlay de Loading do Processamento */
         .loading-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.7); color: white; font-size: 18px; font-weight: bold;
+            background: rgba(15, 23, 42, 0.85); color: white; font-size: 18px; font-weight: bold;
             display: none; align-items: center; justify-content: center; flex-direction: column; z-index: 9999;
+            text-align: center; padding: 20px;
         }
         .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.1); width: 50px; height: 50px;
-            border-radius: 50%; border-left-color: #38bdf8; animation: spin 1s linear infinite; margin-bottom: 16px;
+            border: 4px solid rgba(255, 255, 255, 0.1); width: 55px; height: 55px;
+            border-radius: 50%; border-left-color: #38bdf8; animation: spin 1s linear infinite; margin-bottom: 18px;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        @media print {
-            body { background: white; color: black; }
-            .navbar, .tab-nav, .actions-group, .voice-banner, .scanner-container, .sidebar, #import-summary-card, .pdf-btn, .export-btn, .reset-btn { display: none !important; }
-            .tab-content { display: none !important; }
-            #tab-report { display: block !important; padding: 0 !important; }
-            .card, .report-card, .table-container { border: none !important; box-shadow: none !important; }
-            th { background-color: #f1f5f9 !important; color: #1e293b !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            td, th { border: 1px solid #e2e8f0 !important; padding: 12px !important; }
-        }
     </style>
 
     <script type="module">
@@ -460,7 +451,6 @@
         const analytics = getAnalytics(app);
         const database = getDatabase(app);
 
-        // Deixando referências globais acessíveis pelas funções tradicionais do app
         window.dbFirebase = database;
         window.refFirebase = ref;
         window.updateFirebase = update;
@@ -472,36 +462,27 @@
         window.totalB2Count = 0;
         window.rawScannedFirebaseObject = {}; 
 
-        // Escuta Realtime Base 1
-        const base1Ref = ref(database, 'planilha_base1');
-        onValue(base1Ref, (snapshot) => {
-            const data = snapshot.val();
-            window.base1Map = data || {};
+        // Escutas em Tempo Real
+        onValue(ref(database, 'planilha_base1'), (snapshot) => {
+            window.base1Map = snapshot.val() || {};
             window.totalB1Count = Object.keys(window.base1Map).length;
             updateImportVisuals(1, window.totalB1Count);
             checkAndUnlockScanner();
         });
 
-        // Escuta Realtime Base 2
-        const base2Ref = ref(database, 'planilha_base2');
-        onValue(base2Ref, (snapshot) => {
-            const data = snapshot.val();
-            window.base2Map = data || {};
+        onValue(ref(database, 'planilha_base2'), (snapshot) => {
+            window.base2Map = snapshot.val() || {};
             window.totalB2Count = Object.keys(window.base2Map).length;
             updateImportVisuals(2, window.totalB2Count);
             checkAndUnlockScanner();
         });
 
-        // Escuta Realtime das Bipagens
-        const bipsRef = ref(database, 'bips_triagem');
-        onValue(bipsRef, (snapshot) => {
+        onValue(ref(database, 'bips_triagem'), (snapshot) => {
             const data = snapshot.val() || {};
             window.rawScannedFirebaseObject = data;
-            
             const items = Object.keys(data).map(key => data[key]);
             items.sort((a, b) => new Date(b.timestampBip) - new Date(a.timestampBip));
             window.scannedItemsList = items;
-            
             window.refreshDashboardUI();
             window.calculateAndRenderReport(); 
         });
@@ -530,9 +511,9 @@
                     scannerInput.placeholder = "Passe o leitor de código de barras corporativo...";
                     document.getElementById('import-summary-card').style.display = 'block';
                     document.getElementById('import-summary-text').innerHTML = `
-                        <strong>Base 1 (Forward):</strong> ${window.totalB1Count} registros carregados.<br>
-                        <strong>Base 2 (Receive Task):</strong> ${window.totalB2Count} registros carregados.<br>
-                        <strong>Consolidação Geral:</strong> ${totalRecords} ordens prontas para cruzamento de dados.
+                        <strong>Base 1 (Forward):</strong> ${window.totalB1Count} registros na nuvem.<br>
+                        <strong>Base 2 (Receive Task):</strong> ${window.totalB2Count} registros na nuvem.<br>
+                        <strong>Total Consolidado:</strong> ${totalRecords} ordens ativas para cruzamento.
                     `;
                 } else {
                     scannerInput.disabled = true;
@@ -543,7 +524,6 @@
             window.refreshDashboardUI();
         }
 
-        // LÓGICA DO INPUT DO LEITOR DE CÓDIGO DE BARRAS
         document.addEventListener('DOMContentLoaded', () => {
             const scannerInput = document.getElementById('main-barcode-scanner');
             if (scannerInput) {
@@ -551,7 +531,6 @@
                     if (e.key === 'Enter') {
                         const code = this.value.trim();
                         if (code) {
-                            // TRAVA DE SEGURANÇA: Bloqueia chaves maiores que 15 dígitos (Ex: NFe de 44 dígitos)
                             if (code.length > 15) {
                                 showAlertTop(`❌ ERRO: CÓDIGO INVÁLIDO (${code.length} DÍGITOS). BIPAGEM NÃO PERMITIDA!`, 'alert-red');
                                 emitVoiceAlert('Código inválido');
@@ -559,7 +538,6 @@
                                 e.preventDefault();
                                 return;
                             }
-
                             processBarcodeBip(code);
                             this.value = ''; 
                         }
@@ -617,27 +595,25 @@
                 timestampBip: new Date().toISOString()
             };
 
-            const bipRef = window.refFirebase(window.dbFirebase, 'bips_triagem/' + barcode);
-            window.updateFirebase(bipRef, newBip);
+            window.updateFirebase(window.refFirebase(window.dbFirebase, 'bips_triagem/' + barcode), newBip);
         }
 
-        function showAlertTop(msg, cssClass) {
+        window.showAlertTop = function(msg, cssClass) {
             const bar = document.getElementById('master-top-alert');
             if (bar) {
                 bar.className = `top-alert-bar ${cssClass}`;
                 bar.innerText = msg;
                 bar.style.display = 'block';
-                const delay = cssClass === 'alert-red' ? 5000 : 4000;
-                setTimeout(() => { bar.style.display = 'none'; }, delay);
+                setTimeout(() => { bar.style.display = 'none'; }, cssClass === 'alert-red' ? 5000 : 3500);
             }
-        }
+        };
     </script>
 </head>
 <body>
 
     <div id="loading-screen" class="loading-overlay">
         <div class="spinner"></div>
-        <div id="loading-text">Processando arquivo, por favor aguarde...</div>
+        <div id="loading-text">Processando registros...</div>
     </div>
 
     <div id="master-top-alert" class="top-alert-bar"></div>
@@ -661,7 +637,7 @@
         <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px;">
             <div>
                 <h2 style="font-size: 22px; font-weight: 700; color: #0f172a;">Carregamento Massivo de Dados</h2>
-                <p style="font-size: 14px; color: #64748b; margin-top: 4px;">Selecione os arquivos exportados da plataforma (.csv) ou arquivos compactados (.zip).</p>
+                <p style="font-size: 14px; color: #64748b; margin-top: 4px;">Selecione os arquivos brutos (.csv) exportados ou arquivos compactados (.zip).</p>
             </div>
             
             <div class="import-grid">
@@ -722,7 +698,7 @@
 
             <div class="work-area" style="flex: 1; min-width: 0;">
                 <div class="voice-banner">
-                    <span>⚡</span> <span><strong>Infraestrutura Nuvem Ativa:</strong> Segurança contra erros de leitura e travamento de chaves Danfe/Nota Fiscal.</span>
+                    <span>⚡</span> <span><strong>Infraestrutura Nuvem Ativa:</strong> Proteção integrada contra erros de leitura e travamentos de chaves longas.</span>
                 </div>
 
                 <div class="card" style="padding: 20px;">
@@ -848,8 +824,6 @@
                 window.speechSynthesis.cancel();
                 let utterance = new SpeechSynthesisUtterance(messageText);
                 utterance.lang = 'pt-BR';
-                utterance.rate = 1.0; 
-                utterance.pitch = 1.0;
                 window.speechSynthesis.speak(utterance);
             }
         }
@@ -873,112 +847,6 @@
             }
         }
 
-        // LÓGICA DE DETECÇÃO E LEITURA DOS ARQUIVOS IMPORTADOS
-        window.handleFileSelectUnified = function(event, baseIndex) {
-            const files = event.target.files;
-            if (!files || files.length === 0) return;
-
-            showLoading(true, "Lendo e processando arquivos carregados...");
-
-            Array.from(files).forEach(file => {
-                const extension = file.name.split('.').pop().toLowerCase();
-                
-                if (extension === 'zip') {
-                    // Trata pacotes compactados .zip
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        JSZip.loadAsync(e.target.result).then(function(zip) {
-                            let promises = [];
-                            zip.forEach(function(relativePath, zipEntry) {
-                                if (!zipEntry.dir && zipEntry.name.endsWith('.csv')) {
-                                    promises.push(zipEntry.async("string").then(content => {
-                                        parseAndStoreCSV(content, baseIndex);
-                                    }));
-                                }
-                            });
-                            Promise.all(promises).then(() => {
-                                showLoading(false);
-                            }).catch(err => {
-                                console.error(err);
-                                alert("Erro ao descompactar e processar os CSVs internos do ZIP.");
-                                showLoading(false);
-                            });
-                        });
-                    };
-                    reader.readAsArrayBuffer(file);
-                } else if (extension === 'csv') {
-                    // Trata arquivos estruturados brutos .csv
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        parseAndStoreCSV(e.target.result, baseIndex);
-                        showLoading(false);
-                    };
-                    reader.readAsText(file, "UTF-8");
-                } else {
-                    alert("Formato não suportado! Por favor, utilize apenas arquivos .csv ou .zip");
-                    showLoading(false);
-                }
-            });
-        };
-
-        // PARSER DE CSV INTELIGENTE COM TRATAMENTO DE CABEÇALHOS E CHUNKS DE ENVIO
-        function parseAndStoreCSV(text, baseIndex) {
-            // Divide o arquivo pelas quebras de linhas estruturadas
-            const lines = text.split(/\r?\n/);
-            if (lines.length === 0) return;
-
-            // Identifica o cabeçalho e limpa espaços e aspas extras
-            const headers = lines[0].split(';').map(h => h.trim().replace(/^["']|["']$/g, ''));
-            
-            // Busca dinâmica pelo índice correto das colunas chave
-            const trackingIdx = headers.findIndex(h => h.toLowerCase().includes('tracking') || h.toLowerCase().includes('id') || h.toLowerCase() === 'code');
-            const statusIdx = headers.findIndex(h => h.toLowerCase().includes('status'));
-            const hubIdx = headers.findIndex(h => h.toLowerCase().includes('hub') || h.toLowerCase().includes('destination'));
-            
-            // Localiza a Coluna K (11ª Coluna - Índice 10) para extrair o Segmento / Localização
-            const locationIdx = 10; 
-
-            if (trackingIdx === -1) {
-                alert("Falha na validação estrutural: Não encontramos a coluna identificadora de Tracking no cabeçalho.");
-                return;
-            }
-
-            let batchUpdateObject = {};
-            let processedLinesCount = 0;
-
-            for (let i = 1; i < lines.length; i++) {
-                if (!lines[i].trim()) continue;
-                
-                // Trata divisão mantendo integridade se houver valores entre aspas
-                const columns = lines[i].split(';').map(c => c.trim().replace(/^["']|["']$/g, ''));
-                const trackingNumber = columns[trackingIdx];
-
-                if (trackingNumber && trackingNumber.length <= 15) {
-                    batchUpdateObject[trackingNumber] = {
-                        trackingNumber: trackingNumber,
-                        status: statusIdx !== -1 ? (columns[statusIdx] || 'N/A') : 'N/A',
-                        destination_hub: hubIdx !== -1 ? (columns[hubIdx] || 'N/A') : 'N/A',
-                        location_type: columns[locationIdx] || '-'
-                    };
-                    processedLinesCount++;
-                }
-            }
-
-            // Realiza o upload massivo estruturado para o nó correto do Firebase
-            if (processedLinesCount > 0) {
-                const nodeName = baseIndex === 1 ? 'planilha_base1' : 'planilha_base2';
-                const uploadRef = window.refFirebase(window.dbFirebase, nodeName);
-                window.updateFirebase(uploadRef, batchUpdateObject)
-                    .then(() => {
-                        showAlertTop(`✔ ${processedLinesCount} registros da Base ${baseIndex} salvos com sucesso na nuvem!`, 'alert-green');
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        alert("Erro de comunicação ao sincronizar dados com o Firebase.");
-                    });
-            }
-        }
-
         function showLoading(show, message = "") {
             const overlay = document.getElementById('loading-screen');
             const txt = document.getElementById('loading-text');
@@ -986,6 +854,149 @@
                 if(message) txt.innerText = message;
                 overlay.style.display = show ? 'flex' : 'none';
             }
+        }
+
+        // MOTOR DE SELEÇÃO UNIFICADO ATUALIZADO ANTITRAVAMENTO
+        window.handleFileSelectUnified = function(event, baseIndex) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
+            showLoading(true, "Analisando estrutura de dados do arquivo...");
+
+            Array.from(files).forEach(file => {
+                const extension = file.name.split('.').pop().toLowerCase();
+                
+                if (extension === 'zip') {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        JSZip.loadAsync(e.target.result).then(function(zip) {
+                            let promises = [];
+                            zip.forEach(function(relativePath, zipEntry) {
+                                if (!zipEntry.dir && zipEntry.name.endsWith('.csv')) {
+                                    promises.push(zipEntry.async("string").then(content => {
+                                        return parseAndStoreCSVInChunks(content, baseIndex);
+                                    }));
+                                }
+                            });
+                            Promise.all(promises).then(() => {
+                                showLoading(false);
+                            }).catch(err => {
+                                console.error(err);
+                                showLoading(false);
+                                alert("Ocorreu um erro ao extrair os arquivos do arquivo compactado ZIP.");
+                            });
+                        });
+                    };
+                    reader.readAsArrayBuffer(file);
+                } else if (extension === 'csv') {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        parseAndStoreCSVInChunks(e.target.result, baseIndex).then(() => {
+                            showLoading(false);
+                        });
+                    };
+                    reader.readAsText(file, "UTF-8");
+                } else {
+                    alert("Por favor, selecione apenas arquivos válidos com extensão .csv ou .zip");
+                    showLoading(false);
+                }
+            });
+        };
+
+        // PARSER CHUNKED INTELIGENTE - ENVIANDO EM GRUPOS DE 500 LINHAS CONTRA ERROS DE CONEXÃO
+        function parseAndStoreCSVInChunks(text, baseIndex) {
+            return new Promise((resolve) => {
+                const lines = text.split(/\r?\n/);
+                if (lines.length < 2) {
+                    resolve();
+                    return;
+                }
+
+                // Identifica se a planilha está dividida por vírgula ou ponto e vírgula de forma dinâmica
+                let separator = ';';
+                if (lines[0].includes(',') && !lines[0].includes(';')) {
+                    separator = ',';
+                }
+
+                // Normaliza cabeçalhos removendo aspas e espaços
+                const headers = lines[0].split(separator).map(h => h.trim().replace(/^["']|["']$/g, '').toLowerCase());
+                
+                // Mapeamento agnóstico para aceitar chaves de ambas as planilhas da operação
+                const trackingIdx = headers.findIndex(h => h === 'forward_order_id' || h === 'tracking_number' || h.includes('tracking') || h === 'id');
+                const statusIdx = headers.findIndex(h => h === 'status' || h.includes('status'));
+                const hubIdx = headers.findIndex(h => h === 'destination_hub' || h === 'destination_hub_name' || h.includes('hub'));
+                const locationIdx = 10; // Coluna K mantida fixa
+
+                if (trackingIdx === -1) {
+                    showLoading(false);
+                    alert("A validação falhou: Nenhuma coluna de identificação de rastreamento foi encontrada nesta estrutura de cabeçalho.");
+                    resolve();
+                    return;
+                }
+
+                let rowsToProcess = [];
+                for (let i = 1; i < lines.length; i++) {
+                    if (!lines[i].trim()) continue;
+                    const columns = lines[i].split(separator).map(c => c.trim().replace(/^["']|["']$/g, ''));
+                    const id = columns[trackingIdx];
+                    
+                    if (id && id.length <= 15) {
+                        rowsToProcess.push({
+                            id: id,
+                            status: statusIdx !== -1 ? (columns[statusIdx] || 'N/A') : 'N/A',
+                            hub: hubIdx !== -1 ? (columns[hubIdx] || 'N/A') : 'N/A',
+                            loc: columns[locationIdx] || '-'
+                        });
+                    }
+                }
+
+                if (rowsToProcess.length === 0) {
+                    resolve();
+                    return;
+                }
+
+                // Envia para o Firebase em blocos (lotes) de 500 linhas para não travar a requisição
+                const chunkSize = 500;
+                let currentOffset = 0;
+                const nodeName = baseIndex === 1 ? 'planilha_base1' : 'planilha_base2';
+
+                function sendNextChunk() {
+                    if (currentOffset >= rowsToProcess.length) {
+                        window.showAlertTop(`✔ ${rowsToProcess.length} registros sincronizados com a nuvem!`, 'alert-green');
+                        resolve();
+                        return;
+                    }
+
+                    showLoading(true, `Sincronizando lote (${currentOffset} de ${rowsToProcess.length}) na Nuvem...`);
+                    
+                    let chunkObject = {};
+                    let limit = Math.min(currentOffset + chunkSize, rowsToProcess.length);
+                    
+                    for (let k = currentOffset; k < limit; k++) {
+                        const row = rowsToProcess[k];
+                        chunkObject[row.id] = {
+                            trackingNumber: row.id,
+                            status: row.status,
+                            destinationHub: row.hub,
+                            locationType: row.loc
+                        };
+                    }
+
+                    window.updateFirebase(window.refFirebase(window.dbFirebase, nodeName), chunkObject)
+                        .then(() => {
+                            currentOffset += chunkSize;
+                            sendNextChunk();
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            showLoading(false);
+                            alert("A conexão com o servidor caiu ao tentar subir o lote atual de pacotes.");
+                            resolve();
+                        });
+                }
+
+                sendNextChunk();
+            });
         }
 
         window.calculateAndRenderReport = function() {
@@ -1117,7 +1128,6 @@
             renderTableData();
         };
 
-        // EXPORTAÇÃO COMPATÍVEL DIRETAMENTE COM O EXCEL (UTF-8 COM BOM)
         window.exportToExcelXLSX = function() {
             if (window.scannedItemsList.length === 0) {
                 alert("Não existem dados bipados nesta sessão para exportar.");
@@ -1152,8 +1162,7 @@
 
         window.clearOnlyScans = function() {
             if(confirm("Deseja zerar o histórico de pacotes processados em tempo real?")) {
-                const bipsRef = window.refFirebase(window.dbFirebase, 'bips_triagem');
-                window.removeFirebase(bipsRef);
+                window.removeFirebase(window.refFirebase(window.dbFirebase, 'bips_triagem'));
             }
         };
 

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Parcel Sweeper Hub - Executive Suite</title>
     
+    <!-- Dependências Externas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <style>
@@ -30,7 +31,7 @@
             font-weight: 700;
             text-align: center;
             color: #ffffff;
-            display: none; \
+            display: none;
             letter-spacing: -0.3px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             transition: all 0.2s ease-in-out;
@@ -432,6 +433,7 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 
+    <!-- Script de Inicialização Global e Firebase Seguro -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
@@ -578,16 +580,15 @@
                 destHub = foundData.destinationHub || foundData.destination_hub || foundData.destinationHubName || 'N/A';
                 locType = foundData.locationType || foundData.location_type || '-';
 
-                // NOVA REGRA GEOGRÁFICA REQUERIDA
+                // VALIDAÇÃO GEOGRÁFICA REQUERIDA
                 const hubLower = destHub.toLowerCase();
                 const belongsToRegion = hubLower.includes('uberaba') || hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
 
                 if (!belongsToRegion) {
-                    // Se não pertencer aos hubs listados, força o status a virar "OUTRO HUB" e joga na Tratativa
                     statusText = 'OUTRO HUB';
                     actionText = 'ÁREA DE TRATATIVA';
-                    window.showAlertTop('⚠️ ALERTA: PACOTE DE OUTRO HUB DETECTADO!', 'alert-orange');
-                    window.emitVoiceAlert('Outro hub');
+                    window.showAlertTop('⚠️ ALERTA: PACOTE DE OUTRO HUB DETECTADO! IR PARA ÁREA DE TRATATIVA', 'alert-orange');
+                    window.emitVoiceAlert('Outro hub, ir para área de tratativa');
                 } else if (statusText === 'LMHub_Assigning' || statusText === 'LMHub_Received') {
                     actionText = 'MANTER FLUXO';
                     window.showAlertTop('✔ PACOTE LIBERADO: MANTER FLUXO', 'alert-green');
@@ -651,6 +652,7 @@
         <button class="tab-btn" onclick="switchTab('report')">3. Relatório Executivo Diário</button>
     </div>
 
+    <!-- ABA 1: IMPORTAÇÃO -->
     <div id="tab-import" class="tab-content">
         <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px;">
             <div>
@@ -692,6 +694,7 @@
         </div>
     </div>
 
+    <!-- ABA 2: MONITOR REALTIME -->
     <div id="tab-dashboard" class="tab-content active">
         <div class="dashboard-layout">
             
@@ -780,6 +783,7 @@
         </div>
     </div>
 
+    <!-- ABA 3: RELATÓRIOS -->
     <div id="tab-report" class="tab-content">
         <div style="max-width: 1100px; margin: 0 auto;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px;">
@@ -829,6 +833,7 @@
         </div>
     </div>
 
+    <!-- Regras Logísticas e Controle Operacional da UI -->
     <script>
         window.scannedItemsList = []; 
         window.filteredItemsList = [];
@@ -1028,7 +1033,14 @@
 
             let statusMap = {};
             window.scannedItemsList.forEach(item => {
+                let destHub = item.destinationHub || 'N/A';
+                const hubLower = destHub.toLowerCase();
+                const belongsToRegion = hubLower.includes('uberaba') || hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
+                
                 let status = item.statusOriginal || 'N/A';
+                if (!belongsToRegion && item.encontrado === 'SIM') {
+                    status = 'OUTRO HUB';
+                }
                 statusMap[status] = (statusMap[status] || 0) + 1;
             });
 
@@ -1113,7 +1125,6 @@
             let totalItems = window.filteredItemsList.length;
             let totalPages = Math.ceil(totalItems / window.itemsPerPage);
             
-            // Proteção de limites de página
             if(window.currentPage > totalPages) window.currentPage = totalPages;
             if(window.currentPage < 1) window.currentPage = 1;
 
@@ -1126,7 +1137,6 @@
                 paginationInfo.innerText = `Exibindo ${start + 1}-${Math.min(end, totalItems)} de ${totalItems} registros`;
             }
 
-            // Atualiza estados dos botões
             const btnPrev = document.getElementById('btn-page-prev');
             const btnNext = document.getElementById('btn-page-next');
             const btnCurrent = document.getElementById('btn-page-current');
@@ -1140,6 +1150,20 @@
             sliceItems.forEach(item => {
                 let row = document.createElement('tr');
                 
+                let destHub = item.destinationHub || 'N/A';
+                const hubLower = destHub.toLowerCase();
+                // Verifica se pertence à região válida
+                const belongsToRegion = hubLower.includes('uberaba') || hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
+
+                let statusExibido = item.statusOriginal;
+                let actionText = item.action;
+
+                // CORREÇÃO VISUAL INTERNA DA TABELA: Se não for da região, força na tabela o texto pedido
+                if (!belongsToRegion && item.encontrado === 'SIM') {
+                    statusExibido = 'OUTRO HUB';
+                    actionText = 'ÁREA DE TRATATIVA';
+                }
+
                 let bScanned = `<span class="badge badge-scanned">Sincronizado</span>`;
                 if(item.encontrado === 'NÃO') bScanned = `<span class="badge badge-notfound">Divergente</span>`;
 
@@ -1147,14 +1171,14 @@
                 if(item.origin === 'Base 2') bOrigin = `<span class="badge badge-file-origin origin-base2">Base 2</span>`;
 
                 let bAction = `<span class="badge badge-assigning-action">MANTER FLUXO</span>`;
-                if(item.action === 'ÁREA DE TRATATIVA') bAction = `<span class="badge badge-danger-action">TRATATIVA</span>`;
+                if(actionText === 'ÁREA DE TRATATIVA') bAction = `<span class="badge badge-danger-action">TRATATIVA</span>`;
 
                 let displaySegment = item.locationType || '-';
 
                 row.innerHTML = `
                     <td style="font-weight:700; color: #111827;">${item.trackingNumber}</td>
-                    <td>${item.statusOriginal}</td>
-                    <td>${item.destinationHub}</td>
+                    <td style="${statusExibido === 'OUTRO HUB' ? 'color: #d97706; font-weight: bold;' : ''}">${statusExibido}</td>
+                    <td>${destHub}</td>
                     <td style="font-weight:600; color: #475569; text-align: center;">${displaySegment}</td>
                     <td>${bAction}</td>
                     <td style="text-align: center;">${bOrigin}</td>
@@ -1191,14 +1215,23 @@
 
             window.scannedItemsList.forEach(item => {
                 let tracking = item.trackingNumber || "";
+                let destHub = item.destinationHub || "";
+                const hubLower = destHub.toLowerCase();
+                const belongsToRegion = hubLower.includes('uberaba') || hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
+                
                 let status = item.statusOriginal || "";
-                let hub = item.destinationHub || "";
-                let segment = item.locationType || "-";
                 let action = item.action || "";
+                
+                if (!belongsToRegion && item.encontrado === "SIM") {
+                    status = "OUTRO HUB";
+                    action = "ÁREA DE TRATATIVA";
+                }
+
+                let segment = item.locationType || "-";
                 let origin = item.origin || "";
                 let validacao = item.encontrado === "SIM" ? "Sincronizado" : "Divergente";
 
-                csvContent += `${tracking};${status};${hub};${segment};${action};${origin};${validacao}\n`;
+                csvContent += `${tracking};${status};${destHub};${segment};${action};${origin};${validacao}\n`;
             });
 
             let blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: "text/csv;charset=utf-8;" });

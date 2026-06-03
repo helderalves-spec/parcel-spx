@@ -121,11 +121,11 @@
             display: block;
         }
 
-        /* Layout em Grid Lateral */
+        /* Layout em Grid Lateral Expandido */
         .dashboard-layout {
             display: flex;
             gap: 32px;
-            max-width: 1600px;
+            max-width: 100%; /* Expandido para usar a tela inteira */
             margin: 0 auto;
             width: 100%;
         }
@@ -142,6 +142,7 @@
             align-items: center;
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
             height: fit-content;
+            flex-shrink: 0;
         }
 
         .chart-box {
@@ -290,13 +291,14 @@
             border-style: solid;
         }
 
-        /* Tabelas Modernas Estilo SaaS */
+        /* Tabelas Modernas Estilo SaaS - Responsividade Melhorada */
         .table-container {
             background: #ffffff;
             border: 1px solid #e5e7eb;
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 10px 15px -3px rgba(0,0,0,0.02), 0 4px 6px -2px rgba(0,0,0,0.01);
+            width: 100%;
         }
 
         .table-header {
@@ -416,44 +418,56 @@
             border-collapse: collapse;
             font-size: 13px;
             text-align: left;
+            table-layout: fixed; /* Força o respeito à largura das colunas */
+        }
+
+        th, td {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f3f4f6;
+            color: #374151;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         th {
             background-color: #f8fafc;
             color: #475569;
             font-weight: 600;
-            padding: 14px 24px;
-            border-bottom: 1px solid #e2e8f0;
             text-transform: uppercase;
             font-size: 11px;
             letter-spacing: 0.5px;
         }
 
-        td {
-            padding: 16px 24px;
-            border-bottom: 1px solid #f3f4f6;
-            color: #374151;
-            white-space: nowrap;
-        }
+        /* Dimensionamento inteligente para não esconder informações */
+        th:nth-child(1), td:nth-child(1) { width: 22%; white-space: normal; word-break: break-all; } /* Tracking ID */
+        th:nth-child(2), td:nth-child(2) { width: 15%; } /* Status na Base */
+        th:nth-child(3), td:nth-child(3) { width: 15%; } /* Hub Destino */
+        th:nth-child(4), td:nth-child(4) { width: 10%; text-align: center; } /* Office / Home */
+        th:nth-child(5), td:nth-child(5) { width: 15%; text-align: center; } /* Próxima Ação */
+        th:nth-child(6), td:nth-child(6) { width: 11%; text-align: center; } /* Origem Informação */
+        th:nth-child(7), td:nth-child(7) { width: 12%; text-align: center; } /* Validação */
 
         tr:hover td {
             background-color: #f8fafc;
         }
 
-        /* Status Badges de Alta Performance */
+        /* Status Badges */
         .badge {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             padding: 4px 8px;
             border-radius: 6px;
             font-weight: 600;
             font-size: 11px;
+            width: 100%;
+            text-align: center;
         }
         .badge-scanned { background-color: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
         .badge-notfound { background-color: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; }
         .badge-danger-action { background-color: #fff5f5; color: #c53030; border: 1px solid #feb2b2; }
         .badge-assigning-action { background-color: #ebf8ff; color: #2b6cb0; border: 1px solid #90cdf4; }
-        .badge-file-origin { padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 11px; }
+        .badge-file-origin { padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 11px; display: inline-block; width: 80px; text-align: center; }
         .origin-base1 { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
         .origin-base2 { background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
 
@@ -629,6 +643,15 @@
                     if (e.key === 'Enter') {
                         const code = this.value.trim();
                         if (code) {
+                            // TRAVA DE SEGURANÇA: Bloqueia chaves maiores que 15 dígitos (Ex: NFe de 44 dígitos)
+                            if (code.length > 15) {
+                                showAlertTop(`❌ ERRO: CÓDIGO INVÁLIDO (${code.length} DÍGITOS). BIPAGEM NÃO PERMITIDA!`, 'alert-red');
+                                emitVoiceAlert('Código inválido');
+                                this.value = ''; // Reseta o campo imediatamente para não quebrar a operação
+                                e.preventDefault();
+                                return;
+                            }
+
                             processBarcodeBip(code);
                             this.value = ''; // Limpa imediatamente para o próximo pacote
                         }
@@ -643,7 +666,7 @@
             let actionText = 'ÁREA DE TRATATIVA';
             let statusText = 'DIVERGENTE';
             let destHub = 'N/A';
-            let locType = '-'; // Representa o Segmento (Office / Home)
+            let locType = '-'; 
             let isFound = 'NÃO';
 
             if (window.base1Map && window.base1Map[barcode]) {
@@ -659,8 +682,6 @@
             if (foundData) {
                 statusText = foundData.status || 'N/A';
                 destHub = foundData.destination_hub || foundData.destinationHub || 'N/A';
-                
-                // Mapeamento dinâmico da Coluna K (Segmento)
                 locType = foundData.location_type || foundData.locationType || foundData.segmento || '-';
 
                 if (statusText === 'LMHub_Assigning' || statusText === 'LMHub_Received') {
@@ -673,7 +694,7 @@
                     emitVoiceAlert('Área de tratativa');
                 }
             } else {
-                showAlertTop('❌ PACOTE NÃO ENCONTRADO NAS BASES SINCROINIZADAS', 'alert-red');
+                showAlertTop('❌ PACOTE NÃO ENCONTRADO NAS BASES SINCRONIZADAS', 'alert-red');
                 emitVoiceAlert('Não encontrado');
             }
 
@@ -681,7 +702,7 @@
                 trackingNumber: barcode,
                 statusOriginal: statusText,
                 destinationHub: destHub,
-                locationType: locType, // Salva o Office / Home puxado da base
+                locationType: locType, 
                 action: actionText,
                 origin: originLabel,
                 encontrado: isFound,
@@ -698,7 +719,9 @@
                 bar.className = `top-alert-bar ${cssClass}`;
                 bar.innerText = msg;
                 bar.style.display = 'block';
-                setTimeout(() => { bar.style.display = 'none'; }, 4000);
+                // Deixa o banner de erro visível por um pouco mais de tempo (5s) se for bloqueio
+                const delay = cssClass === 'alert-red' ? 5000 : 4000;
+                setTimeout(() => { bar.style.display = 'none'; }, delay);
             }
         }
     </script>
@@ -764,7 +787,7 @@
         </div>
     </div>
 
-    <!-- ABA 2: PAINEL DE MONITORAMENTO -->
+    <!-- ABA 2: PAINEL DE MONITORAMENTO ENHANCED -->
     <div id="tab-dashboard" class="tab-content active">
         <div class="dashboard-layout">
             
@@ -789,7 +812,7 @@
 
             <div class="work-area" style="flex: 1; min-width: 0;">
                 <div class="voice-banner">
-                    <span>⚡</span> <span><strong>Infraestrutura Nuvem Ativa:</strong> O cruzamento de dados ocorre em microssegundos de forma distribuída para todos os terminais integrados.</span>
+                    <span>⚡</span> <span><strong>Infraestrutura Nuvem Ativa:</strong> Segurança aprimorada contra erros de leitura e travamento de códigos Danfe/Nota Fiscal.</span>
                 </div>
 
                 <div class="card" style="padding: 20px;">
@@ -821,10 +844,10 @@
                                     <th>Tracking ID</th>
                                     <th>Status na Base</th>
                                     <th>Hub Destino</th>
-                                    <th>Office / Home</th> <!-- Título atualizado conforme solicitado -->
-                                    <th>Próxima Ação Direcionada</th>
-                                    <th>Origem Informação</th>
-                                    <th>Validação</th>
+                                    <th style="text-align: center;">Office / Home</th>
+                                    <th style="text-align: center;">Próxima Ação</th>
+                                    <th style="text-align: center;">Origem</th>
+                                    <th style="text-align: center;">Validação</th>
                                 </tr>
                             </thead>
                             <tbody id="live-table-body">
@@ -1037,18 +1060,17 @@
                 if(item.origin === 'Base 2') bOrigin = `<span class="badge badge-file-origin origin-base2">Base 2</span>`;
 
                 let bAction = `<span class="badge badge-assigning-action">MANTER FLUXO</span>`;
-                if(item.action === 'ÁREA DE TRATATIVA') bAction = `<span class="badge badge-danger-action">RETALHAR / TRATATIVA</span>`;
+                if(item.action === 'ÁREA DE TRATATIVA') bAction = `<span class="badge badge-danger-action">TRATATIVA</span>`;
 
-                // Renderiza o valor mapeado (Office, Home ou o hífen padrão se não encontrar)
                 let displaySegment = item.locationType || '-';
 
                 row.innerHTML = `
                     <td style="font-weight:700; color: #111827;">${item.trackingNumber}</td>
                     <td>${item.statusOriginal}</td>
                     <td>${item.destinationHub}</td>
-                    <td style="font-weight:600; color: #475569;">${displaySegment}</td>
+                    <td style="font-weight:600; color: #475569; text-align: center;">${displaySegment}</td>
                     <td>${bAction}</td>
-                    <td>${bOrigin}</td>
+                    <td style="text-align: center;">${bOrigin}</td>
                     <td>${bScanned}</td>
                 `;
                 tbody.appendChild(row);

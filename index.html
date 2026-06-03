@@ -560,10 +560,6 @@
             window.totalB1Count = Object.keys(window.base1Map).length;
             updateImportVisuals(1, window.totalB1Count);
             checkAndUnlockScanner();
-            
-            if (window.totalB1Count > 0 && Object.keys(window.rawScannedFirebaseObject).length > 0) {
-                window.reprocessScansWithNewBases();
-            }
         });
 
         const base2Ref = ref(database, 'planilha_base2');
@@ -573,10 +569,6 @@
             window.totalB2Count = Object.keys(window.base2Map).length;
             updateImportVisuals(2, window.totalB2Count);
             checkAndUnlockScanner();
-
-            if (window.totalB2Count > 0 && Object.keys(window.rawScannedFirebaseObject).length > 0) {
-                window.reprocessScansWithNewBases();
-            }
         });
 
         const bipsRef = ref(database, 'bips_triagem');
@@ -590,8 +582,6 @@
             
             window.refreshDashboardUI();
             window.calculateAndRenderReport(); 
-        }, (error) => {
-            console.log("Erro de conexão Firebase:", error);
         });
 
         function updateImportVisuals(baseNum, count) {
@@ -630,6 +620,85 @@
             }
             window.refreshDashboardUI();
         }
+
+        // LÓGICA DE EVENTO DO LEITOR DE CÓDIGO DE BARRAS (ENTER TRIGGER)
+        document.addEventListener('DOMContentLoaded', () => {
+            const scannerInput = document.getElementById('main-barcode-scanner');
+            if (scannerInput) {
+                scannerInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        const code = this.value.trim();
+                        if (code) {
+                            processBarcodeBip(code);
+                            this.value = ''; // Limpa imediatamente para o próximo pacote
+                        }
+                    }
+                });
+            }
+        });
+
+        function processBarcodeBip(barcode) {
+            let foundData = null;
+            let originLabel = 'NÃO ENCONTRADO';
+            let actionText = 'ÁREA DE TRATATIVA';
+            let statusText = 'DIVERGENTE';
+            let destHub = 'N/A';
+            let locType = '-';
+            let isFound = 'NÃO';
+
+            if (window.base1Map && window.base1Map[barcode]) {
+                foundData = window.base1Map[barcode];
+                originLabel = 'Base 1';
+                isFound = 'SIM';
+            } else if (window.base2Map && window.base2Map[barcode]) {
+                foundData = window.base2Map[barcode];
+                originLabel = 'Base 2';
+                isFound = 'SIM';
+            }
+
+            if (foundData) {
+                statusText = foundData.status || 'N/A';
+                destHub = foundData.destination_hub || foundData.destinationHub || 'N/A';
+                locType = foundData.location_type || foundData.locationType || '-';
+
+                if (statusText === 'LMHub_Assigning' || statusText === 'LMHub_Received') {
+                    actionText = 'MANTER FLUXO';
+                    showAlertTop('✔ PACOTE LIBERADO: MANTER FLUXO', 'alert-green');
+                    emitVoiceAlert('Manter fluxo');
+                } else {
+                    actionText = 'ÁREA DE TRATATIVA';
+                    showAlertTop('⚠ ALERTA: DIRECIONAR PARA ÁREA DE TRATATIVA', 'alert-orange');
+                    emitVoiceAlert('Área de tratativa');
+                }
+            } else {
+                showAlertTop('❌ PACOTE NÃO ENCONTRADO NAS BASES SINCROINIZADAS', 'alert-red');
+                emitVoiceAlert('Não encontrado');
+            }
+
+            const newBip = {
+                trackingNumber: barcode,
+                statusOriginal: statusText,
+                destinationHub: destHub,
+                locationType: locType,
+                action: actionText,
+                origin: originLabel,
+                encontrado: isFound,
+                timestampBip: new Date().toISOString()
+            };
+
+            const bipRef = window.refFirebase(window.dbFirebase, 'bips_triagem/' + barcode);
+            window.updateFirebase(bipRef, newBip);
+        }
+
+        function showAlertTop(msg, cssClass) {
+            const bar = document.getElementById('master-top-alert');
+            if (bar) {
+                bar.className = `top-alert-bar ${cssClass}`;
+                bar.innerText = msg;
+                bar.style.display = 'block';
+                setTimeout(() => { bar.style.display = 'none'; }, 4000);
+            }
+        }
     </script>
 </head>
 <body>
@@ -646,13 +715,13 @@
     </div>
 
     <div class="tab-nav">
-        <button class="tab-btn active" onclick="switchTab('import')">1. Importação de Bases</button>
-        <button class="tab-btn" onclick="switchTab('dashboard')">2. Monitor de Bipagem Realtime</button>
+        <button class="tab-btn" onclick="switchTab('import')">1. Importação de Bases</button>
+        <button class="tab-btn active" onclick="switchTab('dashboard')">2. Monitor de Bipagem Realtime</button>
         <button class="tab-btn" onclick="switchTab('report')">3. Relatório Executivo Diário</button>
     </div>
 
     <!-- ABA 1: IMPORTAR ARQUIVOS -->
-    <div id="tab-import" class="tab-content active">
+    <div id="tab-import" class="tab-content">
         <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px;">
             <div>
                 <h2 style="font-size: 22px; font-weight: 700; color: #0f172a;">Carregamento Massivo de Dados</h2>
@@ -694,7 +763,7 @@
     </div>
 
     <!-- ABA 2: PAINEL DE MONITORAMENTO -->
-    <div id="tab-dashboard" class="tab-content">
+    <div id="tab-dashboard" class="tab-content active">
         <div class="dashboard-layout">
             
             <div class="sidebar">
@@ -870,32 +939,6 @@
             }
         }
 
-        function splitCSVLine(line, separator = null) {
-            if (!separator) {
-                const countComma = (line.match(/,/g) || []).length;
-                const countSemicolon = (line.match(/;/g) || []).length;
-                separator = countSemicolon > countComma ? ';' : ',';
-            }
-
-            let result = [];
-            let current = '';
-            let inQuotes = false;
-
-            for (let i = 0; i < line.length; i++) {
-                let char = line[i];
-                if (char === '"' || char === "'") {
-                    inQuotes = !inQuotes;
-                } else if (char === separator && !inQuotes) {
-                    result.push(current.trim().replace(/^["']|["']$/g, ''));
-                    current = '';
-                } else {
-                    current += char;
-                }
-            }
-            result.push(current.trim().replace(/^["']|["']$/g, ''));
-            return result;
-        }
-
         window.calculateAndRenderReport = function() {
             const totalBipados = window.scannedItemsList.length;
             document.getElementById('report-total-bipados').innerText = totalBipados;
@@ -1020,6 +1063,26 @@
         window.toggleShowAll = function() {
             window.showAllItems = !window.showAllItems;
             renderTableData();
+        };
+
+        window.clearOnlyScans = function() {
+            if(confirm("Deseja zerar o histórico de pacotes processados em tempo real?")) {
+                const bipsRef = window.refFirebase(window.dbFirebase, 'bips_triagem');
+                window.removeFirebase(bipsRef);
+            }
+        };
+
+        window.clearOnlyBases = function() {
+            if(confirm("Deseja apagar as bases sincronizadas da nuvem?")) {
+                window.removeFirebase(window.refFirebase(window.dbFirebase, 'planilha_base1'));
+                window.removeFirebase(window.refFirebase(window.dbFirebase, 'planilha_base2'));
+            }
+        };
+
+        window.clearDatabaseNode = function(nodeName) {
+            if(confirm(`Deseja limpar apenas o nó: ${nodeName}?`)) {
+                window.removeFirebase(window.refFirebase(window.dbFirebase, nodeName));
+            }
         };
     </script>
 </body>

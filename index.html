@@ -643,7 +643,7 @@
             let actionText = 'ÁREA DE TRATATIVA';
             let statusText = 'DIVERGENTE';
             let destHub = 'N/A';
-            let locType = '-';
+            let locType = '-'; // Representa o Segmento (Office / Home)
             let isFound = 'NÃO';
 
             if (window.base1Map && window.base1Map[barcode]) {
@@ -659,7 +659,9 @@
             if (foundData) {
                 statusText = foundData.status || 'N/A';
                 destHub = foundData.destination_hub || foundData.destinationHub || 'N/A';
-                locType = foundData.location_type || foundData.locationType || '-';
+                
+                // Mapeamento dinâmico da Coluna K (Segmento)
+                locType = foundData.location_type || foundData.locationType || foundData.segmento || '-';
 
                 if (statusText === 'LMHub_Assigning' || statusText === 'LMHub_Received') {
                     actionText = 'MANTER FLUXO';
@@ -679,7 +681,7 @@
                 trackingNumber: barcode,
                 statusOriginal: statusText,
                 destinationHub: destHub,
-                locationType: locType,
+                locationType: locType, // Salva o Office / Home puxado da base
                 action: actionText,
                 origin: originLabel,
                 encontrado: isFound,
@@ -819,7 +821,7 @@
                                     <th>Tracking ID</th>
                                     <th>Status na Base</th>
                                     <th>Hub Destino</th>
-                                    <th>Segmento</th>
+                                    <th>Office / Home</th> <!-- Título atualizado conforme solicitado -->
                                     <th>Próxima Ação Direcionada</th>
                                     <th>Origem Informação</th>
                                     <th>Validação</th>
@@ -1001,7 +1003,8 @@
                 window.filteredItemsList = window.scannedItemsList.filter(item => 
                     (item.trackingNumber || '').toLowerCase().includes(query) ||
                     (item.statusOriginal || '').toLowerCase().includes(query) ||
-                    (item.destinationHub || '').toLowerCase().includes(query)
+                    (item.destinationHub || '').toLowerCase().includes(query) ||
+                    (item.locationType || '').toLowerCase().includes(query)
                 );
             } else {
                 window.filteredItemsList = [...window.scannedItemsList];
@@ -1036,11 +1039,14 @@
                 let bAction = `<span class="badge badge-assigning-action">MANTER FLUXO</span>`;
                 if(item.action === 'ÁREA DE TRATATIVA') bAction = `<span class="badge badge-danger-action">RETALHAR / TRATATIVA</span>`;
 
+                // Renderiza o valor mapeado (Office, Home ou o hífen padrão se não encontrar)
+                let displaySegment = item.locationType || '-';
+
                 row.innerHTML = `
                     <td style="font-weight:700; color: #111827;">${item.trackingNumber}</td>
                     <td>${item.statusOriginal}</td>
                     <td>${item.destinationHub}</td>
-                    <td>${item.locationType || '-'}</td>
+                    <td style="font-weight:600; color: #475569;">${displaySegment}</td>
                     <td>${bAction}</td>
                     <td>${bOrigin}</td>
                     <td>${bScanned}</td>

@@ -40,7 +40,7 @@
         .alert-red { background-color: #ff4757 !important; color: #ffffff !important; }
         .alert-orange { background-color: #ffa502 !important; color: #ffffff !important; }
         .alert-blue { background-color: #1e3799 !important; color: #ffffff !important; }
-        .alert-purple { background-color: #8e44ad !important; color: #ffffff !important; } /* Nova cor roxa para alertas */
+        .alert-purple { background-color: #8e44ad !important; color: #ffffff !important; } 
 
         /* Top Navbar */
         .navbar {
@@ -437,6 +437,10 @@
             window.totalB2Count = Object.keys(window.base2Map).length;
             updateImportVisuals(2, window.totalB2Count);
             checkAndUnlockScanner();
+
+            if (window.totalB2Count > 0 && Object.keys(window.rawScannedFirebaseObject).length > 0) {
+                window.reprocessScansWithNewBases();
+            }
         });
 
         // 2. ESCUTANDO OS BIPS EFETUADOS EM TEMPO REAL
@@ -600,7 +604,6 @@
                         <table id="operational-table">
                             <thead>
                                 <tr>
-                                    <!-- ORDENAÇÃO EXATAMENTE IGUAL A SOLICITADA NA IMAGE_02A8BF -->
                                     <th>SPX Tracking Number</th>
                                     <th>Status Original</th>
                                     <th>Destino Detectado</th>
@@ -679,7 +682,6 @@
             return result;
         }
 
-        // PROCESSAMENTO DE TEXTO - BASE 1
         function parseBase1Text(text) {
             const lines = text.split(/\r?\n/);
             if (lines.length < 2) return {};
@@ -724,7 +726,6 @@
             return results;
         }
 
-        // PROCESSAMENTO DE TEXTO - BASE 2
         function parseBase2Text(text) {
             const lines = text.split(/\r?\n/);
             if (lines.length < 2) return {};
@@ -761,7 +762,6 @@
             return results;
         }
 
-        // GERENCIADOR UNIFICADO DE IMPORTAÇÃO (MÚLTIPLOS CSVs OU ZIP)
         async function handleFileSelectUnified(event, baseNum) {
             const files = event.target.files;
             if (!files || files.length === 0) return;
@@ -818,7 +818,7 @@
             }
         }
 
-        // REPROCESSAMENTO RETROATIVO AUTOMÁTICO EM MASSA
+        // REPROCESSAMENTO RETROATIVO AUTOMÁTICO EM MASSA (BASE 1 E BASE 2)
         window.reprocessScansWithNewBases = function() {
             let updatesToPush = {};
             let countMigrated = 0;
@@ -826,6 +826,7 @@
             Object.keys(window.rawScannedFirebaseObject).forEach(key => {
                 let currentScan = window.rawScannedFirebaseObject[key];
                 
+                // Prioridade 1: Encontrou na Base 1
                 if (currentScan.origin !== 'Base 1' && window.base1Map[key]) {
                     let matchedItemB1 = window.base1Map[key];
                     let statusOriginalReal = matchedItemB1.statusOriginal;
@@ -847,7 +848,6 @@
                     }
 
                     if (statusLower === 'return_lmhub_received' || (!statusLower.includes("lmhub_received") && !statusLower.includes("lmhub_assigning"))) {
-                        // Se for entregue ou entregando, não força a ser tratativa por falta de palavra chave
                         if(!statusLower.includes("delivered") && !statusLower.includes("delivering")) {
                             isTratativa = true;
                         }
@@ -867,10 +867,37 @@
                     };
                     countMigrated++;
                 }
+                // Prioridade 2: Se não estava na Base 1, mas agora foi achado na Base 2
+                else if (currentScan.origin === 'NENHUMA' && window.base2Map[key]) {
+                    let matchedItemB2 = window.base2Map[key];
+                    let statusOriginalReal = matchedItemB2.statusOriginal;
+                    let statusLower = statusOriginalReal.toLowerCase();
+                    let isTratativa = false;
+
+                    if (statusLower === 'return_lmhub_received' || (!statusLower.includes("lmhub_received") && !statusLower.includes("lmhub_assigning"))) {
+                        if(!statusLower.includes("delivered") && !statusLower.includes("delivering")) {
+                            isTratativa = true;
+                        }
+                    }
+
+                    updatesToPush[key] = {
+                        trackingNumber: currentScan.trackingNumber,
+                        statusOriginal: statusOriginalReal,
+                        station: 'N/A',
+                        destinationHub: 'N/A',
+                        colunaK: '-',
+                        origin: 'Base 2',
+                        isTratativa: isTratativa,
+                        isOutroHub: false,
+                        notFound: false,
+                        timestampBip: currentScan.timestampBip
+                    };
+                    countMigrated++;
+                }
             });
 
             if (countMigrated > 0 && window.dbFirebase && window.refFirebase && window.updateFirebase) {
-                console.log(`[Retroativo] Atualizando automaticamente ${countMigrated} bips antigos.`);
+                console.log(`[Retroativo] Atualizando automaticamente ${countMigrated} bips antigos com novas bases.`);
                 window.updateFirebase(window.refFirebase(window.dbFirebase, 'bips_triagem'), updatesToPush);
             }
         };
@@ -911,7 +938,6 @@
 
                     let statusLower = statusExibido.toLowerCase();
 
-                    // Regras de Cores e Ações baseadas no Status
                     if (item.notFound) {
                         row.style.backgroundColor = '#fff5f5';
                         acaoHtml = `<span class="badge-danger-action">ÁREA DE TRATATIVA</span>`;
@@ -926,7 +952,6 @@
                             <td style="font-weight: bold; color: #e53e3e;">NÃO</td>
                         `;
                     } else if (statusLower.includes("delivered") || statusLower.includes("delivering")) {
-                        // CORES ROXAS SOLICITADAS PARA DELIVERED / DELIVERING
                         row.style.backgroundColor = '#f3e5f5'; 
                         acaoHtml = `<span class="badge" style="background-color: #8e44ad; color: white;">FINALIZADO / ROTA</span>`;
                         
@@ -1079,7 +1104,6 @@
                         messageText = `🍊 OUTRO HUB DETECTADO! BR: ${codeToFind} | DESTINO: ${destHubContent} -> ÁREA DE TRATATIVA`;
                         emitVoiceAlert("Atenção: Área de Tratativa. Outro hub.");
                     } else if (statusLower.includes("delivered") || statusLower.includes("delivering")) {
-                        // REFEITA COR ROXA NOS ALERTAS DINÂMICOS TOP
                         alertColor = 'alert-purple';
                         messageText = `🔮 STATUS ENCONTRADO: ${statusOriginalReal} | BR: ${codeToFind}`;
                         emitVoiceAlert(statusLower.includes("delivered") ? "Entregue" : "Em rota de entrega");
@@ -1171,6 +1195,7 @@
             }
 
             inputField.value = '';
+            inputField.focus();
         }
 
         function clearOnlyBases() {
@@ -1214,8 +1239,6 @@
             }
 
             let csvContent = "\uFEFF"; 
-            
-            // CABEÇALHO CONFIGURADO SEGUINDO A NOVA ORDEM DA IMAGE_02A8BF
             csvContent += "SPX Tracking Number,Status Original,Destino Detectado,office / home,Filtro Próxima Ação,Origem da Base,Encontrado em Base\n";
 
             window.scannedItemsList.forEach(item => {
@@ -1243,7 +1266,6 @@
                     acaoExportacao = "ÁREA DE TRATATIVA";
                 }
 
-                // INSERÇÃO DE DADOS RESPEITANDO A ORDEM DA IMAGE_02A8BF
                 let row = [
                     `"${item.trackingNumber}"`,
                     `"${finalStatus}"`,

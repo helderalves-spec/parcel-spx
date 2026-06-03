@@ -419,6 +419,7 @@
         window.base2Map = {};
         window.totalB1Count = 0;
         window.totalB2Count = 0;
+        window.rawScannedFirebaseObject = {}; // Guarda o estado bruto vindo da nuvem
 
         // 1. ESCUTANDO AS BASES IMPORTADAS GLOBALMENTE NA NUVEM
         const base1Ref = ref(database, 'planilha_base1');
@@ -428,6 +429,11 @@
             window.totalB1Count = Object.keys(window.base1Map).length;
             updateImportVisuals(1, window.totalB1Count);
             checkAndUnlockScanner();
+            
+            // MODIFICAÇÃO CHAVE: Sempre que a Base 1 for atualizada, varre os bips antigos da Base 2 e força o upgrade!
+            if (window.totalB1Count > 0 && Object.keys(window.rawScannedFirebaseObject).length > 0) {
+                window.reprocessScansWithNewBases();
+            }
         });
 
         const base2Ref = ref(database, 'planilha_base2');
@@ -442,14 +448,13 @@
         // 2. ESCUTANDO OS BIPS EFETUADOS EM TEMPO REAL
         const bipsRef = ref(database, 'bips_triagem');
         onValue(bipsRef, (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                const items = Object.keys(data).map(key => data[key]);
-                items.sort((a, b) => new Date(b.timestampBip) - new Date(a.timestampBip));
-                window.scannedItemsList = items;
-            } else {
-                window.scannedItemsList = [];
-            }
+            const data = snapshot.val() || {};
+            window.rawScannedFirebaseObject = data;
+            
+            const items = Object.keys(data).map(key => data[key]);
+            items.sort((a, b) => new Date(b.timestampBip) - new Date(a.timestampBip));
+            window.scannedItemsList = items;
+            
             window.refreshDashboardUI();
         }, (error) => {
             console.log("Erro de conexão Firebase:", error);
@@ -481,7 +486,7 @@
                     document.getElementById('import-summary-text').innerHTML = `
                         <strong>Base 1 (Nuvem):</strong> ${window.totalB1Count} registros acumulados.<br>
                         <strong>Base 2 (Nuvem):</strong> ${window.totalB2Count} registros acumulados.<br>
-                        <strong>Total Geral em Rede:</strong> ${totalRecords} ordens prontas para bpar.
+                        <strong>Total Geral em Rede:</strong> ${totalRecords} ordens prontas para bipar.
                     `;
                 } else {
                     scannerInput.disabled = true;
@@ -513,7 +518,7 @@
 
     <div id="tab-import" class="tab-content active">
         <div style="max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
-            <h2 style="font-size: 18px;">Carregamento das Bases (Suporta múltiplos arquivos .csv ou pastas compactadas in .zip)</h2>
+            <h2 style="font-size: 18px;">Carregamento das Bases (Suporta múltiplos arquivos .csv ou pastas compactadas em .zip)</h2>
             
             <div class="import-grid">
                 <div>
@@ -691,7 +696,6 @@
             const stationIdx = headers.indexOf('current station');
             const destinationHubIdx = headers.indexOf('destination hub');
             
-            // Índice 10 representa de forma absoluta a coluna 11 (Coluna K)
             const colunaKIdx = 10; 
 
             let results = {};
@@ -704,7 +708,6 @@
                 let station = columns[stationIdx >= 0 ? stationIdx : 36] || 'N/A';
                 let destHub = columns[destinationHubIdx >= 0 ? destinationHubIdx : 44] || '';
                 
-                // Puxa o dado exato da Coluna K (Índice 10)
                 let dadoColunaK = columns[colunaKIdx] || '';
 
                 if(trackingCode) {
@@ -751,7 +754,7 @@
                         statusOriginal: orderStatus,
                         station: 'N/A',
                         destinationHub: 'N/A',
-                        colunaK: '-', // Não existe Coluna K nativa na Base 2
+                        colunaK: '-', 
                         origin: 'Base 2'
                     };
                 }
@@ -815,6 +818,62 @@
                 updateImportVisuals(baseNum, baseNum === 1 ? window.totalB1Count : window.totalB2Count);
             }
         }
+
+        // NOVA FUNÇÃO: REPROCESSAMENTO RETROATIVO AUTOMÁTICO EM MASSA
+        window.reprocessScansWithNewBases = function() {
+            let updatesToPush = {};
+            let countMigrated = 0;
+
+            Object.keys(window.rawScannedFirebaseObject).forEach(key => {
+                let currentScan = window.rawScannedFirebaseObject[key];
+                
+                // Se o item foi salvo como Base 2 ou Não Encontrado, mas AGORA ele consta na recém-chegada Base 1
+                if (currentScan.origin !== 'Base 1' && window.base1Map[key]) {
+                    let matchedItemB1 = window.base1Map[key];
+                    let statusOriginalReal = matchedItemB1.statusOriginal;
+                    let statusLower = statusOriginalReal.toLowerCase();
+                    
+                    let isTratativa = false;
+                    let isOutroHub = false;
+
+                    const destHubContent = matchedItemB1.destinationHub ? matchedItemB1.destinationHub.trim() : "";
+                    const destHubLower = destHubContent.toLowerCase();
+
+                    const allowedCities = ["uberaba", "monte carmelo", "catalão", "catalao"];
+                    let matchesCity = allowedCities.some(city => destHubLower.includes(city));
+
+                    if (!matchesCity && destHubContent.length > 0) {
+                        isOutroHub = true;
+                        isTratativa = true;
+                        statusOriginalReal = "OUTRO HUB";
+                    }
+
+                    if (statusLower === 'return_lmhub_received' || (!statusLower.includes("lmhub_received") && !statusLower.includes("lmhub_assigning"))) {
+                        isTratativa = true;
+                    }
+
+                    // Monta o novo payload corrigido com a prioridade da Base 1
+                    updatesToPush[key] = {
+                        trackingNumber: currentScan.trackingNumber,
+                        statusOriginal: statusOriginalReal,
+                        station: matchedItemB1.station,
+                        destinationHub: matchedItemB1.destinationHub,
+                        colunaK: matchedItemB1.colunaK || '-',
+                        origin: 'Base 1',
+                        isTratativa: isTratativa,
+                        isOutroHub: isOutroHub,
+                        notFound: false,
+                        timestampBip: currentScan.timestampBip // Mantém a hora original que o operador bipou
+                    };
+                    countMigrated++;
+                }
+            });
+
+            if (countMigrated > 0 && window.dbFirebase && window.refFirebase && window.updateFirebase) {
+                console.log(`[Retroativo] Atualizando automaticamente ${countMigrated} bips antigos para os novos parâmetros da Base 1.`);
+                window.updateFirebase(window.refFirebase(window.dbFirebase, 'bips_triagem'), updatesToPush);
+            }
+        };
 
         window.refreshDashboardUI = function() {
             const tbody = document.getElementById('live-table-body');
@@ -959,7 +1018,7 @@
                 const existingScanObject = window.scannedItemsList[existingScanIndex];
                 
                 if (existingScanObject.origin !== 'Base 1' && foundInBase1 && matchedItem) {
-                    console.log(`Re-processando BR ${codeToFind}: Migrando dados para a Base 1.`);
+                    console.log(`Re-bipagem forçada da BR ${codeToFind}: Migrando dados.`);
                 } else {
                     topAlertEl.classList.add('alert-orange');
                     topAlertEl.innerText = `⚠️ CÓDIGO REPETIDO! A BR ${codeToFind} JÁ FOI BIPADA ANTES.`;

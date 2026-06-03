@@ -199,14 +199,6 @@
             color: #1a202c;
         }
 
-        /* Main Workspace Content Area */
-        .work-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
         /* Floating Input field */
         .card {
             background: #ffffff;
@@ -607,14 +599,14 @@
                         <table id="operational-table">
                             <thead>
                                 <tr>
-                                    <!-- ORDENAÇÃO DE COLUNAS CONFIGURADA IGUAL A SOLICITADA NA IMAGE_0399B7 -->
+                                    <!-- ORDENAÇÃO ATUALIZADA EXATAMENTE IGUAL A SOLICITADA NA IMAGE_02A8BF -->
                                     <th>SPX Tracking Number</th>
-                                    <th>Filtro Próxima Ação</th>
-                                    <th>Destino Detectado</th>
-                                    <th>Office / home</th>
                                     <th>Status Original</th>
-                                    <th>Encontrado em Base</th>
+                                    <th>Destino Detectado</th>
+                                    <th>office / home</th>
+                                    <th>Filtro Próxima Ação</th>
                                     <th>Origem da Base</th>
+                                    <th>Encontrado em Base</th>
                                 </tr>
                             </thead>
                             <tbody id="live-table-body">
@@ -898,8 +890,8 @@
                     
                     let acaoHtml = '-';
                     let originBadge = item.origin === 'Base 1' 
-                        ? `<span class="badge badge-file-origin origin-base1">Base 1 (Forward)</span>`
-                        : (item.origin === 'Base 2' ? `<span class="badge badge-file-origin origin-base2">Base 2 (Receive)</span>` : `<span class="badge badge-notfound">NENHUMA</span>`);
+                        ? `<span class="badge badge-file-origin origin-base1">Base 1</span>`
+                        : (item.origin === 'Base 2' ? `<span class="badge badge-file-origin origin-base2">Base 2</span>` : `<span class="badge badge-notfound">NENHUMA</span>`);
 
                     if (item.origin === 'Base 1' && item.destinationHub) {
                         const dhLower = item.destinationHub.toLowerCase();
@@ -920,12 +912,12 @@
                         
                         row.innerHTML = `
                             <td style="font-weight: 600; color: #e53e3e;">${item.trackingNumber}</td>
-                            <td>${acaoHtml}</td>
+                            <td style="color: #e53e3e; font-weight: bold;">NÃO ENCONTRADO</td>
                             <td style="color: #cbd5e0;">-</td>
                             <td style="color: #cbd5e0; font-weight: bold;">-</td>
-                            <td style="color: #e53e3e; font-weight: bold;">NÃO ENCONTRADO</td>
-                            <td style="font-weight: bold; color: #e53e3e;">NÃO</td>
+                            <td>${acaoHtml}</td>
                             <td>${originBadge}</td>
+                            <td style="font-weight: bold; color: #e53e3e;">NÃO</td>
                         `;
                     } else {
                         if (isOutroHubReal || statusExibido === "OUTRO HUB") {
@@ -934,12 +926,12 @@
                             
                             row.innerHTML = `
                                 <td style="font-weight: 600; color: #c05621;">${item.trackingNumber}</td>
-                                <td>${acaoHtml}</td>
+                                <td style="font-weight: bold; color: #c05621;">OUTRO HUB</td>
                                 <td style="font-weight: 500; color: #c05621;">${destinoDetectado}</td>
                                 <td style="color: #c05621; font-weight: 600;">${item.colunaK || '-'}</td>
-                                <td style="font-weight: bold; color: #c05621;">OUTRO HUB</td>
-                                <td style="font-weight: bold; color: #c05621;">SIM</td>
+                                <td>${acaoHtml}</td>
                                 <td>${originBadge}</td>
+                                <td style="font-weight: bold; color: #c05621;">SIM</td>
                             `;
                         } else if (statusExibido.toLowerCase() === 'lmhub_assigning') {
                             row.style.backgroundColor = '#e3f2fd'; 
@@ -947,12 +939,12 @@
                             
                             row.innerHTML = `
                                 <td style="font-weight: 600; color: #0d47a1;">${item.trackingNumber}</td>
-                                <td>${acaoHtml}</td>
+                                <td style="font-weight: bold; color: #0d47a1;">${statusExibido}</td>
                                 <td style="font-weight: 500; color: #0d47a1;">${destinoDetectado}</td>
                                 <td style="color: #0d47a1; font-weight: 600;">${item.colunaK || '-'}</td>
-                                <td style="font-weight: bold; color: #0d47a1;">${statusExibido}</td>
-                                <td style="font-weight: bold; color: #0d47a1;">SIM</td>
+                                <td>${acaoHtml}</td>
                                 <td>${originBadge}</td>
+                                <td style="font-weight: bold; color: #0d47a1;">SIM</td>
                             `;
                         } else if (statusExibido.toLowerCase() === 'return_lmhub_received' || isTratativaReal) {
                             row.style.backgroundColor = '#fffaf0'; 
@@ -960,22 +952,22 @@
                             
                             row.innerHTML = `
                                 <td style="font-weight: 600; color: #c05621;">${item.trackingNumber}</td>
-                                <td>${acaoHtml}</td>
+                                <td style="font-weight: bold; color: #c05621;">${statusExibido}</td>
                                 <td style="font-weight: 500; color: #c05621;">${destinoDetectado}</td>
                                 <td style="color: #c05621; font-weight: 600;">${item.colunaK || '-'}</td>
-                                <td style="font-weight: bold; color: #c05621;">${statusExibido}</td>
-                                <td style="font-weight: bold; color: #c05621;">SIM</td>
+                                <td>${acaoHtml}</td>
                                 <td>${originBadge}</td>
+                                <td style="font-weight: bold; color: #c05621;">SIM</td>
                             `;
                         } else {
                             row.innerHTML = `
                                 <td style="font-weight: 600;">${item.trackingNumber}</td>
-                                <td>-</td>
+                                <td style="font-weight: 600; color: #2f855a;">${statusExibido}</td>
                                 <td style="font-weight: 500; color: #2d3748;">${destinoDetectado}</td>
                                 <td style="font-weight: 600; color: #2d3748;">${item.colunaK || '-'}</td>
-                                <td style="font-weight: 600; color: #2f855a;">${statusExibido}</td>
-                                <td style="font-weight: bold; color: #2f855a;">SIM</td>
+                                <td>-</td>
                                 <td>${originBadge}</td>
+                                <td style="font-weight: bold; color: #2f855a;">SIM</td>
                             `;
                         }
                     }
@@ -1194,8 +1186,8 @@
 
             let csvContent = "\uFEFF"; 
             
-            // CABEÇALHO ATUALIZADO EM ESTRUTURA IGUALMENTE AO EXPOSTO NA IMAGE_0399B7
-            csvContent += "SPX Tracking Number,Filtro Próxima Ação,Destino Detectado,Office / home,Status Original,Encontrado em Base,Origem da Base\n";
+            // CABEÇALHO CONFIGURADO SEGUINDO A NOVA ORDEM DA IMAGE_02A8BF
+            csvContent += "SPX Tracking Number,Status Original,Destino Detectado,office / home,Filtro Próxima Ação,Origem da Base,Encontrado em Base\n";
 
             window.scannedItemsList.forEach(item => {
                 let finalStatus = item.statusOriginal;
@@ -1217,15 +1209,15 @@
                     acaoExportacao = "ÁREA DE TRATATIVA";
                 }
 
-                // INSERÇÃO DE ELEMENTOS SEGUINDO A NOVA ESTRUTURA REORGANIZADA DA SEGUNDA IMAGEM
+                // INSERÇÃO DE DADOS RESPEITANDO A ORDEM DA IMAGE_02A8BF
                 let row = [
                     `"${item.trackingNumber}"`,
-                    `"${acaoExportacao}"`,
+                    `"${finalStatus}"`,
                     `"${destinoDetectado}"`,
                     `"${item.colunaK || '-'}"`,
-                    `"${finalStatus}"`,
-                    `"${item.notFound ? 'NÃO' : 'SIM'}"`,
-                    `"${item.origin}"`
+                    `"${acaoExportacao}"`,
+                    `"${item.origin}"`,
+                    `"${item.notFound ? 'NÃO' : 'SIM'}"`
                 ];
                 csvContent += row.join(",") + "\n";
             });

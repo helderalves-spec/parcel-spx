@@ -38,6 +38,8 @@
         .alert-green { background-color: #2ed573 !important; color: #ffffff !important; }
         .alert-red { background-color: #ff4757 !important; color: #ffffff !important; }
         .alert-orange { background-color: #ffa502 !important; color: #ffffff !important; }
+        .alert-blue { background-color: #1e3799 !important; color: #ffffff !important; }
+        .alert-purple { background-color: #8e44ad !important; color: #ffffff !important; } 
 
         /* Top Navbar */
         .navbar {
@@ -161,6 +163,7 @@
         .chart-text {
             position: absolute;
             text-align: center;
+            width: 100%;
         }
 
         .chart-percentage {
@@ -172,8 +175,8 @@
         .chart-label {
             font-size: 11px;
             color: #718096;
+            margin: 2px auto 0 auto;
             max-width: 110px;
-            margin-top: 2px;
             line-height: 1.2;
         }
 
@@ -194,14 +197,6 @@
         .stat-item .value {
             font-weight: 700;
             color: #1a202c;
-        }
-
-        /* Main Workspace Content Area */
-        .work-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
         }
 
         /* Floating Input field */
@@ -287,11 +282,33 @@
             justify-content: space-between;
             align-items: center;
             background-color: #fafbfe;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .table-search-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .table-search-input {
+            padding: 6px 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            font-size: 13px;
+            width: 240px;
+        }
+
+        .table-search-input:focus {
+            outline: none;
+            border-color: #e65100;
         }
 
         .actions-group {
             display: flex;
             gap: 10px;
+            align-items: center;
         }
 
         .export-btn {
@@ -314,7 +331,7 @@
         }
 
         .reset-btn {
-            background-color: #718096;
+            background-color: #d32f2f;
             color: white;
             border: none;
             padding: 8px 14px;
@@ -329,38 +346,51 @@
         }
 
         .reset-btn:hover {
-            background-color: #4a5568;
+            background-color: #b71c1c;
         }
 
-        /* Estilo para a área dos botões de Gerenciamento de Reset */
-        .management-box {
+        /* Controles de Paginação */
+        .pagination-container {
+            padding: 12px 20px;
+            background: #fafbfe;
+            border-top: 1px solid #e2e8f0;
             display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-top: 15px;
-            background: #f7fafc;
-            padding: 16px;
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .btn-danger-reset {
-            padding: 10px 16px;
-            background-color: #e53e3e;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-            display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 6px;
+            font-size: 13px;
+            color: #4a5568;
         }
 
-        .btn-danger-reset:hover {
-            background-color: #c53030;
+        .pagination-buttons {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .page-btn {
+            background: #ffffff;
+            border: 1px solid #cbd5e0;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            color: #4a5568;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            border-color: #e65100;
+            color: #e65100;
+        }
+
+        .page-btn:disabled {
+            background: #f7fafc;
+            color: #a0aec0;
+            cursor: not-allowed;
+        }
+
+        .page-info {
+            font-weight: 600;
         }
 
         .table-scroll {
@@ -400,6 +430,7 @@
         .badge-scanned { background-color: #c6f6d5; color: #22543d; }
         .badge-notfound { background-color: #fed7d7; color: #9b2c2c; font-weight: bold; }
         .badge-danger-action { background-color: #fff5f5; color: #e53e3e; border: 1px solid #feb2b2; font-weight: bold; padding: 4px 10px; border-radius: 4px; font-size: 11px; }
+        .badge-assigning-action { background-color: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; font-weight: bold; padding: 4px 10px; border-radius: 4px; font-size: 11px; }
         .badge-file-origin { padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; }
         .origin-base1 { background-color: #e2e8f0; color: #4a5568; }
         .origin-base2 { background-color: #ebf8ff; color: #2b6cb0; }
@@ -422,7 +453,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
-        import { getDatabase, ref, set, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, update, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC-98bTSJZekzIcbpWqvVPKzhsLPRSZbIA",
@@ -440,67 +471,93 @@
 
         window.dbFirebase = database;
         window.refFirebase = ref;
-        window.setFirebase = set;
+        window.updateFirebase = update;
         window.removeFirebase = remove;
-        window.updateFirebase = update; // Adicionado para gerenciar múltiplos envios sem travamentos
 
-        // Ouvinte em Tempo Real para persistência da Base 1 (Forward) na Nuvem
-        const base1Ref = ref(database, 'base1_importada');
+        window.base1Map = {};
+        window.base2Map = {};
+        window.totalB1Count = 0;
+        window.totalB2Count = 0;
+        window.rawScannedFirebaseObject = {}; 
+
+        // 1. ESCUTANDO AS BASES IMPORTADAS GLOBALMENTE NA NUVEM
+        const base1Ref = ref(database, 'planilha_base1');
         onValue(base1Ref, (snapshot) => {
             const data = snapshot.val();
-            if (data) {
-                window.base1Database = Object.keys(data).map(key => data[key]);
-                document.getElementById('box-file-1').classList.add('loaded');
-                document.getElementById('icon-file-1').innerText = '✔';
-                document.getElementById('label-file-1').innerText = `Base 1: ${window.base1Database.length} itens`;
-            } else {
-                window.base1Database = [];
-                document.getElementById('box-file-1').classList.remove('loaded');
-                document.getElementById('icon-file-1').innerText = '📥';
-                document.getElementById('label-file-1').innerText = `Selecionar Base Forward`;
+            window.base1Map = data || {};
+            window.totalB1Count = Object.keys(window.base1Map).length;
+            updateImportVisuals(1, window.totalB1Count);
+            checkAndUnlockScanner();
+            
+            if (window.totalB1Count > 0 && Object.keys(window.rawScannedFirebaseObject).length > 0) {
+                window.reprocessScansWithNewBases();
             }
-            window.updateBasesSummaryUI();
         });
 
-        // Ouvinte em Tempo Real para persistência da Base 2 (Receive Task) na Nuvem
-        const base2Ref = ref(database, 'base2_importada');
+        const base2Ref = ref(database, 'planilha_base2');
         onValue(base2Ref, (snapshot) => {
             const data = snapshot.val();
-            if (data) {
-                window.base2Database = Object.keys(data).map(key => data[key]);
-                document.getElementById('box-file-2').classList.add('loaded');
-                document.getElementById('icon-file-2').innerText = '✔';
-                document.getElementById('label-file-2').innerText = `Base 2: ${window.base2Database.length} itens`;
-            } else {
-                window.base2Database = [];
-                document.getElementById('box-file-2').classList.remove('loaded');
-                document.getElementById('icon-file-2').innerText = '📥';
-                document.getElementById('label-file-2').innerText = `Selecionar Base Receive Task`;
+            window.base2Map = data || {};
+            window.totalB2Count = Object.keys(window.base2Map).length;
+            updateImportVisuals(2, window.totalB2Count);
+            checkAndUnlockScanner();
+
+            if (window.totalB2Count > 0 && Object.keys(window.rawScannedFirebaseObject).length > 0) {
+                window.reprocessScansWithNewBases();
             }
-            window.updateBasesSummaryUI();
         });
 
-        // SE SINCRONIZA COM A NUVEM EM TEMPO REAL (BIPS OPERACIONAIS)
+        // 2. ESCUTANDO OS BIPS EFETUADOS EM TEMPO REAL
         const bipsRef = ref(database, 'bips_triagem');
         onValue(bipsRef, (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                const items = Object.keys(data).map(key => data[key]);
-                items.sort((a, b) => new Date(b.timestampBip) - new Date(a.timestampBip));
-                window.scannedItemsList = items;
-
-                const scannerInput = document.getElementById('main-barcode-scanner');
-                if (scannerInput) {
-                    scannerInput.disabled = false;
-                    scannerInput.placeholder = "Passe o leitor de código de barras...";
-                }
-            } else {
-                window.scannedItemsList = [];
-            }
+            const data = snapshot.val() || {};
+            window.rawScannedFirebaseObject = data;
+            
+            const items = Object.keys(data).map(key => data[key]);
+            items.sort((a, b) => new Date(b.timestampBip) - new Date(a.timestampBip));
+            window.scannedItemsList = items;
+            
             window.refreshDashboardUI();
         }, (error) => {
             console.log("Erro de conexão Firebase:", error);
         });
+
+        function updateImportVisuals(baseNum, count) {
+            const box = document.getElementById(`box-file-${baseNum}`);
+            const icon = document.getElementById(`icon-file-${baseNum}`);
+            const label = document.getElementById(`label-file-${baseNum}`);
+            if (count > 0) {
+                box.classList.add('loaded');
+                icon.innerText = '✔';
+                label.innerText = `Base ${baseNum}: ${count} itens ativos na nuvem`;
+            } else {
+                box.classList.remove('loaded');
+                icon.innerText = '📥';
+                label.innerText = baseNum === 1 ? "Selecionar Bases Forward (.csv ou .zip)" : "Selecionar Bases Receive Task (.csv ou .zip)";
+            }
+        }
+
+        function checkAndUnlockScanner() {
+            const totalRecords = window.totalB1Count + window.totalB2Count;
+            const scannerInput = document.getElementById('main-barcode-scanner');
+            if (scannerInput) {
+                if (totalRecords > 0) {
+                    scannerInput.disabled = false;
+                    scannerInput.placeholder = "Passe o leitor de código de barras...";
+                    document.getElementById('import-summary-card').style.display = 'block';
+                    document.getElementById('import-summary-text').innerHTML = `
+                        <strong>Base 1 (Nuvem):</strong> ${window.totalB1Count} registros acumulados.<br>
+                        <strong>Base 2 (Nuvem):</strong> ${window.totalB2Count} registros acumulados.<br>
+                        <strong>Total Geral em Rede:</strong> ${totalRecords} ordens prontas para bipar.
+                    `;
+                } else {
+                    scannerInput.disabled = true;
+                    scannerInput.placeholder = "Aguardando importação das planilhas ou sincronização da nuvem...";
+                    document.getElementById('import-summary-card').style.display = 'none';
+                }
+            }
+            window.refreshDashboardUI();
+        }
     </script>
 </head>
 <body>
@@ -509,7 +566,7 @@
 
     <div class="navbar">
         <div class="brand">
-            Parcel Sweeper Management <span>/</span> <strong>Triagem Coletiva Compartilhada em Rede (Sincronizada)</strong>
+            Parcel Sweeper Management <span>/</span> <strong>Triagem Coletiva Compartilhada Realtime (Múltiplos Arquivos & ZIP)</strong>
         </div>
         <div class="user-profile">
             <span>👤 helder.alves</span>
@@ -523,38 +580,38 @@
 
     <div id="tab-import" class="tab-content active">
         <div style="max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
-            <h2 style="font-size: 18px;">Carregamento das Bases de Triagem (Suporta .ZIP ou .CSV)</h2>
+            <h2 style="font-size: 18px;">Carregamento das Bases (Suporta múltiplos arquivos .csv ou pastas compactadas in .zip)</h2>
             
             <div class="import-grid">
                 <div>
-                    <h3 style="font-size: 14px; margin-bottom: 8px; color: #4a5568;">Base 1: Arquivo Forward (Original)</h3>
+                    <h3 style="font-size: 14px; margin-bottom: 8px; color: #4a5568;">Base 1: Arquivos Forward</h3>
                     <div id="box-file-1" class="import-box" onclick="document.getElementById('csv-file-1').click()">
                         <div id="icon-file-1" style="font-size: 32px; margin-bottom: 8px;">📥</div>
-                        <span id="label-file-1" style="font-size: 13px; font-weight: 600; color: #4a5568;">Selecionar Base Forward</span>
-                        <input type="file" id="csv-file-1" accept=".csv,.zip" style="display: none;" onchange="handleFileSelect(event, 1)">
+                        <span id="label-file-1" style="font-size: 13px; font-weight: 600; color: #4a5568;">Selecionar Bases Forward (.csv ou .zip)</span>
+                        <input type="file" id="csv-file-1" accept=".csv,.zip" multiple style="display: none;" onchange="handleFileSelectUnified(event, 1)">
                     </div>
                 </div>
 
                 <div>
-                    <h3 style="font-size: 14px; margin-bottom: 8px; color: #4a5568;">Base 2: Arquivo Receive Task (Novo)</h3>
+                    <h3 style="font-size: 14px; margin-bottom: 8px; color: #4a5568;">Base 2: Arquivos Receive Task</h3>
                     <div id="box-file-2" class="import-box" onclick="document.getElementById('csv-file-2').click()">
                         <div id="icon-file-2" style="font-size: 32px; margin-bottom: 8px;">📥</div>
-                        <span id="label-file-2" style="font-size: 13px; font-weight: 600; color: #2b6cb0;">Selecionar Base Receive Task</span>
-                        <input type="file" id="csv-file-2" accept=".csv,.zip" style="display: none;" onchange="handleFileSelect(event, 2)">
+                        <span id="label-file-2" style="font-size: 13px; font-weight: 600; color: #2b6cb0;">Selecionar Bases Receive Task (.csv ou .zip)</span>
+                        <input type="file" id="csv-file-2" accept=".csv,.zip" multiple style="display: none;" onchange="handleFileSelectUnified(event, 2)">
                     </div>
                 </div>
             </div>
 
-            <div class="management-box">
-                <button class="btn-danger-reset" onclick="resetBaseNuvem(1)">⚠️ Resetar Base 1</button>
-                <button class="btn-danger-reset" onclick="resetBaseNuvem(2)">⚠️ Resetar Base 2</button>
-                <button class="btn-danger-reset" style="background-color: #b7791f;" onclick="resetBaseNuvem('ambas')">🔥 Resetar Ambas as Bases</button>
-            </div>
-
             <div class="card" id="import-summary-card" style="display: none;">
-                <h4 style="color: #2e7d32;" id="summary-title">✔ Bases Prontas!</h4>
+                <h4 style="color: #2e7d32;" id="summary-title">✔ Sistema Ativo e Sincronizado em Rede!</h4>
                 <div style="font-size: 13px; margin-top: 5px; line-height: 1.5;" id="import-summary-text"></div>
-                <button class="btn btn-primary" style="margin-top: 15px; padding: 10px 20px; background-color: #e65100; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;" onclick="switchTab('dashboard')">Iniciar Bipagem Conjugada →</button>
+                
+                <div style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 12px;">
+                    <button style="padding: 10px 20px; background-color: #e65100; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;" onclick="switchTab('dashboard')">Iniciar Bipagem Conjugada →</button>
+                    <button style="padding: 10px 14px; background-color: #4a5568; color: white; border: none; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer;" onclick="clearDatabaseNode('planilha_base1')">🗑️ Resetar Apenas Base 1</button>
+                    <button style="padding: 10px 14px; background-color: #2b6cb0; color: white; border: none; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer;" onclick="clearDatabaseNode('planilha_base2')">🗑️ Resetar Apenas Base 2</button>
+                    <button style="padding: 10px 14px; background-color: #d32f2f; color: white; border: none; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer;" onclick="clearOnlyBases()">🚨 Reset Geral de Todas as Bases</button>
+                </div>
             </div>
         </div>
     </div>
@@ -574,48 +631,53 @@
                     </div>
                 </div>
                 <div class="stats-list">
-                    <div class="stat-item"><span>Total Carregado Local</span><span class="value" id="ui-total-esperado">0</span></div>
+                    <div class="stat-item"><span>Total Sincronizado</span><span class="value" id="ui-total-esperado">0</span></div>
                     <div class="stat-item"><span>Base 1 Itens</span><span class="value" id="ui-b1-count">0</span></div>
                     <div class="stat-item"><span>Base 2 Itens</span><span class="value" id="ui-b2-count">0</span></div>
                     <div class="stat-item"><span>Total Bipado (Rede)</span><span class="value" id="ui-total-bipado">0</span></div>
                 </div>
             </div>
 
-            <div class="work-area">
+            <div class="work-area" style="flex: 1; min-width: 0;">
                 <div class="voice-banner">
-                    <span>🔊</span> <strong>Modo Multi-Computador:</strong> Os dados exibidos abaixo estão consolidados e compartilhados simultaneamente em todas as telas da rede.
+                    <span>🔊</span> <strong>Sincronismo Ativo:</strong> Qualquer terminal da rede pode bipar agora. A inteligência do banco de dados está compartilhada de forma unificada.
                 </div>
 
                 <div class="card" style="padding: 14px 20px;">
                     <div class="scanner-container">
                         <span class="scanner-label">📷 ESCANEAR BR:</span>
-                        <input type="text" id="main-barcode-scanner" class="scanner-input" placeholder="Aguardando importação das planilhas ou sincronização da nuvem...">
+                        <input type="text" id="main-barcode-scanner" class="scanner-input" placeholder="Aguardando importação das planilhas..." disabled>
                     </div>
                 </div>
 
-                <div class="table-container">
+                <div class="table-container" style="margin-top: 20px;">
                     <div class="table-header">
                         <strong style="font-size: 14px;">Controle Unificado de Triagem (Base 1 + Base 2)</strong>
+                        
                         <div class="actions-group">
+                            <div class="table-search-box">
+                                <input type="text" id="table-search" class="table-search-input" placeholder="🔎 Pesquisar BR, status ou destino..." oninput="handleSearch()">
+                            </div>
                             <button class="export-btn" onclick="exportToExcelXLSX()">
                                 <span>📊</span> Exportar Relatório (.CSV)
                             </button>
-                            <button class="reset-btn" id="btn-reset-ui" onclick="clearAllScans()">
-                                <span>🔄</span> Limpar Alerta de Tela
+                            <button class="reset-btn" onclick="clearOnlyScans()">
+                                <span>🗑️</span> Limpar Bips Efetuados
                             </button>
                         </div>
                     </div>
+                    
                     <div class="table-scroll">
                         <table id="operational-table">
                             <thead>
                                 <tr>
-                                    <th>SPX TN</th>
-                                    <th>Status Localizado</th>
+                                    <th>SPX Tracking Number</th>
+                                    <th>Status Original</th>
                                     <th>Destino Detectado</th>
-                                    <th>Coluna K / Vendedor</th>
-                                    <th>Próxima Ação</th>
-                                    <th>Origem</th>
-                                    <th>Esperado</th>
+                                    <th>office / home</th>
+                                    <th>Filtro Próxima Ação</th>
+                                    <th>Origem da Base</th>
+                                    <th>Encontrado em Base</th>
                                 </tr>
                             </thead>
                             <tbody id="live-table-body">
@@ -627,6 +689,17 @@
                             </tbody>
                         </table>
                     </div>
+
+                    <div class="pagination-container" id="pagination-bar" style="display: none;">
+                        <div id="pagination-info-text">Exibindo 0-0 de 0 registros</div>
+                        <div class="pagination-buttons">
+                            <button class="page-btn" id="btn-show-all" onclick="toggleShowAll()">👁️ Mostrar Todos</button>
+                            <button class="page-btn" id="btn-page-prev" onclick="changePage(-1)">◀ Anterior</button>
+                            <span class="page-info" id="span-page-current">Pág 1</span>
+                            <button class="page-btn" id="btn-page-next" onclick="changePage(1)">Próximo ▶</button>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -634,9 +707,12 @@
     </div>
 
     <script>
-        window.base1Database = [];
-        window.base2Database = [];
         window.scannedItemsList = []; 
+        window.filteredItemsList = [];
+        window.currentPage = 1;
+        window.itemsPerPage = 50;
+        window.showAllItems = false;
+        window.currentSearchQuery = "";
 
         function emitVoiceAlert(messageText) {
             if ('speechSynthesis' in window) {
@@ -658,7 +734,6 @@
             } else {
                 document.querySelectorAll('.tab-btn')[1].classList.add('active');
                 document.getElementById('tab-dashboard').classList.add('active');
-                
                 const inputEl = document.getElementById('main-barcode-scanner');
                 setTimeout(() => { if(inputEl && !inputEl.disabled) inputEl.focus(); }, 100);
             }
@@ -690,489 +765,470 @@
             return result;
         }
 
-        function parseBase1(text) {
+        // Função utilitária para mapear índices por similaridade (Ignora acentos, espaços e caixa alta/baixa)
+        function findHeaderIndex(headers, targets) {
+            const clean = str => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+            const targetCleans = targets.map(clean);
+            
+            for (let i = 0; i < headers.length; i++) {
+                let hClean = clean(headers[i]);
+                if (targetCleans.some(t => hClean.includes(t) || t.includes(hClean))) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        function parseBase1Text(text) {
             const lines = text.split(/\r?\n/);
-            if (lines.length === 0) return [];
+            if (lines.length < 2) return {};
+
             const firstLine = lines[0];
             const countComma = (firstLine.match(/,/g) || []).length;
             const countSemicolon = (firstLine.match(/;/g) || []).length;
             const sep = countSemicolon > countComma ? ';' : ',';
-            const headers = splitCSVLine(firstLine, sep).map(h => h.toLowerCase().trim());
-            
-            const trackingIdx = headers.indexOf('sls tracking number');
-            const statusIdx = headers.indexOf('status');
-            const stationIdx = headers.indexOf('current station');
-            const destinationHubIdx = headers.indexOf('destination hub');
-            
-            const colunaKIdx = headers.length > 10 ? 10 : -1;
+            const headers = splitCSVLine(firstLine, sep);
 
-            let results = [];
+            // Mapeamento dinâmico inteligente por tolerância fonética/visual
+            const trackingIdx = findHeaderIndex(headers, ['sls tracking number', 'tracking number', 'tracking', 'codigo', 'rastreio']);
+            const statusIdx = findHeaderIndex(headers, ['status', 'order status', 'situacao']);
+            const stationIdx = findHeaderIndex(headers, ['current station', 'station', 'estacao']);
+            const destinationHubIdx = findHeaderIndex(headers, ['destination hub', 'destination', 'hub destino', 'hub']);
+            const colunaKIdx = 10; // Mantém fallback fixo da coluna K caso necessário
+
+            let results = {};
             for (let i = 1; i < lines.length; i++) {
                 let currentLine = lines[i].trim();
                 if (!currentLine) continue;
+                
                 let columns = splitCSVLine(currentLine, sep);
                 let trackingCode = columns[trackingIdx >= 0 ? trackingIdx : 1] || '';
                 let baseStatus = columns[statusIdx >= 0 ? statusIdx : 22] || 'N/A';
                 let station = columns[stationIdx >= 0 ? stationIdx : 36] || 'N/A';
                 let destHub = columns[destinationHubIdx >= 0 ? destinationHubIdx : 44] || '';
-                let valorK = colunaKIdx >= 0 ? columns[colunaKIdx] : '-';
-
+                let dadoColunaK = columns[colunaKIdx] || '';
+                
                 if(trackingCode) {
-                    results.push({
-                        trackingNumber: trackingCode.trim(),
-                        statusOriginal: baseStatus.trim(),
-                        station: station.trim(),
-                        destinationHub: destHub.trim(),
-                        colunaK: valorK ? valorK.trim() : '-',
+                    let cleanKey = trackingCode.replace(/[.#$\[\]]/g, "_");
+                    results[cleanKey] = {
+                        trackingNumber: trackingCode,
+                        statusOriginal: baseStatus,
+                        station: station,
+                        destinationHub: destHub,
+                        colunaK: dadoColunaK,
                         origin: 'Base 1'
-                    });
+                    };
                 }
             }
             return results;
         }
 
-        function parseBase2(text) {
-            let normalizedText = text.replace(/\r?\n/g, '\n');
-            const lines = normalizedText.split('\n');
-            if (lines.length === 0) return [];
+        function parseBase2Text(text) {
+            const lines = text.split(/\r?\n/);
+            if (lines.length < 2) return {};
+
             const firstLine = lines[0];
             const countComma = (firstLine.match(/,/g) || []).length;
             const countSemicolon = (firstLine.match(/;/g) || []).length;
             const sep = countSemicolon > countComma ? ';' : ',';
-            const headers = splitCSVLine(firstLine, sep).map(h => h.toLowerCase().trim());
-            
-            const trackingIdx = headers.indexOf('spx tracking number');
-            const orderStatusIdx = headers.indexOf('order status');
-            const sellerNameIdx = headers.indexOf('seller name');
+            const headers = splitCSVLine(firstLine, sep);
 
-            let results = [];
+            const trackingIdx = findHeaderIndex(headers, ['spx tracking number', 'tracking number', 'tracking', 'codigo', 'rastreio']);
+            const orderStatusIdx = findHeaderIndex(headers, ['order status', 'status', 'situacao']);
+
+            let results = {};
             for (let i = 1; i < lines.length; i++) {
                 let currentLine = lines[i].trim();
                 if (!currentLine) continue;
+                
                 let columns = splitCSVLine(currentLine, sep);
                 let trackingCode = columns[trackingIdx >= 0 ? trackingIdx : 0] || '';
                 let orderStatus = columns[orderStatusIdx >= 0 ? orderStatusIdx : 1] || 'N/A';
-                let sellerName = columns[sellerNameIdx >= 0 ? sellerNameIdx : 9] || '-';
-
+                
                 if(trackingCode && trackingCode.toLowerCase() !== 'spx tracking number') {
-                    results.push({
-                        trackingNumber: trackingCode.trim(),
-                        statusOriginal: orderStatus.trim(),
+                    let cleanKey = trackingCode.replace(/[.#$\[\]]/g, "_");
+                    results[cleanKey] = {
+                        trackingNumber: trackingCode,
+                        statusOriginal: orderStatus,
                         station: 'N/A',
                         destinationHub: 'N/A',
-                        colunaK: sellerName ? sellerName.trim() : '-',
+                        colunaK: '-',
                         origin: 'Base 2'
-                    });
+                    };
                 }
             }
             return results;
         }
 
-        async function processFileContent(fileObject, baseNum) {
-            const fileNameLower = fileObject.name.toLowerCase();
+        // Processamento em background por lotes dinâmicos de 50.000 linhas para evitar travamento
+        async function processChunksAsync(lines, baseNum, onProgress) {
+            let results = {};
+            const chunkSize = 50000;
+            const totalLines = lines.length;
             
-            if (fileNameLower.endsWith('.zip')) {
-                try {
-                    const zip = await JSZip.loadAsync(fileObject);
-                    let csvFileInZip = null;
-                    
-                    zip.forEach((relativePath, file) => {
-                        if (relativePath.toLowerCase().endsWith('.csv') && !csvFileInZip) {
-                            csvFileInZip = file;
-                        }
-                    });
-                    
-                    if (!csvFileInZip) {
-                        alert("Erro: Nenhum arquivo .CSV foi localizado dentro do arquivo .ZIP enviado.");
-                        return;
-                    }
-                    
-                    const textData = await csvFileInZip.async("string");
-                    executeParsing(textData, baseNum, `[ZIP] ${fileObject.name}`);
-                } catch (err) {
-                    alert("Falha ao abrir ou descompactar o arquivo ZIP: " + err.message);
-                }
-            } else {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    executeParsing(e.target.result, baseNum, fileObject.name);
-                };
-                reader.readAsText(fileObject, 'UTF-8');
-            }
-        }
+            // Extração de cabeçalhos
+            const firstLine = lines[0];
+            const countComma = (firstLine.match(/,/g) || []).length;
+            const countSemicolon = (firstLine.match(/;/g) || []).length;
+            const sep = countSemicolon > countComma ? ';' : ',';
+            const headers = splitCSVLine(firstLine, sep);
 
-        // CORREÇÃO: Função modificada para dar suporte a arquivos massivos dividindo o upload em blocos (evita truncamento)
-        function executeParsing(text, baseNum, displayName) {
-            let parsedList = [];
-            let targetNode = (baseNum === 1) ? 'base1_importada' : 'base2_importada';
-            
+            let trackingIdx, statusIdx, stationIdx, destinationHubIdx, orderStatusIdx;
             if (baseNum === 1) {
-                parsedList = parseBase1(text);
+                trackingIdx = findHeaderIndex(headers, ['sls tracking number', 'tracking number', 'tracking', 'codigo', 'rastreio']);
+                statusIdx = findHeaderIndex(headers, ['status', 'order status', 'situacao']);
+                stationIdx = findHeaderIndex(headers, ['current station', 'station', 'estacao']);
+                destinationHubIdx = findHeaderIndex(headers, ['destination hub', 'destination', 'hub destino', 'hub']);
             } else {
-                parsedList = parseBase2(text);
+                trackingIdx = findHeaderIndex(headers, ['spx tracking number', 'tracking number', 'tracking', 'codigo', 'rastreio']);
+                orderStatusIdx = findHeaderIndex(headers, ['order status', 'status', 'situacao']);
             }
 
-            if (window.dbFirebase && window.refFirebase && window.updateFirebase) {
-                // Notificação visual de processamento em lote grande
-                let originalLabel = document.getElementById(`label-file-${baseNum}`).innerText;
-                document.getElementById(`label-file-${baseNum}`).innerText = `Salvando ${parsedList.length} itens na nuvem...`;
-
-                let chunks = [];
-                let chunkSize = 4000; // Dividir em partes menores para suportar arquivos massivos de 10k, 20k, 50k+ com segurança
-                for (let i = 0; i < parsedList.length; i += chunkSize) {
-                    chunks.push(parsedList.slice(i, i + chunkSize));
+            for (let i = 1; i < totalLines; i += chunkSize) {
+                const end = Math.min(i + chunkSize, totalLines);
+                
+                for (let j = i; j < end; j++) {
+                    let currentLine = lines[j].trim();
+                    if (!currentLine) continue;
+                    
+                    let columns = splitCSVLine(currentLine, sep);
+                    if (baseNum === 1) {
+                        let trackingCode = columns[trackingIdx >= 0 ? trackingIdx : 1] || '';
+                        let baseStatus = columns[statusIdx >= 0 ? statusIdx : 22] || 'N/A';
+                        let station = columns[stationIdx >= 0 ? stationIdx : 36] || 'N/A';
+                        let destHub = columns[destinationHubIdx >= 0 ? destinationHubIdx : 44] || '';
+                        let dadoColunaK = columns[10] || '';
+                        
+                        if (trackingCode) {
+                            let cleanKey = trackingCode.replace(/[.#$\[\]]/g, "_");
+                            results[cleanKey] = {
+                                trackingNumber: trackingCode,
+                                statusOriginal: baseStatus,
+                                station: station,
+                                destinationHub: destHub,
+                                colunaK: dadoColunaK,
+                                origin: 'Base 1'
+                            };
+                        }
+                    } else {
+                        let trackingCode = columns[trackingIdx >= 0 ? trackingIdx : 0] || '';
+                        let orderStatus = columns[orderStatusIdx >= 0 ? orderStatusIdx : 1] || 'N/A';
+                        
+                        if (trackingCode && trackingCode.toLowerCase() !== 'spx tracking number') {
+                            let cleanKey = trackingCode.replace(/[.#$\[\]]/g, "_");
+                            results[cleanKey] = {
+                                trackingNumber: trackingCode,
+                                statusOriginal: orderStatus,
+                                station: 'N/A',
+                                destinationHub: 'N/A',
+                                colunaK: '-',
+                                origin: 'Base 2'
+                            };
+                        }
+                    }
                 }
+                
+                // Notifica a UI e cede controle momentâneo para a Thread principal respirar
+                onProgress(Math.min(100, Math.round((end / totalLines) * 100)));
+                await new Promise(resolve => setTimeout(resolve, 15));
+            }
+            return results;
+        }
 
-                let chunkIndex = 0;
-                function sendNextChunk() {
-                    if (chunkIndex >= chunks.length) {
-                        // Concluído com sucesso total
-                        if(baseNum === 1) { window.base1Database = parsedList; } else { window.base2Database = parsedList; }
-                        window.updateBasesSummaryUI();
-                        return;
+        async function handleFileSelectUnified(event, baseNum) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
+            const label = document.getElementById(`label-file-${baseNum}`);
+            label.innerText = "Preparando arquivos... Aguarde.";
+            
+            let accumulatedData = {};
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (file.name.endsWith('.zip')) {
+                    try {
+                        const zip = await JSZip.loadAsync(file);
+                        const fileNames = Object.keys(zip.files);
+                        for (let fileName of fileNames) {
+                            if (fileName.endsWith('.csv') && !zip.files[fileName].dir) {
+                                label.innerText = `Processando arquivo ZIP [${fileName}]...`;
+                                const textData = await zip.files[fileName].async("text");
+                                const lines = textData.split(/\r?\n/);
+                                
+                                let parsed = await processChunksAsync(lines, baseNum, (pct) => {
+                                    label.innerText = `Lendo ZIP: ${pct}% concluído...`;
+                                });
+                                Object.assign(accumulatedData, parsed);
+                            }
+                        }
+                    } catch (err) {
+                        console.error("Erro ao ler ZIP:", err);
+                        alert("Falha ao processar arquivo ZIP válido.");
+                    }
+                } else if (file.name.endsWith('.csv')) {
+                    const textData = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => resolve(e.target.result);
+                        reader.readAsText(file, 'UTF-8');
+                    });
+                    
+                    const lines = textData.split(/\r?\n/);
+                    let parsed = await processChunksAsync(lines, baseNum, (pct) => {
+                        label.innerText = `Lendo CSV: ${pct}% unificado...`;
+                    });
+                    Object.assign(accumulatedData, parsed);
+                }
+            }
+
+            if (Object.keys(accumulatedData).length > 0) {
+                label.innerText = "Enviando dados consolidados para a nuvem...";
+                if (window.dbFirebase && window.refFirebase && window.updateFirebase) {
+                    const targetNode = baseNum === 1 ? 'planilha_base1' : 'planilha_base2';
+                    const nodeRef = window.refFirebase(window.dbFirebase, targetNode);
+                    
+                    window.updateFirebase(nodeRef, accumulatedData).then(() => {
+                        event.target.value = '';
+                        alert(`Sucesso! Novos dados integrados e atualizados na Base ${baseNum}.`);
+                    }).catch(err => {
+                        console.error(err);
+                        alert("Erro ao persistir informações no Firebase.");
+                        updateImportVisuals(baseNum, baseNum === 1 ? window.totalB1Count : window.totalB2Count);
+                    });
+                }
+            } else {
+                alert("Nenhum dado CSV válido foi extraído dos arquivos selecionados.");
+                updateImportVisuals(baseNum, baseNum === 1 ? window.totalB1Count : window.totalB2Count);
+            }
+        }
+
+        window.reprocessScansWithNewBases = function() {
+            let updatesToPush = {};
+            let countMigrated = 0;
+
+            Object.keys(window.rawScannedFirebaseObject).forEach(key => {
+                let currentScan = window.rawScannedFirebaseObject[key];
+                
+                if (currentScan.origin !== 'Base 1' && window.base1Map[key]) {
+                    let matchedItemB1 = window.base1Map[key];
+                    let statusOriginalReal = matchedItemB1.statusOriginal;
+                    let statusLower = statusOriginalReal.toLowerCase();
+                    let isTratativa = false;
+                    let isOutroHub = false;
+
+                    const destHubContent = matchedItemB1.destinationHub ? matchedItemB1.destinationHub.trim() : "";
+                    const destHubLower = destHubContent.toLowerCase();
+                    const allowedCities = ["uberaba", "monte carmelo", "catalão", "catalao"];
+                    let matchesCity = allowedCities.some(city => destHubLower.includes(city));
+
+                    if (!matchesCity && destHubContent.length > 0) {
+                        isOutroHub = true;
+                        isTratativa = true;
+                        statusOriginalReal = "OUTRO HUB";
                     }
 
-                    let uploadObj = {};
-                    chunks[chunkIndex].forEach(item => {
-                        const cleanKey = item.trackingNumber.replace(/[.#$\[\]]/g, "_");
-                        uploadObj[cleanKey] = item;
-                    });
+                    if (statusLower === 'return_lmhub_received' || (!statusLower.includes("lmhub_received") && !statusLower.includes("lmhub_assigning"))) {
+                        if(!statusLower.includes("delivered") && !statusLower.includes("delivering")) {
+                            isTratativa = true;
+                        }
+                    }
 
-                    const targetRef = window.refFirebase(window.dbFirebase, targetNode);
-                    window.updateFirebase(targetRef, uploadObj)
-                        .then(() => {
-                            chunkIndex++;
-                            sendNextChunk(); // Envia o próximo bloco
-                        })
-                        .catch(err => {
-                            alert("Erro no upload do lote Firebase: " + err.message);
-                            document.getElementById(`label-file-${baseNum}`).innerText = originalLabel;
-                        });
+                    updatesToPush[key] = {
+                        trackingNumber: currentScan.trackingNumber,
+                        statusOriginal: statusOriginalReal,
+                        station: matchedItemB1.station,
+                        destinationHub: matchedItemB1.destinationHub,
+                        colunaK: matchedItemB1.colunaK || '-',
+                        origin: 'Base 1',
+                        isTratativa: isTratativa,
+                        isOutroHub: isOutroHub,
+                        notFound: false,
+                        timestampBip: currentScan.timestampBip
+                    };
+                    countMigrated++;
+                } else if (currentScan.origin === 'NENHUMA' && window.base2Map[key]) {
+                    let matchedItemB2 = window.base2Map[key];
+                    let statusOriginalReal = matchedItemB2.statusOriginal;
+                    let statusLower = statusOriginalReal.toLowerCase();
+                    let isTratativa = false;
+
+                    if (statusLower === 'return_lmhub_received' || (!statusLower.includes("lmhub_received") && !statusLower.includes("lmhub_assigning"))) {
+                        if(!statusLower.includes("delivered") && !statusLower.includes("delivering")) {
+                            isTratativa = true;
+                        }
+                    }
+
+                    updatesToPush[key] = {
+                        trackingNumber: currentScan.trackingNumber,
+                        statusOriginal: statusOriginalReal,
+                        station: 'N/A',
+                        destinationHub: 'N/A',
+                        colunaK: '-',
+                        origin: 'Base 2',
+                        isTratativa: isTratativa,
+                        isOutroHub: false,
+                        notFound: false,
+                        timestampBip: currentScan.timestampBip
+                    };
+                    countMigrated++;
                 }
-                sendNextChunk();
+            });
+
+            if (countMigrated > 0 && window.dbFirebase && window.refFirebase && window.updateFirebase) {
+                console.log(`[Retroativo] Atualizando automaticamente ${countMigrated} bips antigos com novas bases.`);
+                window.updateFirebase(window.refFirebase(window.dbFirebase, 'bips_triagem'), updatesToPush);
+            }
+        };
+
+        window.handleSearch = function() {
+            const query = document.getElementById('table-search').value.toLowerCase().trim();
+            window.currentSearchQuery = query;
+            window.currentPage = 1; 
+            window.refreshDashboardUI();
+        };
+
+        window.changePage = function(direction) {
+            window.currentPage += direction;
+            window.refreshDashboardUI();
+        };
+
+        window.toggleShowAll = function() {
+            window.showAllItems = !window.showAllItems;
+            const btn = document.getElementById('btn-show-all');
+            if(window.showAllItems) {
+                btn.innerText = "📄 Paginar (50 itens)";
             } else {
-                if (baseNum === 1) { window.base1Database = parsedList; } else { window.base2Database = parsedList; }
-                window.updateBasesSummaryUI();
+                btn.innerText = "👁️ Mostrar Todos";
+                window.currentPage = 1;
             }
-        }
-
-        // NOVO: Função para deletar as bases remotamente no Firebase de acordo com o botão clicado
-        window.resetBaseNuvem = function(tipo) {
-            if (!window.dbFirebase || !window.removeFirebase || !window.refFirebase) {
-                alert("Erro: Firebase não inicializado corretamente.");
-                return;
-            }
-
-            let confirmacao = confirm(`Tem certeza que deseja deletar a(s) base(s) selecionada(s)? Esta ação limpará os dados de triagem esperados em todos os computadores.`);
-            if (!confirmacao) return;
-
-            if (tipo === 1 || tipo === 'ambas') {
-                const targetRef1 = window.refFirebase(window.dbFirebase, 'base1_importada');
-                window.removeFirebase(targetRef1);
-            }
-            if (tipo === 2 || tipo === 'ambas') {
-                const targetRef2 = window.refFirebase(window.dbFirebase, 'base2_importada');
-                window.removeFirebase(targetRef2);
-            }
-        }
-
-        window.updateBasesSummaryUI = function() {
-            const totalRecords = (window.base1Database ? window.base1Database.length : 0) + (window.base2Database ? window.base2Database.length : 0);
-            
-            const summaryCard = document.getElementById('import-summary-card');
-            const summaryText = document.getElementById('import-summary-text');
-            const inputEl = document.getElementById('main-barcode-scanner');
-
-            if (totalRecords > 0) {
-                if(inputEl) {
-                    inputEl.disabled = false;
-                    inputEl.placeholder = "Passe o leitor de código de barras...";
-                }
-                if(summaryCard && summaryText) {
-                    summaryCard.style.display = 'block';
-                    summaryText.innerHTML = `
-                        <strong>Base 1 (Forward):</strong> ${window.base1Database ? window.base1Database.length : 0} registros mapeados na nuvem.<br>
-                        <strong>Base 2 (Receive Task):</strong> ${window.base2Database ? window.base2Database.length : 0} registros mapeados na nuvem.<br>
-                        <strong>Total Combinado Ativo:</strong> ${totalRecords} ordens prontas para busca cruzada.
-                    `;
-                }
-            } else {
-                if(summaryCard) summaryCard.style.display = 'none';
-            }
-            refreshDashboardUI();
-        }
-
-        function handleFileSelect(event, baseNum) {
-            const file = event.target.files[0];
-            if (!file) return;
-            processFileContent(file, baseNum);
-        }
+            window.refreshDashboardUI();
+        };
 
         window.refreshDashboardUI = function() {
             const tbody = document.getElementById('live-table-body');
-            if(!tbody) return;
-            
+            const paginationBar = document.getElementById('pagination-bar');
+
             if (!window.scannedItemsList || window.scannedItemsList.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #a0aec0; padding: 40px; font-style: italic;">Nenhum registro exposto. Bipe um pacote para validar.</td></tr>`;
+                paginationBar.style.display = 'none';
             } else {
-                tbody.innerHTML = '';
-                window.scannedItemsList.forEach(item => {
-                    const row = document.createElement('tr');
+                if (window.currentSearchQuery) {
+                    window.filteredItemsList = window.scannedItemsList.filter(item => {
+                        let tracking = (item.trackingNumber || '').toLowerCase();
+                        let status = (item.statusOriginal || '').toLowerCase();
+                        let destino = (item.destinationHub || '').toLowerCase();
+                        let acao = item.notFound ? 'área de tratativa não encontrado' : (item.isTratativa ? 'área de tratativa' : 'bipar e alocar na gaiola');
+                        return tracking.includes(window.currentSearchQuery) || 
+                               status.includes(window.currentSearchQuery) || 
+                               destino.includes(window.currentSearchQuery) ||
+                               acao.toLowerCase().includes(window.currentSearchQuery);
+                    });
+                } else {
+                    window.filteredItemsList = [...window.scannedItemsList];
+                }
+
+                const totalItems = window.filteredItemsList.length;
+                let displayItems = [];
+
+                if (window.showAllItems) {
+                    displayItems = window.filteredItemsList;
+                    paginationBar.style.display = 'flex';
+                    document.getElementById('pagination-info-text').innerText = `Exibindo todos os ${totalItems} registros encontrados`;
+                    document.getElementById('btn-page-prev').disabled = true;
+                    document.getElementById('btn-page-next').disabled = true;
+                    document.getElementById('span-page-current').innerText = `Pág 1/1`;
+                } else {
+                    paginationBar.style.display = totalItems > window.itemsPerPage ? 'flex' : 'none';
+                    const totalPages = Math.ceil(totalItems / window.itemsPerPage) || 1;
+                    if (window.currentPage > totalPages) window.currentPage = totalPages;
                     
-                    if (item.notFound) {
-                        row.innerHTML = `
-                            <td style="font-weight: 600; color: #e53e3e;">${item.trackingNumber}</td>
-                            <td style="color: #e53e3e; font-weight: bold;">NÃO ENCONTRADO</td>
-                            <td style="color: #cbd5e0;">-</td>
-                            <td style="color: #cbd5e0;">-</td>
-                            <td><span class="badge badge-notfound">ÁREA DE TRATATIVA</span></td>
-                            <td><span class="badge badge-file-origin" style="background-color: #cbd5e0;">NENHUMA</span></td>
-                            <td style="font-weight: bold; color: #e53e3e;">NÃO</td>
-                        `;
-                    } else {
-                        let originBadge = item.origin === 'Base 1' 
-                            ? `<span class="badge badge-file-origin origin-base1">Base 1 (Forward)</span>`
-                            : `<span class="badge badge-file-origin origin-base2">Base 2 (Receive)</span>`;
+                    const startIndex = (window.currentPage - 1) * window.itemsPerPage;
+                    const endIndex = Math.min(startIndex + window.itemsPerPage, totalItems);
+                    
+                    displayItems = window.filteredItemsList.slice(startIndex, endIndex);
+                    
+                    document.getElementById('pagination-info-text').innerText = `Exibindo ${totalItems === 0 ? 0 : startIndex + 1}-${endIndex} de ${totalItems} registros`;
+                    document.getElementById('btn-page-prev').disabled = window.currentPage === 1;
+                    document.getElementById('btn-page-next').disabled = window.currentPage === totalPages;
+                    document.getElementById('span-page-current').innerText = `Pág ${window.currentPage}/${totalPages}`;
+                }
 
-                        let acaoHtml = `<span class="badge badge-scanned">PROSSEGUIR</span>`;
+                if (displayItems.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #a0aec0; padding: 25px;">Nenhum item corresponde à pesquisa efetuada.</td></tr>`;
+                } else {
+                    tbody.innerHTML = "";
+                    displayItems.forEach(item => {
+                        let badgeScan = item.notFound ? `<span class="badge badge-notfound">NÃO ENCONTRADO</span>` : `<span class="badge badge-scanned">Mapeado</span>`;
+                        let badgeOrigin = item.origin === 'Base 1' ? `<span class="badge badge-file-origin origin-base1">Forward (B1)</span>` : (item.origin === 'Base 2' ? `<span class="badge badge-file-origin origin-base2">Receive Task (B2)</span>` : `<span class="badge badge-file-origin" style="background:#e53e3e;color:white;">NENHUMA</span>`);
                         
-                        let statusExibido = item.statusOriginal ? item.statusOriginal.toUpperCase() : "N/A";
-                        let statusLower = item.statusOriginal ? item.statusOriginal.toLowerCase() : "";
-                        let destinoDetectado = item.destinationHub !== 'N/A' && item.destinationHub !== '-' ? item.destinationHub : (item.station || '-');
-
-                        let isOutroHubReal = false;
-                        if (item.origin === 'Base 1') {
-                            const allowed = ["uberaba", "monte carmelo", "catalão", "catalao"];
-                            const dhLower = item.destinationHub ? item.destinationHub.toLowerCase() : "";
-                            if (!allowed.some(city => dhLower.includes(city)) && item.destinationHub.trim().length > 0) {
-                                isOutroHubReal = true;
-                            }
+                        let acaoHtml = "";
+                        if (item.notFound) {
+                            acaoHtml = `<span class="badge badge-danger-action">🚨 ÁREA DE TRATATIVA</span>`;
+                        } else if (item.isTratativa) {
+                            acaoHtml = `<span class="badge badge-danger-action">⚠️ ÁREA DE TRATATIVA</span>`;
+                        } else {
+                            acaoHtml = `<span class="badge badge-assigning-action">📦 BIPAR E ALOCAR GAIOLA</span>`;
                         }
 
-                        if (isOutroHubReal || statusExibido === "OUTRO HUB") {
-                            row.style.backgroundColor = '#fffaf0'; 
-                            statusExibido = "OUTRO HUB";
-                            acaoHtml = `<span class="badge-danger-action" style="background-color: #feebc8; color: #c05621; border-color: #fbd38d;">ÁREA DE TRATATIVA</span>`;
-                        } else if (statusLower.includes("delivered") || statusLower.includes("delivering")) {
-                            row.style.backgroundColor = '#fff5f5';
-                            acaoHtml = `<span class="badge-danger-action">ÁREA DE TRATATIVA</span>`;
-                        } else if (statusLower === 'lmhub_assigning') {
-                            row.style.backgroundColor = '#fffaf0';
-                            acaoHtml = `<span class="badge-danger-action" style="background-color: #feebc8; color: #c05621; border-color: #fbd38d;">ÁREA DE TRATATIVA</span>`;
-                        } else if (!statusLower.includes("lmhub_received") && item.origin === 'Base 1') {
-                            row.style.backgroundColor = '#fff5f5';
-                            acaoHtml = `<span class="badge-danger-action">ÁREA DE TRATATIVA</span>`;
-                        } else if (item.origin === 'Base 2' && statusLower !== 'assigned') {
-                            row.style.backgroundColor = '#fff5f5';
-                            acaoHtml = `<span class="badge-danger-action">ÁREA DE TRATATIVA</span>`;
-                        }
-
+                        let row = document.createElement('tr');
                         row.innerHTML = `
-                            <td style="font-weight: 600;">${item.trackingNumber}</td>
-                            <td style="font-weight: bold; color: #2b6cb0;">${statusExibido}</td>
-                            <td style="font-weight: 500;">${destinoDetectado}</td>
-                            <td style="font-weight: 600;">${item.colunaK || '-'}</td>
+                            <td><strong>${item.trackingNumber}</strong></td>
+                            <td><span style="font-family:monospace;color:#4a5568;">${item.statusOriginal}</span></td>
+                            <td>${item.destinationHub || '-'}</td>
+                            <td>${item.colunaK || '-'}</td>
                             <td>${acaoHtml}</td>
-                            <td>${originBadge}</td>
-                            <td style="font-weight: bold; color: #2f855a;">SIM</td>
+                            <td>${badgeOrigin}</td>
+                            <td>${badgeScan}</td>
                         `;
-                    }
-                    tbody.appendChild(row);
-                });
+                        tbody.appendChild(row);
+                    });
+                }
             }
 
-            const totalB1 = window.base1Database ? window.base1Database.length : 0;
-            const totalB2 = window.base2Database ? window.base2Database.length : 0;
-            const totalRecords = totalB1 + totalB2;
-            const totalBipados = window.scannedItemsList ? window.scannedItemsList.length : 0;
-            const ratioPct = totalRecords > 0 ? ((totalBipados / totalRecords) * 100) : 0;
+            // Atualização dinâmica dos contadores nas caixas laterais
+            document.getElementById('ui-b1-count').innerText = window.totalB1Count;
+            document.getElementById('ui-b2-count').innerText = window.totalB2Count;
+            
+            const totalEsperado = window.totalB1Count + window.totalB2Count;
+            document.getElementById('ui-total-esperado').innerText = totalEsperado;
 
-            document.getElementById('ui-total-esperado').innerText = totalRecords;
-            document.getElementById('ui-b1-count').innerText = totalB1;
-            document.getElementById('ui-b2-count').innerText = totalB2;
-            document.getElementById('ui-total-bipado').innerText = totalBipados;
-            document.getElementById('ui-percentage').innerText = ratioPct.toFixed(2) + '%';
+            const bipsEfetuadosEmRede = window.scannedItemsList.length;
+            document.getElementById('ui-total-bipado').innerText = bipsEfetuadosEmRede;
 
+            // Gráfico circular
+            let percent = 0;
+            if (totalEsperado > 0) {
+                percent = (bipsEfetuadosEmRede / totalEsperado) * 100;
+            }
+            document.getElementById('ui-percentage').innerText = percent.toFixed(2) + "%";
+            
             const circle = document.getElementById('progress-circle');
-            if(circle) {
-                const radius = 70;
-                const circumference = 2 * Math.PI * radius;
-                const offset = circumference - (Math.min(ratioPct, 100) / 100) * circumference;
+            if (circle) {
+                const circumference = 2 * Math.PI * 70; 
+                const offset = circumference - (Math.min(percent, 100) / 100) * circumference;
                 circle.style.strokeDasharray = circumference;
                 circle.style.strokeDashoffset = offset;
             }
-        }
+        };
 
-        function executeBarcodeBeep() {
-            const inputField = document.getElementById('main-barcode-scanner');
-            const codeToFind = inputField.value.trim();
-            const topAlertEl = document.getElementById('master-top-alert');
-
-            if (!codeToFind) return;
-
-            topAlertEl.className = 'top-alert-bar';
-            topAlertEl.style.display = 'block';
-
-            const alreadyScanned = window.scannedItemsList.find(item => item.trackingNumber === codeToFind);
-            if (alreadyScanned) {
-                topAlertEl.classList.add('alert-orange');
-                topAlertEl.innerText = `⚠️ CÓDIGO REPETIDO! A BR ${codeToFind} JÁ FOI BIPADA ANTES.`;
-                emitVoiceAlert("Código repetido");
-                inputField.value = ''; 
+        window.exportToExcelXLSX = function() {
+            if(!window.scannedItemsList || window.scannedItemsList.length === 0) {
+                alert("Não existem bips registrados para exportação.");
                 return;
             }
 
-            let matchedItem = window.base1Database ? window.base1Database.find(item => item.trackingNumber === codeToFind) : null;
-            let foundInBase1 = true;
-
-            if (!matchedItem) {
-                matchedItem = window.base2Database ? window.base2Database.find(item => item.trackingNumber === codeToFind) : null;
-                foundInBase1 = false;
-            }
-
-            let finalScannedObject = null;
-
-            if (matchedItem) {
-                const statusLower = matchedItem.statusOriginal.toLowerCase();
-                let isTratativa = false;
-                let alertColor = 'alert-green';
-                let messageText = '';
-
-                if (foundInBase1) {
-                    const destHubContent = matchedItem.destinationHub ? matchedItem.destinationHub.trim() : "";
-                    const destHubLower = destHubContent.toLowerCase();
-                    let isForeignHub = false;
-
-                    const allowedCities = ["uberaba", "monte carmelo", "catalão", "catalao"];
-                    if (destHubContent.length > 0) {
-                        let matchesCity = allowedCities.some(city => destHubLower.includes(city));
-                        if (!matchesCity) {
-                            isForeignHub = true;
-                        }
-                    }
-
-                    if (statusLower.includes("delivered") || statusLower.includes("delivering")) {
-                        isTratativa = true;
-                    } else if (statusLower === 'lmhub_assigning') {
-                        isTratativa = true;
-                    } else if (!statusLower.includes("lmhub_received")) {
-                        isTratativa = true;
-                    }
-
-                    if (isForeignHub) {
-                        alertColor = 'alert-orange';
-                        messageText = `🍊 OUTRO HUB DETECTADO! BR: ${codeToFind} | DESTINO: ${destHubContent} -> ENVIAR PARA TRATATIVA`;
-                        emitVoiceAlert("Atenção: Outro hub");
-                    } else if (isTratativa) {
-                        alertColor = 'alert-orange';
-                        messageText = `🍊 STATUS RETIDO / ADVERTÊNCIA (${matchedItem.statusOriginal})! BR: ${codeToFind} -> ENVIAR PARA TRATATIVA`;
-                        emitVoiceAlert("Atenção: Área de Tratativa");
-                    } else {
-                        messageText = `✅ BIPAGEM OK (Base 1)! BR: ${codeToFind} | DESTINO PARCEL ACEITO`;
-                        emitVoiceAlert("Bipado com sucesso");
-                    }
-                } else {
-                    if (statusLower !== 'assigned') {
-                        isTratativa = true;
-                    }
-
-                    if (isTratativa) {
-                        alertColor = 'alert-orange';
-                        messageText = `🍊 STATUS RETIDO / ADVERTÊNCIA NA BASE 2 (${matchedItem.statusOriginal})! BR: ${codeToFind} -> ENVIAR PARA TRATATIVA`;
-                        emitVoiceAlert("Atenção: Área de Tratativa");
-                    } else {
-                        alertColor = 'alert-green';
-                        messageText = `✅ LOCALIZADO NA BASE 2 (Receive Task)! STATUS: ${matchedItem.statusOriginal} | BR: ${codeToFind}`;
-                        emitVoiceAlert("Bipado com sucesso");
-                    }
-                }
-
-                topAlertEl.classList.add(alertColor);
-                topAlertEl.innerText = messageText;
-
-                finalScannedObject = {
-                    trackingNumber: matchedItem.trackingNumber,
-                    statusOriginal: matchedItem.statusOriginal,
-                    station: matchedItem.station,
-                    destinationHub: matchedItem.destinationHub,
-                    colunaK: matchedItem.colunaK,
-                    origin: matchedItem.origin,
-                    notFound: false,
-                    timestampBip: new Date().toISOString()
-                };
-
-            } else {
-                topAlertEl.classList.add('alert-red');
-                topAlertEl.innerText = `❌ REGISTRO NÃO ENCONTRADO NAS BASES! BR: ${codeToFind} -> DIRECIONAR PARA TRATATIVA`;
-                emitVoiceAlert("Atenção: Não encontrado");
-
-                finalScannedObject = {
-                    trackingNumber: codeToFind,
-                    statusOriginal: 'NÃO ENCONTRADO',
-                    station: '-',
-                    destinationHub: '-',
-                    colunaK: '-',
-                    origin: 'NENHUMA',
-                    notFound: true,
-                    timestampBip: new Date().toISOString()
-                };
-            }
-
-            inputField.value = '';
-
-            try {
-                if (window.dbFirebase && window.refFirebase && window.setFirebase) {
-                    const cleanKey = codeToFind.replace(/[.#$\[\]]/g, "_");
-                    const itemRef = window.refFirebase(window.dbFirebase, 'bips_triagem/' + cleanKey);
-                    window.setFirebase(itemRef, finalScannedObject);
-                }
-            } catch (e) {
-                window.scannedItemsList.unshift(finalScannedObject);
-                window.refreshDashboardUI();
-            }
-        }
-
-        function clearAllScans() {
-            document.getElementById('master-top-alert').style.display = 'none';
-            document.getElementById('master-top-alert').innerText = '';
+            let csvContent = "\uFEFFSPX Tracking Number,Status Triado,Destino Detectado,Office/Home,Filtro Proxima Acao,Origem da Base,Encontrado em Base\n";
             
-            const inputEl = document.getElementById('main-barcode-scanner');
-            if(inputEl) inputEl.focus();
-        }
-
-        document.getElementById('main-barcode-scanner').addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
-                executeBarcodeBeep();
-            }
-        });
-
-        function exportToExcelXLSX() {
-            if (!window.scannedItemsList || window.scannedItemsList.length === 0) {
-                alert("Nenhum item bipado para exportação.");
-                return;
-            }
-
-            let csvContent = "\uFEFF"; 
-            csvContent += "SPX Tracking Number,Status Localizado,Destino Detectado,Coluna K / Vendedor,Próxima Ação,Origem,Esperado\n";
-
             window.scannedItemsList.forEach(item => {
-                let finalStatus = item.statusOriginal ? item.statusOriginal.toUpperCase() : "N/A";
-                let statusLower = item.statusOriginal ? item.statusOriginal.toLowerCase() : "";
-                let destinoDetectado = item.destinationHub !== 'N/A' && item.destinationHub !== '-' ? item.destinationHub : (item.station || '-');
-                let acaoExportacao = "PROSSEGUIR";
-
-                if (item.origin === 'Base 1') {
-                    if (statusLower.includes("delivered") || statusLower.includes("delivering") || statusLower === 'lmhub_assigning' || !statusLower.includes("lmhub_received")) {
-                        acaoExportacao = "ÁREA DE TRATATIVA";
-                    }
+                let finalStatus = item.statusOriginal;
+                let acaoExportacao = item.isTratativa ? "ÁREA DE TRATATIVA" : "BIPAR E ALOCAR NA GAIOLA";
+                let destinoDetectado = item.destinationHub || "-";
+                
+                if (item.origin === 'Base 1' && item.destinationHub) {
+                    const dhLower = item.destinationHub.trim().toLowerCase();
                     const allowed = ["uberaba", "monte carmelo", "catalão", "catalao"];
-                    const dhLower = item.destinationHub ? item.destinationHub.toLowerCase() : "";
                     if (!allowed.some(city => dhLower.includes(city)) && item.destinationHub.trim().length > 0) {
                         finalStatus = "OUTRO HUB";
-                        acaoExportacao = "ÁREA DE TRATATIVA";
-                    }
-                } else if (item.origin === 'Base 2') {
-                    if (statusLower !== 'assigned') {
                         acaoExportacao = "ÁREA DE TRATATIVA";
                     }
                 }
@@ -1205,7 +1261,161 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-        }
+        };
+
+        window.clearOnlyScans = function() {
+            if(confirm("Deseja zerar o histórico de pacotes processados em tempo real?")) {
+                const bipsRef = window.refFirebase(window.dbFirebase, 'bips_triagem');
+                window.removeFirebase(bipsRef);
+            }
+        };
+
+        window.clearOnlyBases = function() {
+            if(confirm("Deseja apagar as bases sincronizadas da nuvem?")) {
+                window.removeFirebase(window.refFirebase(window.dbFirebase, 'planilha_base1'));
+                window.removeFirebase(window.refFirebase(window.dbFirebase, 'planilha_base2'));
+            }
+        };
+
+        window.clearDatabaseNode = function(nodeName) {
+            if(confirm(`Deseja limpar apenas o nó: ${nodeName}?`)) {
+                window.removeFirebase(window.refFirebase(window.dbFirebase, nodeName));
+            }
+        };
+
+        // EVENT LISTENER COMPLETO DO LEITOR DE CÓDIGO DE BARRAS
+        document.getElementById('main-barcode-scanner').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                let barcode = this.value.trim();
+                this.value = "";
+                if (!barcode) return;
+
+                let alertBox = document.getElementById('master-top-alert');
+                alertBox.className = "top-alert-bar"; 
+                alertBox.style.display = "block";
+
+                let cleanKey = barcode.replace(/[.#$\[\]]/g, "_");
+                let timestamp = new Date().toISOString();
+
+                // LÓGICA DE TRIAGEM
+                if (window.base1Map[cleanKey]) {
+                    let record = window.base1Map[cleanKey];
+                    let statusOriginalReal = record.statusOriginal;
+                    let statusLower = statusOriginalReal.toLowerCase();
+                    let isTratativa = false;
+                    let isOutroHub = false;
+
+                    const destHubContent = record.destinationHub ? record.destinationHub.trim() : "";
+                    const destHubLower = destHubContent.toLowerCase();
+                    const allowedCities = ["uberaba", "monte carmelo", "catalão", "catalao"];
+                    let matchesCity = allowedCities.some(city => destHubLower.includes(city));
+
+                    if (!matchesCity && destHubContent.length > 0) {
+                        isOutroHub = true;
+                        isTratativa = true;
+                        statusOriginalReal = "OUTRO HUB";
+                        alertBox.innerText = `⚠️ TRATATIVA: OUTRO HUB [${destHubContent}]`;
+                        alertBox.classList.add('alert-purple');
+                        emitVoiceAlert(`Atenção, Outro Hub. Enviar para área de tratativa.`);
+                    } else if (statusLower === 'return_lmhub_received' || (!statusLower.includes("lmhub_received") && !statusLower.includes("lmhub_assigning"))) {
+                        if (!statusLower.includes("delivered") && !statusLower.includes("delivering")) {
+                            isTratativa = true;
+                            alertBox.innerText = `⚠️ TRATATIVA: STATUS CONFLITANTE [${record.statusOriginal}]`;
+                            alertBox.classList.add('alert-orange');
+                            emitVoiceAlert(`Atenção, Status ${record.statusOriginal}. Enviar para tratativa.`);
+                        } else {
+                            alertBox.innerText = `📦 OK: GAIOLA [${record.statusOriginal}]`;
+                            alertBox.classList.add('alert-green');
+                            emitVoiceAlert("Gaiola.");
+                        }
+                    } else {
+                        alertBox.innerText = `📦 OK: GAIOLA [${record.statusOriginal}]`;
+                        alertBox.classList.add('alert-green');
+                        emitVoiceAlert("Gaiola.");
+                    }
+
+                    if (window.dbFirebase && window.refFirebase && window.updateFirebase) {
+                        let updates = {};
+                        updates[cleanKey] = {
+                            trackingNumber: barcode,
+                            statusOriginal: statusOriginalReal,
+                            station: record.station,
+                            destinationHub: record.destinationHub,
+                            colunaK: record.colunaK || '-',
+                            origin: 'Base 1',
+                            isTratativa: isTratativa,
+                            isOutroHub: isOutroHub,
+                            notFound: false,
+                            timestampBip: timestamp
+                        };
+                        window.updateFirebase(window.refFirebase(window.dbFirebase, 'bips_triagem'), updates);
+                    }
+
+                } else if (window.base2Map[cleanKey]) {
+                    let record = window.base2Map[cleanKey];
+                    let statusOriginalReal = record.statusOriginal;
+                    let statusLower = statusOriginalReal.toLowerCase();
+                    let isTratativa = false;
+
+                    if (statusLower === 'return_lmhub_received' || (!statusLower.includes("lmhub_received") && !statusLower.includes("lmhub_assigning"))) {
+                        if (!statusLower.includes("delivered") && !statusLower.includes("delivering")) {
+                            isTratativa = true;
+                            alertBox.innerText = `⚠️ TRATATIVA: STATUS BASE 2 [${record.statusOriginal}]`;
+                            alertBox.classList.add('alert-orange');
+                            emitVoiceAlert(`Tratativa, status ${record.statusOriginal}.`);
+                        } else {
+                            alertBox.innerText = `📦 OK BASE 2: GAIOLA [${record.statusOriginal}]`;
+                            alertBox.classList.add('alert-blue');
+                            emitVoiceAlert("Gaiola.");
+                        }
+                    } else {
+                        alertBox.innerText = `📦 OK BASE 2: GAIOLA [${record.statusOriginal}]`;
+                        alertBox.classList.add('alert-blue');
+                        emitVoiceAlert("Gaiola.");
+                    }
+
+                    if (window.dbFirebase && window.refFirebase && window.updateFirebase) {
+                        let updates = {};
+                        updates[cleanKey] = {
+                            trackingNumber: barcode,
+                            statusOriginal: statusOriginalReal,
+                            station: 'N/A',
+                            destinationHub: 'N/A',
+                            colunaK: '-',
+                            origin: 'Base 2',
+                            isTratativa: isTratativa,
+                            isOutroHub: false,
+                            notFound: false,
+                            timestampBip: timestamp
+                        };
+                        window.updateFirebase(window.refFirebase(window.dbFirebase, 'bips_triagem'), updates);
+                    }
+
+                } else {
+                    alertBox.innerText = "🚨 NÃO ENCONTRADO EM NENHUMA BASE";
+                    alertBox.classList.add('alert-red');
+                    emitVoiceAlert("Não encontrado, atenção, não encontrado.");
+
+                    if (window.dbFirebase && window.refFirebase && window.updateFirebase) {
+                        let updates = {};
+                        updates[cleanKey] = {
+                            trackingNumber: barcode,
+                            statusOriginal: 'NÃO ENCONTRADO',
+                            station: 'N/A',
+                            destinationHub: 'N/A',
+                            colunaK: '-',
+                            origin: 'NENHUMA',
+                            isTratativa: true,
+                            isOutroHub: false,
+                            notFound: true,
+                            timestampBip: timestamp
+                        };
+                        window.updateFirebase(window.refFirebase(window.dbFirebase, 'bips_triagem'), updates);
+                    }
+                }
+            }
+        });
     </script>
 </body>
 </html>

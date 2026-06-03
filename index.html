@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Parcel Sweeper Hub - Executive Suite</title>
     
-    <!-- Dependências Externas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <style>
@@ -42,8 +41,10 @@
         .alert-green { background: linear-gradient(135deg, #10b981, #059669) !important; }
         .alert-red { background: linear-gradient(135deg, #ef4444, #dc2626) !important; }
         .alert-orange { background: linear-gradient(135deg, #f59e0b, #d97706) !important; }
+        .alert-purple { background: linear-gradient(135deg, #6b21a8, #581c87) !important; }
+        .alert-blue { background: linear-gradient(135deg, #2563eb, #1d4ed8) !important; }
 
-        /* Top Navbar - Dark Mode Executive */
+        /* Top Navbar */
         .navbar {
             background-color: #0f172a;
             padding: 16px 32px;
@@ -60,15 +61,8 @@
             letter-spacing: -0.2px;
         }
 
-        .brand span {
-            color: #475569;
-            margin: 0 8px;
-        }
-
-        .brand strong {
-            color: #f8fafc;
-            font-weight: 700;
-        }
+        .brand span { color: #475569; margin: 0 8px; }
+        .brand strong { color: #f8fafc; font-weight: 700; }
 
         .user-profile {
             display: flex;
@@ -103,34 +97,14 @@
             transition: all 0.2s ease;
         }
 
-        .tab-btn:hover {
-            color: #f8fafc;
-        }
-
-        .tab-btn.active {
-            color: #38bdf8;
-            border-bottom-color: #38bdf8;
-        }
+        .tab-btn:hover { color: #f8fafc; }
+        .tab-btn.active { color: #38bdf8; border-bottom-color: #38bdf8; }
 
         /* Main Content Container */
-        .tab-content {
-            display: none;
-            padding: 32px;
-            flex: 1;
-        }
+        .tab-content { display: none; padding: 32px; flex: 1; }
+        .tab-content.active { display: block; }
 
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Layout em Grid Lateral Expandido */
-        .dashboard-layout {
-            display: flex;
-            gap: 32px;
-            max-width: 100%;
-            margin: 0 auto;
-            width: 100%;
-        }
+        .dashboard-layout { display: flex; gap: 32px; max-width: 100%; margin: 0 auto; width: 100%; }
 
         /* Sidebar Executiva */
         .sidebar {
@@ -157,12 +131,7 @@
             margin-bottom: 32px;
         }
 
-        .circle-bg {
-            fill: none;
-            stroke: #f3f4f6;
-            stroke-width: 10;
-        }
-
+        .circle-bg { fill: none; stroke: #f3f4f6; stroke-width: 10; }
         .circle-progress {
             fill: none;
             stroke: #2563eb;
@@ -175,175 +144,36 @@
             transition: stroke-dashoffset 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .chart-text {
-            position: absolute;
-            text-align: center;
-            width: 100%;
-        }
+        .chart-text { position: absolute; text-align: center; width: 100%; }
+        .chart-percentage { font-size: 28px; font-weight: 800; color: #111827; letter-spacing: -0.5px; }
+        .chart-label { font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px; }
 
-        .chart-percentage {
-            font-size: 28px;
-            font-weight: 800;
-            color: #111827;
-            letter-spacing: -0.5px;
-        }
-
-        .chart-label {
-            font-size: 11px;
-            font-weight: 600;
-            color: #6b7280;
-            text-transform: uppercase;
-            margin-top: 4px;
-            letter-spacing: 0.5px;
-        }
-
-        .stats-list {
-            width: 100%;
-            border-top: 1px solid #f3f4f6;
-            padding-top: 24px;
-        }
-
-        .stat-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 13px;
-            margin-bottom: 16px;
-            color: #4b5563;
-        }
-
-        .stat-item .value {
-            font-weight: 700;
-            color: #111827;
-            background-color: #f3f4f6;
-            padding: 4px 10px;
-            border-radius: 6px;
-        }
+        .stats-list { width: 100%; border-top: 1px solid #f3f4f6; padding-top: 24px; }
+        .stat-item { display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-bottom: 16px; color: #4b5563; }
+        .stat-item .value { font-weight: 700; color: #111827; background-color: #f3f4f6; padding: 4px 10px; border-radius: 6px; }
 
         /* Cards Gerais */
-        .card {
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
-        }
+        .card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03); }
+        .import-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
 
-        .import-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 32px;
-        }
-
-        /* Área do Scanner de Código de Barras */
-        .scanner-container {
-            background: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            padding: 20px;
-            border-radius: 8px;
-            display: flex;
-            gap: 16px;
-            align-items: center;
-        }
-
-        .scanner-label {
-            font-size: 13px;
-            font-weight: 800;
-            color: #166534;
-            letter-spacing: 0.5px;
-        }
-
-        .scanner-input {
-            flex: 1;
-            padding: 14px 18px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 600;
-            background-color: #ffffff;
-            letter-spacing: 0.5px;
-            transition: all 0.2s;
-        }
-
-        .scanner-input:focus {
-            outline: none;
-            border-color: #10b981;
-            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
-        }
+        /* Área do Scanner */
+        .scanner-container { background: #f8fafc; border: 1px solid #cbd5e1; padding: 20px; border-radius: 8px; display: flex; gap: 16px; align-items: center; }
+        .scanner-label { font-size: 13px; font-weight: 800; color: #334155; letter-spacing: 0.5px; }
+        .scanner-input { flex: 1; padding: 14px 18px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 16px; font-weight: 600; background-color: #ffffff; letter-spacing: 0.5px; transition: all 0.2s; }
+        .scanner-input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15); }
 
         /* Caixas de Importação */
-        .import-box {
-            border: 2px dashed #cbd5e1;
-            border-radius: 12px;
-            background-color: #ffffff;
-            padding: 48px 24px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
+        .import-box { border: 2px dashed #cbd5e1; border-radius: 12px; background-color: #ffffff; padding: 48px 24px; text-align: center; cursor: pointer; transition: all 0.2s ease; }
+        .import-box:hover { border-color: #2563eb; background-color: #f8fafc; }
+        .import-box.loaded { border-color: #10b981; background-color: #f0fdf4; border-style: solid; }
 
-        .import-box:hover {
-            border-color: #2563eb;
-            background-color: #f8fafc;
-        }
+        /* Tabelas */
+        .table-container { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.02), 0 4px 6px -2px rgba(0,0,0,0.01); width: 100%; }
+        .table-header { padding: 20px 24px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; background-color: #ffffff; flex-wrap: wrap; gap: 16px; }
+        .table-search-input { padding: 10px 16px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 13px; width: 280px; background-color: #f9fafb; transition: all 0.2s; }
+        .actions-group { display: flex; gap: 12px; align-items: center; }
 
-        .import-box.loaded {
-            border-color: #10b981;
-            background-color: #f0fdf4;
-            border-style: solid;
-        }
-
-        /* Tabelas Modernas */
-        .table-container {
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.02), 0 4px 6px -2px rgba(0,0,0,0.01);
-            width: 100%;
-        }
-
-        .table-header {
-            padding: 20px 24px;
-            border-bottom: 1px solid #e5e7eb;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #ffffff;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .table-search-input {
-            padding: 10px 16px;
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
-            font-size: 13px;
-            width: 280px;
-            background-color: #f9fafb;
-            transition: all 0.2s;
-        }
-
-        .actions-group {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
-        /* Botões */
-        .export-btn, .pdf-btn, .reset-btn {
-            padding: 10px 18px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            border: none;
-            transition: all 0.2s ease;
-        }
-
+        .export-btn, .pdf-btn, .reset-btn { padding: 10px 18px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; border: none; transition: all 0.2s ease; }
         .export-btn { background-color: #ffffff; color: #374151; border: 1px solid #e5e7eb; }
         .export-btn:hover { background-color: #f9fafb; border-color: #d1d5db; }
         .pdf-btn { background-color: #2563eb; color: white; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.15); }
@@ -352,62 +182,46 @@
         .reset-btn:hover { background-color: #dc2626; }
 
         /* Paginação */
-        .pagination-container {
-            padding: 16px 24px;
-            background: #ffffff;
-            border-top: 1px solid #e5e7eb;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 13px;
-            color: #4b5563;
-        }
-
+        .pagination-container { padding: 16px 24px; background: #ffffff; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #4b5563; }
         .pagination-buttons { display: flex; gap: 6px; }
-
-        .page-btn {
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            padding: 6px 12px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: 6px;
-            color: #374151;
-            transition: all 0.15s;
-        }
-
+        .page-btn { background: #ffffff; border: 1px solid #e5e7eb; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; border-radius: 6px; color: #374151; transition: all 0.15s; }
         .page-btn:hover:not(:disabled) { border-color: #2563eb; color: #2563eb; }
         .page-btn:disabled { background: #f3f4f6; color: #9ca3af; cursor: not-allowed; }
 
         .table-scroll { overflow-x: auto; max-height: 550px; }
-
         table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; table-layout: fixed; }
-
         th, td { padding: 16px 20px; border-bottom: 1px solid #f3f4f6; color: #374151; overflow: hidden; text-overflow: ellipsis; }
-
         th { background-color: #f8fafc; color: #475569; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
 
-        /* Ajuste Dinâmico para impedir quebra do layout */
         th:nth-child(1), td:nth-child(1) { width: 22%; white-space: normal; word-break: break-all; }
-        th:nth-child(2), td:nth-child(2) { width: 15%; }
-        th:nth-child(3), td:nth-child(3) { width: 15%; }
+        th:nth-child(2), td:nth-child(2) { width: 16%; }
+        th:nth-child(3), td:nth-child(3) { width: 16%; }
         th:nth-child(4), td:nth-child(4) { width: 10%; text-align: center; }
-        th:nth-child(5), td:nth-child(5) { width: 15%; text-align: center; }
+        th:nth-child(5), td:nth-child(5) { width: 14%; text-align: center; }
         th:nth-child(6), td:nth-child(6) { width: 11%; text-align: center; }
-        th:nth-child(7), td:nth-child(7) { width: 12%; text-align: center; }
+        th:nth-child(7), td:nth-child(7) { width: 11%; text-align: center; }
 
         tr:hover td { background-color: #f8fafc; }
 
-        /* Badges */
-        .badge { display: inline-flex; align-items: center; justify-content: center; padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 11px; width: 100%; text-align: center; }
-        .badge-scanned { background-color: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
-        .badge-notfound { background-color: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; }
-        .badge-danger-action { background-color: #fff5f5; color: #c53030; border: 1px solid #feb2b2; }
-        .badge-assigning-action { background-color: #ebf8ff; color: #2b6cb0; border: 1px solid #90cdf4; }
+        /* REGRAS DE CORES CORPORATIVAS SOLICITADAS (BADGES) */
+        .badge { display: inline-flex; align-items: center; justify-content: center; padding: 6px 10px; border-radius: 6px; font-weight: 700; font-size: 11px; width: 100%; text-align: center; text-transform: uppercase; letter-spacing: 0.3px; }
+        
+        /* 1. DELIVERING / DELIVERED -> TARJA ROJA (ROXO ESCURO / VINHO) */
+        .badge-roja { background-color: #581c87; color: #f3e8ff; border: 1px solid #7e22ce; }
+        
+        /* 2. OUTRO HUB / RETURN -> TARJA AMARELA */
+        .badge-amarelo { background-color: #fef08a; color: #854d0e; border: 1px solid #facc15; }
+        
+        /* 3. LMHUB_ASSIGNING / LMHUB_RECEIVED -> TARJA AZUL */
+        .badge-azul { background-color: #dbeafe; color: #1e40af; border: 1px solid #60a5fa; }
+        
+        /* 4. DIVERGENTE / NÃO ENCONTRADO -> TARJA VERMELHA */
+        .badge-vermelho { background-color: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
         .badge-file-origin { padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 11px; display: inline-block; width: 80px; text-align: center; }
         .origin-base1 { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
         .origin-base2 { background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+        .origin-ambas { background-color: #fae8ff; color: #86198f; border: 1px solid #e879f9; }
 
         .voice-banner { background-color: #e0f2fe; border: 1px solid #bae6fd; padding: 12px 18px; border-radius: 8px; font-size: 13px; color: #0369a1; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
 
@@ -419,21 +233,12 @@
         .report-card-title { font-size: 12px; color: #6b7280; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
         .report-card-value { font-size: 36px; font-weight: 800; color: #111827; line-height: 1; letter-spacing: -1px; }
 
-        /* Overlay de Loading do Processamento */
-        .loading-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.85); color: white; font-size: 18px; font-weight: bold;
-            display: none; align-items: center; justify-content: center; flex-direction: column; z-index: 9999;
-            text-align: center; padding: 20px;
-        }
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.1); width: 55px; height: 55px;
-            border-radius: 50%; border-left-color: #38bdf8; animation: spin 1s linear infinite; margin-bottom: 18px;
-        }
+        /* Loading Overlay */
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); color: white; font-size: 18px; font-weight: bold; display: none; align-items: center; justify-content: center; flex-direction: column; z-index: 9999; text-align: center; padding: 20px; }
+        .spinner { border: 4px solid rgba(255, 255, 255, 0.1); width: 55px; height: 55px; border-radius: 50%; border-left-color: #38bdf8; animation: spin 1s linear infinite; margin-bottom: 18px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 
-    <!-- Script de Inicialização Global e Firebase Seguro -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
@@ -453,7 +258,6 @@
         const analytics = getAnalytics(app);
         const database = getDatabase(app);
 
-        // Exportando referências seguras para escopo global encapsulado
         window.firebaseActions = {
             updateData: (path, data) => update(ref(database, path), data),
             removeNode: (path) => remove(ref(database, path))
@@ -463,9 +267,8 @@
         window.base2Map = {};
         window.totalB1Count = 0;
         window.totalB2Count = 0;
-        window.rawScannedFirebaseObject = {}; 
 
-        // Escutas em Tempo Real Seguras
+        // Escutas em Tempo Real
         onValue(ref(database, 'planilha_base1'), (snapshot) => {
             window.base1Map = snapshot.val() || {};
             window.totalB1Count = Object.keys(window.base1Map).length;
@@ -482,7 +285,6 @@
 
         onValue(ref(database, 'bips_triagem'), (snapshot) => {
             const data = snapshot.val() || {};
-            window.rawScannedFirebaseObject = data;
             const items = Object.keys(data).map(key => data[key]);
             items.sort((a, b) => new Date(b.timestampBip) - new Date(a.timestampBip));
             window.scannedItemsList = items;
@@ -556,52 +358,75 @@
             }
         });
 
+        // LÓGICA DE BUSCA PRIORITÁRIA DE ACORDO COM AS NOVAS REGRAS DE CORES CORPORATIVAS
         function processBarcodeBip(barcode) {
-            let foundData = null;
+            let b1Data = window.base1Map ? window.base1Map[barcode] : null;
+            let b2Data = window.base2Map ? window.base2Map[barcode] : null;
+
             let originLabel = 'NÃO ENCONTRADO';
-            let actionText = 'ÁREA DE TRATATIVA';
-            let statusText = 'DIVERGENTE';
+            let isFound = 'NÃO';
+            let statusText = 'NÃO ENCONTRADO';
             let destHub = 'N/A';
             let locType = '-'; 
-            let isFound = 'NÃO';
+            let actionText = 'IR PARA ÁREA DE TRATATIVA';
+            let alertColor = 'alert-red';
+            let voiceMessage = 'Não encontrado, ir para área de tratativa';
 
-            if (window.base1Map && window.base1Map[barcode]) {
-                foundData = window.base1Map[barcode];
-                originLabel = 'Base 1';
+            // Regra prioritária: Procura primeiro na Base 1, se achar junta com dados se houver na Base 2
+            if (b1Data) {
                 isFound = 'SIM';
-            } else if (window.base2Map && window.base2Map[barcode]) {
-                foundData = window.base2Map[barcode];
+                originLabel = b2Data ? 'Ambas' : 'Base 1';
+                statusText = b1Data.status || 'N/A';
+                destHub = b1Data.destinationHub || b1Data.destination_hub || b1Data.destinationHubName || 'N/A';
+                locType = b1Data.locationType || b1Data.location_type || (b2Data ? b2Data.locationType : '-');
+            } else if (b2Data) {
+                // Se não achou na Base 1 mas está na Base 2
+                isFound = 'SIM';
                 originLabel = 'Base 2';
-                isFound = 'SIM';
+                statusText = b2Data.status || 'N/A';
+                destHub = b2Data.destinationHub || b2Data.destination_hub || b2Data.destinationHubName || 'N/A';
+                locType = b2Data.locationType || b2Data.location_type || '-';
             }
 
-            if (foundData) {
-                statusText = foundData.status || 'N/A';
-                destHub = foundData.destinationHub || foundData.destination_hub || foundData.destinationHubName || 'N/A';
-                locType = foundData.locationType || foundData.location_type || '-';
-
-                // VALIDAÇÃO GEOGRÁFICA REQUERIDA
+            if (isFound === 'SIM') {
                 const hubLower = destHub.toLowerCase();
+                const statusLower = statusText.toLowerCase();
                 const belongsToRegion = hubLower.includes('uberaba') || hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
 
-                if (!belongsToRegion) {
-                    statusText = 'OUTRO HUB';
-                    actionText = 'ÁREA DE TRATATIVA';
-                    window.showAlertTop('⚠️ ALERTA: PACOTE DE OUTRO HUB DETECTADO! IR PARA ÁREA DE TRATATIVA', 'alert-orange');
-                    window.emitVoiceAlert('Outro hub, ir para área de tratativa');
-                } else if (statusText === 'LMHub_Assigning' || statusText === 'LMHub_Received') {
+                // 1. Regra para STATUS DELIVERING ou DELIVERED (Tarja Roja / Roxo)
+                if (statusLower.includes('delivering') || statusLower.includes('delivered')) {
+                    actionText = 'IR PARA ÁREA DE TRATATIVA';
+                    alertColor = 'alert-purple';
+                    voiceMessage = 'Pacote em rota ou entregue, ir para área de tratativa';
+                }
+                // 2. Regra para OUTRO HUB ou RETURN (Tarja Amarela)
+                else if (!belongsToRegion || statusLower.includes('return')) {
+                    statusText = !belongsToRegion ? 'OUTRO HUB' : statusText;
+                    actionText = 'IR PARA ÁREA DE TRATATIVA';
+                    alertColor = 'alert-orange';
+                    voiceMessage = !belongsToRegion ? 'Outro hub, ir para área de tratativa' : 'Retorno, ir para área de tratativa';
+                }
+                // 3. Regra para LMHub_Assigning ou LMHub_Received (Tarja Azul / Fluxo Normal)
+                else if (statusText === 'LMHub_Assigning' || statusText === 'LMHub_Received') {
                     actionText = 'MANTER FLUXO';
-                    window.showAlertTop('✔ PACOTE LIBERADO: MANTER FLUXO', 'alert-green');
-                    window.emitVoiceAlert('Manter fluxo');
-                } else {
-                    actionText = 'ÁREA DE TRATATIVA';
-                    window.showAlertTop('⚠ ALERTA: DIRECIONAR PARA ÁREA DE TRATATIVA', 'alert-orange');
-                    window.emitVoiceAlert('Área de tratativa');
+                    alertColor = 'alert-blue';
+                    voiceMessage = 'Manter fluxo';
+                }
+                // 4. Qualquer outro status dentro da região vira tratativa amarela/laranja
+                else {
+                    actionText = 'IR PARA ÁREA DE TRATATIVA';
+                    alertColor = 'alert-orange';
+                    voiceMessage = 'Status divergente, ir para área de tratativa';
                 }
             } else {
-                window.showAlertTop('❌ PACOTE NÃO ENCONTRADO NAS BASES SINCRONIZADAS', 'alert-red');
-                window.emitVoiceAlert('Não encontrado');
+                // Pacote não encontrado (Tarja Vermelha)
+                actionText = 'IR PARA ÁREA DE TRATATIVA';
+                alertColor = 'alert-red';
+                voiceMessage = 'Não encontrado, ir para área de tratativa';
             }
+
+            window.showAlertTop(`📢 ${statusText.toUpperCase()} | ${actionText}`, alertColor);
+            window.emitVoiceAlert(voiceMessage);
 
             const newBip = {
                 trackingNumber: barcode,
@@ -623,7 +448,7 @@
                 bar.className = `top-alert-bar ${cssClass}`;
                 bar.innerText = msg;
                 bar.style.display = 'block';
-                setTimeout(() => { bar.style.display = 'none'; }, cssClass === 'alert-red' ? 5000 : 3500);
+                setTimeout(() => { bar.style.display = 'none'; }, 4000);
             }
         };
     </script>
@@ -652,7 +477,6 @@
         <button class="tab-btn" onclick="switchTab('report')">3. Relatório Executivo Diário</button>
     </div>
 
-    <!-- ABA 1: IMPORTAÇÃO -->
     <div id="tab-import" class="tab-content">
         <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px;">
             <div>
@@ -662,7 +486,7 @@
             
             <div class="import-grid">
                 <div>
-                    <h3 style="font-size: 14px; margin-bottom: 12px; font-weight: 600; color: #475569;">Fluxo Forward (Base Principal)</h3>
+                    <h3 style="font-size: 14px; margin-bottom: 12px; font-weight: 600; color: #475569;">Fluxo Forward (Base Principal - Procurada Primeiro)</h3>
                     <div id="box-file-1" class="import-box" onclick="document.getElementById('csv-file-1').click()">
                         <div id="icon-file-1" style="font-size: 36px; margin-bottom: 12px; color: #3b82f6;">📥</div>
                         <span id="label-file-1" style="font-size: 13px; font-weight: 600; color: #334155;">Selecionar Bases Forward (.csv ou .zip)</span>
@@ -671,7 +495,7 @@
                 </div>
 
                 <div>
-                    <h3 style="font-size: 14px; margin-bottom: 12px; font-weight: 600; color: #475569;">Fluxo Receive Task (Base de Cruzamento)</h3>
+                    <h3 style="font-size: 14px; margin-bottom: 12px; font-weight: 600; color: #475569;">Fluxo Receive Task (Base de Cruzamento Secundária)</h3>
                     <div id="box-file-2" class="import-box" onclick="document.getElementById('csv-file-2').click()">
                         <div id="icon-file-2" style="font-size: 36px; margin-bottom: 12px; color: #0284c7;">📥</div>
                         <span id="label-file-2" style="font-size: 13px; font-weight: 600; color: #334155;">Selecionar Bases Receive Task (.csv ou .zip)</span>
@@ -694,7 +518,6 @@
         </div>
     </div>
 
-    <!-- ABA 2: MONITOR REALTIME -->
     <div id="tab-dashboard" class="tab-content active">
         <div class="dashboard-layout">
             
@@ -719,7 +542,7 @@
 
             <div class="work-area" style="flex: 1; min-width: 0;">
                 <div class="voice-banner">
-                    <span>⚡</span> <span><strong>Infraestrutura Nuvem Ativa:</strong> Proteção integrada contra erros de leitura e travamentos de chaves longas.</span>
+                    <span>⚡</span> <span><strong>Controle de Cores Ativo:</strong> Roxo (Delivering/Delivered) | Amarelo (Outro Hub/Return) | Azul (Assigning/Received) | Vermelho (Divergente).</span>
                 </div>
 
                 <div class="card" style="padding: 20px;">
@@ -783,7 +606,6 @@
         </div>
     </div>
 
-    <!-- ABA 3: RELATÓRIOS -->
     <div id="tab-report" class="tab-content">
         <div style="max-width: 1100px; margin: 0 auto;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px;">
@@ -833,7 +655,6 @@
         </div>
     </div>
 
-    <!-- Regras Logísticas e Controle Operacional da UI -->
     <script>
         window.scannedItemsList = []; 
         window.filteredItemsList = [];
@@ -900,26 +721,19 @@
                                     }));
                                 }
                             });
-                            Promise.all(promises).then(() => {
-                                showLoading(false);
-                            }).catch(err => {
-                                console.error(err);
-                                showLoading(false);
-                                alert("Ocorreu um erro ao extrair os arquivos do ZIP.");
-                            });
+                            Promise.all(promises).then(() => { showLoading(false); })
+                            .catch(err => { console.error(err); showLoading(false); alert("Erro ao extrair ZIP."); });
                         });
                     };
                     reader.readAsArrayBuffer(file);
                 } else if (extension === 'csv') {
                     const reader = new FileReader();
                     reader.onload = function(e) {
-                        parseAndStoreCSVInChunks(e.target.result, baseIndex).then(() => {
-                            showLoading(false);
-                        });
+                        parseAndStoreCSVInChunks(e.target.result, baseIndex).then(() => { showLoading(false); });
                     };
                     reader.readAsText(file, "UTF-8");
                 } else {
-                    alert("Por favor, selecione apenas arquivos válidos com extensão .csv ou .zip");
+                    alert("Selecione arquivos .csv ou .zip");
                     showLoading(false);
                 }
             });
@@ -928,16 +742,9 @@
         function parseAndStoreCSVInChunks(text, baseIndex) {
             return new Promise((resolve) => {
                 const lines = text.split(/\r?\n/);
-                if (lines.length < 2) {
-                    resolve();
-                    return;
-                }
+                if (lines.length < 2) { resolve(); return; }
 
-                let separator = ';';
-                if (lines[0].includes(',') && !lines[0].includes(';')) {
-                    separator = ',';
-                }
-
+                let separator = lines[0].includes(',') && !lines[0].includes(';') ? ',' : ';';
                 const headers = lines[0].split(separator).map(h => h.trim().replace(/^["']|["']$/g, '').toLowerCase());
                 
                 const trackingIdx = headers.findIndex(h => h === 'forward_order_id' || h === 'tracking_number' || h.includes('tracking') || h === 'id');
@@ -947,7 +754,7 @@
 
                 if (trackingIdx === -1) {
                     showLoading(false);
-                    alert("A validação falhou: Nenhuma coluna de rastreamento (Tracking ID) foi encontrada.");
+                    alert("Coluna de rastreamento não encontrada.");
                     resolve();
                     return;
                 }
@@ -968,10 +775,7 @@
                     }
                 }
 
-                if (rowsToProcess.length === 0) {
-                    resolve();
-                    return;
-                }
+                if (rowsToProcess.length === 0) { resolve(); return; }
 
                 const chunkSize = 500;
                 let currentOffset = 0;
@@ -979,16 +783,13 @@
 
                 function sendNextChunk() {
                     if (currentOffset >= rowsToProcess.length) {
-                        window.showAlertTop(`✔ ${rowsToProcess.length} registros sincronizados com a nuvem!`, 'alert-green');
+                        window.showAlertTop(`✔ ${rowsToProcess.length} registros sincronizados na nuvem!`, 'alert-green');
                         resolve();
                         return;
                     }
-
-                    showLoading(true, `Sincronizando lote (${currentOffset} de ${rowsToProcess.length}) na Nuvem...`);
                     
                     let chunkObject = {};
                     let limit = Math.min(currentOffset + chunkSize, rowsToProcess.length);
-                    
                     for (let k = currentOffset; k < limit; k++) {
                         const row = rowsToProcess[k];
                         chunkObject[row.id] = {
@@ -1000,18 +801,9 @@
                     }
 
                     window.firebaseActions.updateData(nodeName, chunkObject)
-                        .then(() => {
-                            currentOffset += chunkSize;
-                            sendNextChunk();
-                        })
-                        .catch(err => {
-                            console.error(err);
-                            showLoading(false);
-                            alert("A conexão caiu ao tentar subir o lote atual.");
-                            resolve();
-                        });
+                        .then(() => { currentOffset += chunkSize; sendNextChunk(); })
+                        .catch(err => { console.error(err); resolve(); });
                 }
-
                 sendNextChunk();
             });
         }
@@ -1025,34 +817,24 @@
             if(!tbody) return;
 
             if (totalBipados === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 48px; font-style: italic;">Aguardando processamento inicial de pacotes para cálculo estatístico.</td></tr>`;
-                const totalStatusEl = document.getElementById('report-total-status');
-                if(totalStatusEl) totalStatusEl.innerText = 0;
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 48px; font-style: italic;">Aguardando pacotes.</td></tr>`;
+                if(document.getElementById('report-total-status')) document.getElementById('report-total-status').innerText = 0;
                 return;
             }
 
             let statusMap = {};
             window.scannedItemsList.forEach(item => {
-                let destHub = item.destinationHub || 'N/A';
-                const hubLower = destHub.toLowerCase();
-                const belongsToRegion = hubLower.includes('uberaba') || hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
-                
                 let status = item.statusOriginal || 'N/A';
-                if (!belongsToRegion && item.encontrado === 'SIM') {
-                    status = 'OUTRO HUB';
-                }
                 statusMap[status] = (statusMap[status] || 0) + 1;
             });
 
             let statusSortedKeys = Object.keys(statusMap).sort((a, b) => a.localeCompare(b));
-            const totalStatusEl = document.getElementById('report-total-status');
-            if(totalStatusEl) totalStatusEl.innerText = statusSortedKeys.length;
+            if(document.getElementById('report-total-status')) document.getElementById('report-total-status').innerText = statusSortedKeys.length;
 
             tbody.innerHTML = "";
             statusSortedKeys.forEach(statusKey => {
                 let qtd = statusMap[statusKey];
                 let percent = ((qtd / totalBipados) * 100).toFixed(2);
-
                 let row = document.createElement('tr');
                 row.innerHTML = `
                     <td style="font-weight: 600; color: #1f2937; padding-left: 24px;">${statusKey}</td>
@@ -1067,26 +849,18 @@
             const tExpected = (window.totalB1Count || 0) + (window.totalB2Count || 0);
             const tScanned = window.scannedItemsList ? window.scannedItemsList.length : 0;
 
-            const elExpected = document.getElementById('ui-total-esperado');
-            const elB1 = document.getElementById('ui-b1-count');
-            const elB2 = document.getElementById('ui-b2-count');
-            const elBipado = document.getElementById('ui-total-bipado');
+            if(document.getElementById('ui-total-esperado')) document.getElementById('ui-total-esperado').innerText = tExpected;
+            if(document.getElementById('ui-b1-count')) document.getElementById('ui-b1-count').innerText = window.totalB1Count || 0;
+            if(document.getElementById('ui-b2-count')) document.getElementById('ui-b2-count').innerText = window.totalB2Count || 0;
+            if(document.getElementById('ui-total-bipado')) document.getElementById('ui-total-bipado').innerText = tScanned;
 
-            if(elExpected) elExpected.innerText = tExpected;
-            if(elB1) elB1.innerText = window.totalB1Count || 0;
-            if(elB2) elB2.innerText = window.totalB2Count || 0;
-            if(elBipado) elBipado.innerText = tScanned;
-
-            let percentage = 0;
-            if (tExpected > 0) percentage = (tScanned / tExpected) * 100;
-            const elPercentage = document.getElementById('ui-percentage');
-            if(elPercentage) elPercentage.innerText = percentage.toFixed(2) + '%';
+            let percentage = tExpected > 0 ? (tScanned / tExpected) * 100 : 0;
+            if(document.getElementById('ui-percentage')) document.getElementById('ui-percentage').innerText = percentage.toFixed(2) + '%';
 
             let circumference = 2 * Math.PI * 70;
             let offset = circumference - (percentage / 100) * circumference;
             if(offset < 0) offset = 0;
-            const elCircle = document.getElementById('progress-circle');
-            if(elCircle) elCircle.style.strokeDashoffset = offset;
+            if(document.getElementById('progress-circle')) document.getElementById('progress-circle').style.strokeDashoffset = offset;
 
             renderTableData();
         };
@@ -1094,93 +868,73 @@
         function renderTableData() {
             let query = window.currentSearchQuery ? window.currentSearchQuery.toLowerCase() : "";
             if(window.scannedItemsList) {
-                if(query) {
-                    window.filteredItemsList = window.scannedItemsList.filter(item => 
-                        (item.trackingNumber || '').toLowerCase().includes(query) ||
-                        (item.statusOriginal || '').toLowerCase().includes(query) ||
-                        (item.destinationHub || '').toLowerCase().includes(query) ||
-                        (item.locationType || '').toLowerCase().includes(query)
-                    );
-                } else {
-                    window.filteredItemsList = [...window.scannedItemsList];
-                }
-            } else {
-                window.filteredItemsList = [];
-            }
+                window.filteredItemsList = query ? window.scannedItemsList.filter(item => 
+                    (item.trackingNumber || '').toLowerCase().includes(query) ||
+                    (item.statusOriginal || '').toLowerCase().includes(query) ||
+                    (item.destinationHub || '').toLowerCase().includes(query)
+                ) : [...window.scannedItemsList];
+            } else { window.filteredItemsList = []; }
 
             const tbody = document.getElementById('live-table-body');
             if(!tbody) return;
             tbody.innerHTML = "";
 
             const paginationBar = document.getElementById('pagination-bar');
-
             if (window.filteredItemsList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #94a3b8; padding: 48px;">Nenhum registro correspondente aos filtros de pesquisa.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #94a3b8; padding: 48px;">Nenhum registro encontrado.</td></tr>`;
                 if(paginationBar) paginationBar.style.display = 'none';
                 return;
             }
 
             if(paginationBar) paginationBar.style.display = 'flex';
-            
             let totalItems = window.filteredItemsList.length;
             let totalPages = Math.ceil(totalItems / window.itemsPerPage);
             
-            if(window.currentPage > totalPages) window.currentPage = totalPages;
-            if(window.currentPage < 1) window.currentPage = 1;
-
             let start = (window.currentPage - 1) * window.itemsPerPage;
             let end = start + window.itemsPerPage;
             let sliceItems = window.showAllItems ? window.filteredItemsList : window.filteredItemsList.slice(start, end);
 
-            const paginationInfo = document.getElementById('pagination-info-text');
-            if(paginationInfo) {
-                paginationInfo.innerText = `Exibindo ${start + 1}-${Math.min(end, totalItems)} de ${totalItems} registros`;
+            if(document.getElementById('pagination-info-text')) {
+                document.getElementById('pagination-info-text').innerText = `Exibindo ${start + 1}-${Math.min(end, totalItems)} de ${totalItems} registros`;
             }
 
-            const btnPrev = document.getElementById('btn-page-prev');
-            const btnNext = document.getElementById('btn-page-next');
-            const btnCurrent = document.getElementById('btn-page-current');
-            const btnShowAll = document.getElementById('btn-show-all');
-
-            if(btnPrev) btnPrev.disabled = window.currentPage === 1 || window.showAllItems;
-            if(btnNext) btnNext.disabled = window.currentPage === totalPages || window.showAllItems;
-            if(btnCurrent) btnCurrent.innerText = window.currentPage;
-            if(btnShowAll) btnShowAll.innerText = window.showAllItems ? "Ver Paginado" : "Ver Tudo";
+            if(document.getElementById('btn-page-prev')) document.getElementById('btn-page-prev').disabled = window.currentPage === 1 || window.showAllItems;
+            if(document.getElementById('btn-page-next')) document.getElementById('btn-page-next').disabled = window.currentPage === totalPages || window.showAllItems;
+            if(document.getElementById('btn-page-current')) document.getElementById('btn-page-current').innerText = window.currentPage;
 
             sliceItems.forEach(item => {
                 let row = document.createElement('tr');
-                
-                let destHub = item.destinationHub || 'N/A';
-                const hubLower = destHub.toLowerCase();
-                // Verifica se pertence à região válida
-                const belongsToRegion = hubLower.includes('uberaba') || hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
+                let st = item.statusOriginal || 'N/A';
+                let stLower = st.toLowerCase();
+                let act = item.action || 'IR PARA ÁREA DE TRATATIVA';
 
-                let statusExibido = item.statusOriginal;
-                let actionText = item.action;
+                let badgeClass = "badge-vermelho"; // Default divergente / não encontrado
+                let badgeAction = "TRATATIVA";
 
-                // CORREÇÃO VISUAL INTERNA DA TABELA: Se não for da região, força na tabela o texto pedido
-                if (!belongsToRegion && item.encontrado === 'SIM') {
-                    statusExibido = 'OUTRO HUB';
-                    actionText = 'ÁREA DE TRATATIVA';
+                // APLICAÇÃO VISUAL DAS NOVAS REGRAS DE CORES
+                if (stLower.includes('delivering') || stLower.includes('delivered')) {
+                    badgeClass = "badge-roja";
+                    badgeAction = "TRATATIVA";
+                } else if (st === 'OUTRO HUB' || stLower.includes('return')) {
+                    badgeClass = "badge-amarelo";
+                    badgeAction = "TRATATIVA";
+                } else if (st === 'LMHub_Assigning' || st === 'LMHub_Received') {
+                    badgeClass = "badge-azul";
+                    badgeAction = "FLUXO OK";
                 }
 
-                let bScanned = `<span class="badge badge-scanned">Sincronizado</span>`;
-                if(item.encontrado === 'NÃO') bScanned = `<span class="badge badge-notfound">Divergente</span>`;
-
+                let bScanned = item.encontrado === 'SIM' ? `<span class="badge badge-azul">Sincronizado</span>` : `<span class="badge badge-vermelho">Divergente</span>`;
+                
                 let bOrigin = `<span class="badge badge-file-origin origin-base1">Base 1</span>`;
                 if(item.origin === 'Base 2') bOrigin = `<span class="badge badge-file-origin origin-base2">Base 2</span>`;
-
-                let bAction = `<span class="badge badge-assigning-action">MANTER FLUXO</span>`;
-                if(actionText === 'ÁREA DE TRATATIVA') bAction = `<span class="badge badge-danger-action">TRATATIVA</span>`;
-
-                let displaySegment = item.locationType || '-';
+                if(item.origin === 'Ambas') bOrigin = `<span class="badge badge-file-origin origin-ambas">Ambas</span>`;
 
                 row.innerHTML = `
                     <td style="font-weight:700; color: #111827;">${item.trackingNumber}</td>
-                    <td style="${statusExibido === 'OUTRO HUB' ? 'color: #d97706; font-weight: bold;' : ''}">${statusExibido}</td>
-                    <td>${destHub}</td>
-                    <td style="font-weight:600; color: #475569; text-align: center;">${displaySegment}</td>
-                    <td>${bAction}</td>
+                    <td><span class="badge ${badgeClass}">${st}</span></td>
+                    <td>${item.destinationHub || 'N/A'}</td>
+                    <td style="font-weight:600; color: #475569; text-align: center;">${item.locationType || '-'}</td>
+                    <td><span class="badge ${badgeClass}">${badgeAction}</span></td>
                     <td style="text-align: center;">${bOrigin}</td>
                     <td>${bScanned}</td>
                 `;
@@ -1189,81 +943,32 @@
         }
 
         window.handleSearch = function() {
-            const searchInput = document.getElementById('table-search');
-            window.currentSearchQuery = searchInput ? searchInput.value : "";
+            window.currentSearchQuery = document.getElementById('table-search') ? document.getElementById('table-search').value : "";
             window.currentPage = 1;
             renderTableData();
         };
 
-        window.changePage = function(amount) {
-            window.currentPage += amount;
-            renderTableData();
-        };
-
-        window.toggleShowAll = function() {
-            window.showAllItems = !window.showAllItems;
-            renderTableData();
-        };
+        window.changePage = function(amount) { window.currentPage += amount; renderTableData(); };
+        window.toggleShowAll = function() { window.showAllItems = !window.showAllItems; renderTableData(); };
 
         window.exportToExcelXLSX = function() {
-            if (!window.scannedItemsList || window.scannedItemsList.length === 0) {
-                alert("Não existem dados bipados nesta sessão para exportar.");
-                return;
-            }
-
-            let csvContent = "Tracking ID;Status na Base;Hub Destino;Office / Home;Proxima Acao;Origem Informacao;Validacao\n";
-
+            if (!window.scannedItemsList || window.scannedItemsList.length === 0) return;
+            let csvContent = "Tracking ID;Status;Hub;Office-Home;Acao;Origem;Validacao\n";
             window.scannedItemsList.forEach(item => {
-                let tracking = item.trackingNumber || "";
-                let destHub = item.destinationHub || "";
-                const hubLower = destHub.toLowerCase();
-                const belongsToRegion = hubLower.includes('uberaba') || hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
-                
-                let status = item.statusOriginal || "";
-                let action = item.action || "";
-                
-                if (!belongsToRegion && item.encontrado === "SIM") {
-                    status = "OUTRO HUB";
-                    action = "ÁREA DE TRATATIVA";
-                }
-
-                let segment = item.locationType || "-";
-                let origin = item.origin || "";
-                let validacao = item.encontrado === "SIM" ? "Sincronizado" : "Divergente";
-
-                csvContent += `${tracking};${status};${destHub};${segment};${action};${origin};${validacao}\n`;
+                csvContent += `${item.trackingNumber};${item.statusOriginal};${item.destinationHub};${item.locationType};${item.action};${item.origin};${item.encontrado}\n`;
             });
-
             let blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: "text/csv;charset=utf-8;" });
             let link = document.createElement("a");
-            
-            let dataAtual = new Date().toISOString().slice(0,10);
             link.href = URL.createObjectURL(blob);
-            link.setAttribute("download", `Relatorio_Triagem_${dataAtual}.csv`);
-            
+            link.setAttribute("download", `Triagem_${new Date().toISOString().slice(0,10)}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
         };
 
-        window.clearOnlyScans = function() {
-            if(confirm("Deseja zerar o histórico de pacotes processados em tempo real?")) {
-                window.firebaseActions.removeNode('bips_triagem');
-            }
-        };
-
-        window.clearOnlyBases = function() {
-            if(confirm("Deseja apagar as bases sincronizadas da nuvem?")) {
-                window.firebaseActions.removeNode('planilha_base1');
-                window.firebaseActions.removeNode('planilha_base2');
-            }
-        };
-
-        window.clearDatabaseNode = function(nodeName) {
-            if(confirm(`Deseja limpar apenas o nó: ${nodeName}?`)) {
-                window.firebaseActions.removeNode(nodeName);
-            }
-        };
+        window.clearOnlyScans = function() { if(confirm("Zerar bips?")) window.firebaseActions.removeNode('bips_triagem'); };
+        window.clearOnlyBases = function() { if(confirm("Limpar bases?")) { window.firebaseActions.removeNode('planilha_base1'); window.firebaseActions.removeNode('planilha_base2'); } };
+        window.clearDatabaseNode = function(nodeName) { if(confirm("Limpar este nó?")) window.firebaseActions.removeNode(nodeName); };
     </script>
 </body>
 </html>

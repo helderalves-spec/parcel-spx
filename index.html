@@ -40,6 +40,7 @@
         .alert-red { background-color: #ff4757 !important; color: #ffffff !important; }
         .alert-orange { background-color: #ffa502 !important; color: #ffffff !important; }
         .alert-blue { background-color: #1e3799 !important; color: #ffffff !important; }
+        .alert-purple { background-color: #8e44ad !important; color: #ffffff !important; } /* Nova cor roxa para alertas */
 
         /* Top Navbar */
         .navbar {
@@ -599,7 +600,7 @@
                         <table id="operational-table">
                             <thead>
                                 <tr>
-                                    <!-- ORDENAÇÃO ATUALIZADA EXATAMENTE IGUAL A SOLICITADA NA IMAGE_02A8BF -->
+                                    <!-- ORDENAÇÃO EXATAMENTE IGUAL A SOLICITADA NA IMAGE_02A8BF -->
                                     <th>SPX Tracking Number</th>
                                     <th>Status Original</th>
                                     <th>Destino Detectado</th>
@@ -846,7 +847,10 @@
                     }
 
                     if (statusLower === 'return_lmhub_received' || (!statusLower.includes("lmhub_received") && !statusLower.includes("lmhub_assigning"))) {
-                        isTratativa = true;
+                        // Se for entregue ou entregando, não força a ser tratativa por falta de palavra chave
+                        if(!statusLower.includes("delivered") && !statusLower.includes("delivering")) {
+                            isTratativa = true;
+                        }
                     }
 
                     updatesToPush[key] = {
@@ -866,7 +870,7 @@
             });
 
             if (countMigrated > 0 && window.dbFirebase && window.refFirebase && window.updateFirebase) {
-                console.log(`[Retroativo] Atualizando automaticamente ${countMigrated} bips antigos para os novos parâmetros da Base 1.`);
+                console.log(`[Retroativo] Atualizando automaticamente ${countMigrated} bips antigos.`);
                 window.updateFirebase(window.refFirebase(window.dbFirebase, 'bips_triagem'), updatesToPush);
             }
         };
@@ -905,7 +909,9 @@
                         }
                     }
 
-                    // Configura as marcações de Ação e Cores
+                    let statusLower = statusExibido.toLowerCase();
+
+                    // Regras de Cores e Ações baseadas no Status
                     if (item.notFound) {
                         row.style.backgroundColor = '#fff5f5';
                         acaoHtml = `<span class="badge-danger-action">ÁREA DE TRATATIVA</span>`;
@@ -918,6 +924,20 @@
                             <td>${acaoHtml}</td>
                             <td>${originBadge}</td>
                             <td style="font-weight: bold; color: #e53e3e;">NÃO</td>
+                        `;
+                    } else if (statusLower.includes("delivered") || statusLower.includes("delivering")) {
+                        // CORES ROXAS SOLICITADAS PARA DELIVERED / DELIVERING
+                        row.style.backgroundColor = '#f3e5f5'; 
+                        acaoHtml = `<span class="badge" style="background-color: #8e44ad; color: white;">FINALIZADO / ROTA</span>`;
+                        
+                        row.innerHTML = `
+                            <td style="font-weight: 600; color: #8e44ad;">${item.trackingNumber}</td>
+                            <td style="font-weight: bold; color: #8e44ad;">${statusExibido}</td>
+                            <td style="font-weight: 500; color: #8e44ad;">${destinoDetectado}</td>
+                            <td style="color: #8e44ad; font-weight: 600;">${item.colunaK || '-'}</td>
+                            <td>${acaoHtml}</td>
+                            <td>${originBadge}</td>
+                            <td style="font-weight: bold; color: #8e44ad;">SIM</td>
                         `;
                     } else {
                         if (isOutroHubReal || statusExibido === "OUTRO HUB") {
@@ -933,7 +953,7 @@
                                 <td>${originBadge}</td>
                                 <td style="font-weight: bold; color: #c05621;">SIM</td>
                             `;
-                        } else if (statusExibido.toLowerCase() === 'lmhub_assigning') {
+                        } else if (statusLower === 'lmhub_assigning') {
                             row.style.backgroundColor = '#e3f2fd'; 
                             acaoHtml = `<span class="badge-assigning-action">PROSSEGUIR (ASSIGNING)</span>`;
                             
@@ -946,7 +966,7 @@
                                 <td>${originBadge}</td>
                                 <td style="font-weight: bold; color: #0d47a1;">SIM</td>
                             `;
-                        } else if (statusExibido.toLowerCase() === 'return_lmhub_received' || isTratativaReal) {
+                        } else if (statusLower === 'return_lmhub_received' || isTratativaReal) {
                             row.style.backgroundColor = '#fffaf0'; 
                             acaoHtml = `<span class="badge-danger-action" style="background-color: #feebc8; color: #c05621; border-color: #fbd38d;">ÁREA DE TRATATIVA</span>`;
                             
@@ -1058,6 +1078,11 @@
                         alertColor = 'alert-orange';
                         messageText = `🍊 OUTRO HUB DETECTADO! BR: ${codeToFind} | DESTINO: ${destHubContent} -> ÁREA DE TRATATIVA`;
                         emitVoiceAlert("Atenção: Área de Tratativa. Outro hub.");
+                    } else if (statusLower.includes("delivered") || statusLower.includes("delivering")) {
+                        // REFEITA COR ROXA NOS ALERTAS DINÂMICOS TOP
+                        alertColor = 'alert-purple';
+                        messageText = `🔮 STATUS ENCONTRADO: ${statusOriginalReal} | BR: ${codeToFind}`;
+                        emitVoiceAlert(statusLower.includes("delivered") ? "Entregue" : "Em rota de entrega");
                     } else if (statusLower === 'lmhub_assigning') {
                         alertColor = 'alert-blue';
                         messageText = `🔵 STATUS: LMHub_Assigning | BR: ${codeToFind} | DESTINO PARCEL ACEITO`;
@@ -1076,7 +1101,11 @@
                         messageText = `✅ BIPAGEM OK (Base 1)! BR: ${codeToFind} | DESTINO COLETADO EM ${destHubContent.toUpperCase()}`;
                     }
                 } else {
-                    if (statusLower === 'lmhub_assigning') {
+                    if (statusLower.includes("delivered") || statusLower.includes("delivering")) {
+                        alertColor = 'alert-purple';
+                        messageText = `🔮 STATUS ENCONTRADO (Base 2): ${statusOriginalReal} | BR: ${codeToFind}`;
+                        emitVoiceAlert(statusLower.includes("delivered") ? "Entregue" : "Em rota de entrega");
+                    } else if (statusLower === 'lmhub_assigning') {
                         alertColor = 'alert-blue';
                         messageText = `🔵 STATUS: LMHub_Assigning (Base 2) | BR: ${codeToFind}`;
                         emitVoiceAlert("Assigning");
@@ -1193,6 +1222,11 @@
                 let finalStatus = item.statusOriginal;
                 let acaoExportacao = item.isTratativa ? 'ÁREA DE TRATATIVA' : 'PROSSEGUIR';
                 let destinoDetectado = item.destinationHub !== 'N/A' && item.destinationHub !== '-' ? item.destinationHub : (item.station !== 'N/A' ? item.station : '-');
+
+                let statusLower = finalStatus.toLowerCase();
+                if(statusLower.includes("delivered") || statusLower.includes("delivering")) {
+                    acaoExportacao = "FINALIZADO / ROTA";
+                }
 
                 if (item.origin === 'Base 1' && item.destinationHub) {
                     const dhLower = item.destinationHub.toLowerCase();

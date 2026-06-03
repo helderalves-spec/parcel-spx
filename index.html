@@ -412,7 +412,38 @@
         window.setFirebase = set;
         window.removeFirebase = remove;
 
-        // SE SINCRONIZA COM A NUVEM EM TEMPO REAL
+        // NOVO: Ouvinte em Tempo Real para persistência da Base 1 (Forward) na Nuvem
+        const base1Ref = ref(database, 'base1_importada');
+        onValue(base1Ref, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                // Firebase armazena objetos indexados por chaves; converte de volta para lista
+                window.base1Database = Object.keys(data).map(key => data[key]);
+                document.getElementById('box-file-1').classList.add('loaded');
+                document.getElementById('icon-file-1').innerText = '✔';
+                document.getElementById('label-file-1').innerText = `Base 1: ${window.base1Database.length} itens`;
+            } else {
+                window.base1Database = [];
+            }
+            window.updateBasesSummaryUI();
+        });
+
+        // NOVO: Ouvinte em Tempo Real para persistência da Base 2 (Receive Task) na Nuvem
+        const base2Ref = ref(database, 'base2_importada');
+        onValue(base2Ref, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                window.base2Database = Object.keys(data).map(key => data[key]);
+                document.getElementById('box-file-2').classList.add('loaded');
+                document.getElementById('icon-file-2').innerText = '✔';
+                document.getElementById('label-file-2').innerText = `Base 2: ${window.base2Database.length} itens`;
+            } else {
+                window.base2Database = [];
+            }
+            window.updateBasesSummaryUI();
+        });
+
+        // SE SINCRONIZA COM A NUVEM EM TEMPO REAL (BIPS OPERACIONAIS)
         const bipsRef = ref(database, 'bips_triagem');
         onValue(bipsRef, (snapshot) => {
             const data = snapshot.val();
@@ -560,8 +591,9 @@
     </div>
 
     <script>
-        let base1Database = [];
-        let base2Database = [];
+        // Mapeamento global das bases para escopo de leitura
+        window.base1Database = [];
+        window.base2Database = [];
         window.scannedItemsList = []; 
 
         function emitVoiceAlert(messageText) {
@@ -728,30 +760,60 @@
         }
 
         function executeParsing(text, baseNum, displayName) {
+            let parsedList = [];
             if (baseNum === 1) {
-                base1Database = parseBase1(text);
-                document.getElementById('box-file-1').classList.add('loaded');
-                document.getElementById('icon-file-1').innerText = '✔';
-                document.getElementById('label-file-1').innerText = `Base 1: ${base1Database.length} itens`;
+                parsedList = parseBase1(text);
+                // NOVO: Envia o lote decodificado estruturado direto para a Nuvem Firebase
+                if (window.dbFirebase && window.refFirebase && window.setFirebase) {
+                    let uploadObj = {};
+                    parsedList.forEach(item => {
+                        const cleanKey = item.trackingNumber.replace(/[.#$\[\]]/g, "_");
+                        uploadObj[cleanKey] = item;
+                    });
+                    const targetRef = window.refFirebase(window.dbFirebase, 'base1_importada');
+                    window.setFirebase(targetRef, uploadObj);
+                } else {
+                    window.base1Database = parsedList;
+                    window.updateBasesSummaryUI();
+                }
             } else {
-                base2Database = parseBase2(text);
-                document.getElementById('box-file-2').classList.add('loaded');
-                document.getElementById('icon-file-2').innerText = '✔';
-                document.getElementById('label-file-2').innerText = `Base 2: ${base2Database.length} itens`;
+                parsedList = parseBase2(text);
+                // NOVO: Envia o lote decodificado estruturado direto para a Nuvem Firebase
+                if (window.dbFirebase && window.refFirebase && window.setFirebase) {
+                    let uploadObj = {};
+                    parsedList.forEach(item => {
+                        const cleanKey = item.trackingNumber.replace(/[.#$\[\]]/g, "_");
+                        uploadObj[cleanKey] = item;
+                    });
+                    const targetRef = window.refFirebase(window.dbFirebase, 'base2_importada');
+                    window.setFirebase(targetRef, uploadObj);
+                } else {
+                    window.base2Database = parsedList;
+                    window.updateBasesSummaryUI();
+                }
             }
+        }
 
-            const totalRecords = base1Database.length + base2Database.length;
+        // NOVO: Atualiza o painel de resumo e habilita o scanner baseado na resposta unificada do Firebase
+        window.updateBasesSummaryUI = function() {
+            const totalRecords = window.base1Database.length + window.base2Database.length;
             if (totalRecords > 0) {
                 const inputEl = document.getElementById('main-barcode-scanner');
-                inputEl.disabled = false;
-                inputEl.placeholder = "Passe o leitor de código de barras...";
+                if(inputEl) {
+                    inputEl.disabled = false;
+                    inputEl.placeholder = "Passe o leitor de código de barras...";
+                }
                 
-                document.getElementById('import-summary-card').style.display = 'block';
-                document.getElementById('import-summary-text').innerHTML = `
-                    <strong>Base 1 (Forward):</strong> ${base1Database.length} registros mapeados.<br>
-                    <strong>Base 2 (Receive Task):</strong> ${base2Database.length} registros mapeados.<br>
-                    <strong>Total Combinado:</strong> ${totalRecords} ordens prontas para busca cruzada.
-                `;
+                const summaryCard = document.getElementById('import-summary-card');
+                const summaryText = document.getElementById('import-summary-text');
+                if(summaryCard && summaryText) {
+                    summaryCard.style.display = 'block';
+                    summaryText.innerHTML = `
+                        <strong>Base 1 (Forward):</strong> ${window.base1Database.length} registros mapeados na nuvem.<br>
+                        <strong>Base 2 (Receive Task):</strong> ${window.base2Database.length} registros mapeados na nuvem.<br>
+                        <strong>Total Combinado Ativo:</strong> ${totalRecords} ordens prontas para busca cruzada.
+                    `;
+                }
             }
             refreshDashboardUI();
         }
@@ -764,6 +826,7 @@
 
         window.refreshDashboardUI = function() {
             const tbody = document.getElementById('live-table-body');
+            if(!tbody) return;
             
             if (!window.scannedItemsList || window.scannedItemsList.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #a0aec0; padding: 40px; font-style: italic;">Nenhum registro exposto. Bipe um pacote para validar.</td></tr>`;
@@ -834,8 +897,8 @@
                 });
             }
 
-            const totalB1 = base1Database.length;
-            const totalB2 = base2Database.length;
+            const totalB1 = window.base1Database.length;
+            const totalB2 = window.base2Database.length;
             const totalRecords = totalB1 + totalB2;
             const totalBipados = window.scannedItemsList ? window.scannedItemsList.length : 0;
             const ratioPct = totalRecords > 0 ? ((totalBipados / totalRecords) * 100) : 0;
@@ -847,11 +910,13 @@
             document.getElementById('ui-percentage').innerText = ratioPct.toFixed(2) + '%';
 
             const circle = document.getElementById('progress-circle');
-            const radius = 70;
-            const circumference = 2 * Math.PI * radius;
-            const offset = circumference - (Math.min(ratioPct, 100) / 100) * circumference;
-            circle.style.strokeDasharray = circumference;
-            circle.style.strokeDashoffset = offset;
+            if(circle) {
+                const radius = 70;
+                const circumference = 2 * Math.PI * radius;
+                const offset = circumference - (Math.min(ratioPct, 100) / 100) * circumference;
+                circle.style.strokeDasharray = circumference;
+                circle.style.strokeDashoffset = offset;
+            }
         }
 
         function executeBarcodeBeep() {
@@ -873,11 +938,12 @@
                 return;
             }
 
-            let matchedItem = base1Database.find(item => item.trackingNumber === codeToFind);
+            // AJUSTE: Mapeia a busca usando as variáveis globais sincronizadas da nuvem
+            let matchedItem = window.base1Database.find(item => item.trackingNumber === codeToFind);
             let foundInBase1 = true;
 
             if (!matchedItem) {
-                matchedItem = base2Database.find(item => item.trackingNumber === codeToFind);
+                matchedItem = window.base2Database.find(item => item.trackingNumber === codeToFind);
                 foundInBase1 = false;
             }
 
@@ -983,13 +1049,10 @@
             }
         }
 
-        // AJUSTE SOLICITADO: A função foi modificada para NUNCA apagar os dados do Firebase e nem as bases locais.
         function clearAllScans() {
-            // Apenas remove a barra de alerta visual superior da tela
             document.getElementById('master-top-alert').style.display = 'none';
             document.getElementById('master-top-alert').innerText = '';
             
-            // Foca novamente o scanner para continuar a operação com total segurança
             const inputEl = document.getElementById('main-barcode-scanner');
             if(inputEl) inputEl.focus();
         }

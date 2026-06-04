@@ -934,10 +934,19 @@
             let statusMap = {};
             window.scannedItemsList.forEach(item => {
                 let status = item.statusOriginal || 'N/A';
+                let hub = (item.destinationHub || '').toLowerCase();
                 
-                // Mapeamento de agrupamento solicitado: junta office e - em um único marcador
-                if (status === 'LMHub_Received_office' || status === 'LMHub_Received_-') {
-                    status = 'LMHub_Received_office / -';
+                // Validação de pertinência de região/hub local monitorado
+                const pertencerRegiaoAtiva = hub.includes('uberaba') || hub.includes('carmelo') || hub.includes('catalao') || hub.includes('catalão');
+
+                // Filtro solicitado: Agrupa o que for LMHub_Received que NÃO pertencer a essas 3 praças
+                if (status.startsWith('LMHub_Received') && !pertencerRegiaoAtiva) {
+                    status = 'LMHub_Received (Outros Hubs)';
+                } else {
+                    // Mantém o agrupamento anterior solicitado para as praças mapeadas
+                    if (status === 'LMHub_Received_office' || status === 'LMHub_Received_-') {
+                        status = 'LMHub_Received_office / -';
+                    }
                 }
                 
                 statusMap[status] = (statusMap[status] || 0) + 1;

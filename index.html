@@ -934,6 +934,12 @@
             let statusMap = {};
             window.scannedItemsList.forEach(item => {
                 let status = item.statusOriginal || 'N/A';
+                
+                // Mapeamento de agrupamento solicitado: junta office e - em um único marcador
+                if (status === 'LMHub_Received_office' || status === 'LMHub_Received_-') {
+                    status = 'LMHub_Received_office / -';
+                }
+                
                 statusMap[status] = (statusMap[status] || 0) + 1;
             });
 

@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Parcel Sweeper Hub - Executive Suite</title>
     
-    <!-- Dependências Externas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <style>
@@ -204,7 +203,7 @@
 
         tr:hover td { background-color: #f8fafc; }
 
-        /* MUDANÇA CORPORATIVA: REMOÇÃO DE CORES DA TABELA DE ACORDO COM image_d8d73b.png */
+        /* LAYOUT NEUTRO SEM CORES NAS LINHAS */
         .badge { 
             display: inline-flex; 
             align-items: center; 
@@ -240,7 +239,6 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 
-    <!-- Script Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
@@ -269,19 +267,24 @@
         window.base2Map = {};
         window.totalB1Count = 0;
         window.totalB2Count = 0;
+        window.scannedItemsList = [];
 
+        // Ouvinte da Base 1 (Sempre que mudar/importar, reavalia os bips existentes)
         onValue(ref(database, 'planilha_base1'), (snapshot) => {
             window.base1Map = snapshot.val() || {};
             window.totalB1Count = Object.keys(window.base1Map).length;
             updateImportVisuals(1, window.totalB1Count);
             checkAndUnlockScanner();
+            triggerRetroactiveRecalculate();
         });
 
+        // Ouvinte da Base 2 (Sempre que mudar/importar, reavalia os bips existentes)
         onValue(ref(database, 'planilha_base2'), (snapshot) => {
             window.base2Map = snapshot.val() || {};
             window.totalB2Count = Object.keys(window.base2Map).length;
             updateImportVisuals(2, window.totalB2Count);
             checkAndUnlockScanner();
+            triggerRetroactiveRecalculate();
         });
 
         onValue(ref(database, 'bips_triagem'), (snapshot) => {
@@ -337,6 +340,77 @@
             window.refreshDashboardUI();
         }
 
+        // NOVA CONFIGURAÇÃO: ATUALIZAÇÃO AUTOMÁTICA RETROATIVA DO STATUS DE ITENS JÁ BIPADOS
+        function triggerRetroactiveRecalculate() {
+            if (!window.scannedItemsList || window.scannedItemsList.length === 0) return;
+            
+            let updates = {};
+            let mudouAlgo = false;
+
+            window.scannedItemsList.forEach(item => {
+                const barcode = item.trackingNumber;
+                if(!barcode) return;
+
+                let b1Data = window.base1Map ? window.base1Map[barcode] : null;
+                let b2Data = window.base2Map ? window.base2Map[barcode] : null;
+
+                let originLabel = 'NÃO ENCONTRADO';
+                let isFound = 'NÃO';
+                let statusText = 'NÃO ENCONTRADO';
+                let destHub = 'N/A';
+                let locType = '-'; 
+                let actionText = 'IR PARA ÁREA DE TRATATIVA';
+
+                if (b1Data) {
+                    isFound = 'SIM';
+                    originLabel = b2Data ? 'Ambas' : 'Base 1';
+                    statusText = b2Data ? (b2Data.status || b1Data.status || 'N/A') : (b1Data.status || 'N/A');
+                    destHub = b1Data.destinationHub || b1Data.destination_hub || b1Data.destinationHubName || 'N/A';
+                    locType = b1Data.locationType || b1Data.location_type || (b2Data ? b2Data.locationType : '-');
+                } 
+                else if (b2Data) {
+                    isFound = 'SIM';
+                    originLabel = 'Base 2';
+                    statusText = b2Data.status || 'N/A';
+                    destHub = b2Data.destinationHub || b2Data.destination_hub || b2Data.destinationHubName || 'N/A';
+                    locType = b2Data.locationType || b2Data.location_type || '-';
+                }
+
+                if (isFound === 'SIM') {
+                    const hubLower = destHub.toLowerCase();
+                    const statusLower = statusText.toLowerCase();
+                    const isOurRegion = hubLower.includes('uberaba') || hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
+                    const isLMHubReceived = (statusText === 'LMHub_Received' || statusLower === 'lmhub_received');
+
+                    if (isLMHubReceived && isOurRegion) {
+                        actionText = 'MANTER FLUXO';
+                    } else if (isOurRegion && (statusText === 'LMHub_Assigning' || statusLower.includes('assigning') || statusLower.includes('received'))) {
+                        actionText = 'MANTER FLUXO';
+                    } else {
+                        actionText = 'IR PARA ÁREA DE TRATATIVA';
+                    }
+                }
+
+                // Verifica se os dados atuais diferem do que estava gravado na lista de bips
+                if (item.statusOriginal !== statusText || item.destinationHub !== destHub || item.action !== actionText || item.encontrado !== isFound) {
+                    updates[barcode] = {
+                        ...item,
+                        statusOriginal: statusText,
+                        destinationHub: destHub,
+                        locationType: locType,
+                        action: actionText,
+                        origin: originLabel,
+                        encontrado: isFound
+                    };
+                    mudouAlgo = true;
+                }
+            });
+
+            if (mudouAlgo) {
+                window.firebaseActions.updateData('bips_triagem', updates);
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             const scannerInput = document.getElementById('main-barcode-scanner');
             if (scannerInput) {
@@ -359,7 +433,6 @@
             }
         });
 
-        // REGRAS ATUALIZADAS DE COR DA TARJA E MAPEAMENTO DA REGIAO BR
         function processBarcodeBip(barcode) {
             let b1Data = window.base1Map ? window.base1Map[barcode] : null;
             let b2Data = window.base2Map ? window.base2Map[barcode] : null;
@@ -392,35 +465,29 @@
                 const hubLower = destHub.toLowerCase();
                 const statusLower = statusText.toLowerCase();
                 
-                // Validação exata da Região Solicitada
                 const isOurRegion = hubLower.includes('uberaba') || hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
                 const isLMHubReceived = (statusText === 'LMHub_Received' || statusLower === 'lmhub_received');
 
-                // 1. REGRA PRINCIPAL: SE FOR LMHub_Received E DA REGIAO (UBERABA, MONTE CARMELO, CATALÃO) -> TARJA VERDE DA BR
                 if (isLMHubReceived && isOurRegion) {
                     actionText = 'MANTER FLUXO';
                     alertColor = 'alert-green';
                     voiceMessage = 'Manter fluxo';
                 }
-                // 2. REGRA OUTROS STATUS DA REGIAO (Ex: LMHub_Assigning normal) -> TARJA AZUL
                 else if (isOurRegion && (statusText === 'LMHub_Assigning' || statusLower.includes('assigning') || statusLower.includes('received'))) {
                     actionText = 'MANTER FLUXO';
                     alertColor = 'alert-blue';
                     voiceMessage = 'Manter fluxo';
                 }
-                // 3. REGRA DELIVERING OU DELIVERED -> TARJA ROXA
                 else if (statusLower.includes('delivering') || statusLower.includes('delivered')) {
                     actionText = 'IR PARA ÁREA DE TRATATIVA';
                     alertColor = 'alert-purple';
                     voiceMessage = 'Pacote em rota ou entregue, ir para área de tratativa';
                 }
-                // 4. REGRA OUTRO HUB OU CONTÉM RETURN -> TARJA AMARELA
                 else if (!isOurRegion || statusLower.includes('return')) {
                     actionText = 'IR PARA ÁREA DE TRATATIVA';
                     alertColor = 'alert-orange';
                     voiceMessage = !isOurRegion ? 'Outro hub, ir para área de tratativa' : 'Retorno, ir para área de tratativa';
                 }
-                // 5. REGRA CONTINGÊNCIA GERAL -> TARJA ALARANJADA
                 else {
                     actionText = 'IR PARA ÁREA DE TRATATIVA';
                     alertColor = 'alert-orange';
@@ -449,7 +516,6 @@
             window.firebaseActions.updateData('bips_triagem/' + barcode, newBip);
         }
 
-        // MUDANÇA OPERACIONAL: A TARJA AGORA É FIXA E PERSISTENTE (NÃO POSSUI TIMEOUT PARA SUMIR)
         window.showAlertTop = function(msg, cssClass) {
             const bar = document.getElementById('master-top-alert');
             if (bar) {
@@ -484,7 +550,6 @@
         <button class="tab-btn" onclick="switchTab('report')">3. Relatório Executivo Diário</button>
     </div>
 
-    <!-- ABA 1: IMPORTAÇÃO -->
     <div id="tab-import" class="tab-content">
         <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px;">
             <div>
@@ -526,7 +591,6 @@
         </div>
     </div>
 
-    <!-- ABA 2: MONITOR REALTIME -->
     <div id="tab-dashboard" class="tab-content active">
         <div class="dashboard-layout">
             
@@ -615,7 +679,6 @@
         </div>
     </div>
 
-    <!-- ABA 3: RELATÓRIOS -->
     <div id="tab-report" class="tab-content">
         <div style="max-width: 1100px; margin: 0 auto;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px;">
@@ -665,9 +728,7 @@
         </div>
     </div>
 
-    <!-- Regras Logísticas e Controle Operacional da UI -->
     <script>
-        window.scannedItemsList = []; 
         window.filteredItemsList = [];
         window.currentPage = 1;
         window.itemsPerPage = 50;
@@ -881,7 +942,6 @@
             renderTableData();
         };
 
-        // RENDERIZAÇÃO DA TABELA 100% NEUTRA (SEM CORES DISCREPANTES CONFORME SOLICITADO)
         function renderTableData() {
             let query = window.currentSearchQuery ? window.currentSearchQuery.toLowerCase() : "";
             if(window.scannedItemsList) {
@@ -924,7 +984,6 @@
                 let st = item.statusOriginal || 'N/A';
                 let hub = item.destinationHub || 'N/A';
                 
-                // Mapeamento textual da ação correspondente
                 let badgeAction = item.action || "TRATATIVA";
                 let bScanned = item.encontrado === 'SIM' ? `<span class="badge">Sincronizado</span>` : `<span class="badge">Divergente</span>`;
                 let bOrigin = `<span class="badge">Base 1</span>`;

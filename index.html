@@ -43,7 +43,7 @@
         .alert-orange { background: linear-gradient(135deg, #f59e0b, #d97706) !important; }
         .alert-purple { background: linear-gradient(135deg, #7c3aed, #6d28d9) !important; }
         .alert-blue { background: linear-gradient(135deg, #2563eb, #1d4ed8) !important; }
-        .alert-pink { background: linear-gradient(135deg, #ec4899, #db2777) !important; } /* Cor Rosa para o XPT */
+        .alert-pink { background: linear-gradient(135deg, #ec4899, #db2777) !important; }
 
         /* Top Navbar */
         .navbar {
@@ -204,7 +204,6 @@
 
         tr:hover td { background-color: #f8fafc; }
 
-        /* LAYOUT NEUTRO SEM CORES NAS LINHAS */
         .badge { 
             display: inline-flex; 
             align-items: center; 
@@ -221,8 +220,6 @@
             color: #334155; 
             border: 1px solid #cbd5e1;
         }
-
-        .badge-file-origin { padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 11px; display: inline-block; width: 80px; text-align: center; background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
 
         .voice-banner { background-color: #e0f2fe; border: 1px solid #bae6fd; padding: 12px 18px; border-radius: 8px; font-size: 13px; color: #0369a1; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
 
@@ -270,7 +267,6 @@
         window.totalB2Count = 0;
         window.scannedItemsList = [];
 
-        // Ouvinte da Base 1
         onValue(ref(database, 'planilha_base1'), (snapshot) => {
             window.base1Map = snapshot.val() || {};
             window.totalB1Count = Object.keys(window.base1Map).length;
@@ -279,7 +275,6 @@
             triggerRetroactiveRecalculate();
         });
 
-        // Ouvinte da Base 2
         onValue(ref(database, 'planilha_base2'), (snapshot) => {
             window.base2Map = snapshot.val() || {};
             window.totalB2Count = Object.keys(window.base2Map).length;
@@ -341,7 +336,6 @@
             window.refreshDashboardUI();
         }
 
-        // FUNÇÃO DE ATUALIZAÇÃO AUTOMÁTICA RETROATIVA DA BASE DE DADOS
         function triggerRetroactiveRecalculate() {
             if (!window.scannedItemsList || window.scannedItemsList.length === 0) return;
             
@@ -384,24 +378,19 @@
                     const isUberaba = hubLower.includes('uberaba');
                     const isXPT = hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
 
-                    // Regra de Customização de Status Exclusiva de Uberaba se for LMHub_Received
                     if (isUberaba && (statusText === 'LMHub_Received' || statusLower === 'lmhub_received' || statusLower.includes('received'))) {
                         statusText = `LMHub_Received_${locType}`;
                     }
 
-                    // 1ª Prioridade Absoluta: LMHub_Assigning
                     if (statusText.startsWith('LMHub_Assigning') || statusLower.includes('assigning')) {
                         actionText = 'DIRECIONAR A ROTA CORRETA';
                     }
-                    // 2ª Regra: Destinos Monte Carmelo ou Catalão -> XPT
                     else if (isXPT) {
                         actionText = 'DIRECIONAR AO XPT';
                     }
-                    // 3ª Regra: Não é Uberaba (Qualquer outro hub diferente)
                     else if (!isUberaba) {
                         actionText = 'DIRECIONAR A ESTAÇÃO CORRETA';
                     }
-                    // 4ª Regra: É Uberaba (Nossa Região) -> Segue fluxo de status padrão
                     else if (statusText.startsWith('LMHub_Received')) {
                         actionText = 'MANTER FLUXO';
                     } 
@@ -486,30 +475,25 @@
                 const isUberaba = hubLower.includes('uberaba');
                 const isXPT = hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
 
-                // Executa a concatenação do sufixo Office/Home caso atenda o critério de Uberaba e status Received
                 if (isUberaba && (statusText === 'LMHub_Received' || statusLower === 'lmhub_received' || statusLower.includes('received'))) {
                     statusText = `LMHub_Received_${locType}`;
                 }
 
-                // 1º CASO: LMHub_Assigning -> Rota Correta (Fundo Azul)
                 if (statusText.startsWith('LMHub_Assigning') || statusLower.includes('assigning')) {
                     actionText = 'DIRECIONAR A ROTA CORRETA';
                     alertColor = 'alert-blue';
                     voiceMessage = 'Direcionar a rota correta';
                 }
-                // 2º CASO: Monte Carmelo ou Catalão -> Direcionar ao XPT (Rosa)
                 else if (isXPT) {
                     actionText = 'DIRECIONAR AO XPT';
                     alertColor = 'alert-pink';
                     voiceMessage = 'Direcionar ao xis pê tê';
                 }
-                // 3º CASO: Outro Hub (Diferente de Uberaba) -> Estação Correta (Fundo Laranja)
                 else if (!isUberaba) {
                     actionText = 'DIRECIONAR A ESTAÇÃO CORRETA';
                     alertColor = 'alert-orange';
                     voiceMessage = 'Direcionar a estação correta';
                 }
-                // 4º CASO: É de Uberaba -> Valida fluxo de status interno
                 else if (statusText.startsWith('LMHub_Received')) {
                     actionText = 'MANTER FLUXO';
                     alertColor = 'alert-green';
@@ -936,15 +920,13 @@
                 let status = item.statusOriginal || 'N/A';
                 let hub = (item.destinationHub || '').toLowerCase();
                 
-                // Validação de pertinência de região/hub local monitorado
                 const pertencerRegiaoAtiva = hub.includes('uberaba') || hub.includes('carmelo') || hub.includes('catalao') || hub.includes('catalão');
 
-                // Filtro solicitado: Agrupa o que for LMHub_Received que NÃO pertencer a essas 3 praças
                 if (status.startsWith('LMHub_Received') && !pertencerRegiaoAtiva) {
                     status = 'LMHub_Received (Outros Hubs)';
                 } else {
-                    // Mantém o agrupamento anterior solicitado para as praças mapeadas
-                    if (status === 'LMHub_Received_office' || status === 'LMHub_Received_-') {
+                    // Agrupa e consolida qualquer variação de Office ou '-' no padrão unificado
+                    if (status === 'LMHub_Received_Office' || status === 'LMHub_Received_office' || status === 'LMHub_Received_-') {
                         status = 'LMHub_Received_office / -';
                     }
                 }

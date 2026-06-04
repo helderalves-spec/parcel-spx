@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Parcel Sweeper Hub - Executive Suite</title>
     
+    <!-- Dependências Externas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <style>
@@ -239,6 +240,7 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 
+    <!-- Script Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
@@ -269,7 +271,7 @@
         window.totalB2Count = 0;
         window.scannedItemsList = [];
 
-        // Ouvinte da Base 1 (Sempre que mudar/importar, reavalia os bips existentes)
+        // Ouvinte da Base 1
         onValue(ref(database, 'planilha_base1'), (snapshot) => {
             window.base1Map = snapshot.val() || {};
             window.totalB1Count = Object.keys(window.base1Map).length;
@@ -278,7 +280,7 @@
             triggerRetroactiveRecalculate();
         });
 
-        // Ouvinte da Base 2 (Sempre que mudar/importar, reavalia os bips existentes)
+        // Ouvinte da Base 2
         onValue(ref(database, 'planilha_base2'), (snapshot) => {
             window.base2Map = snapshot.val() || {};
             window.totalB2Count = Object.keys(window.base2Map).length;
@@ -340,7 +342,7 @@
             window.refreshDashboardUI();
         }
 
-        // NOVA CONFIGURAÇÃO: ATUALIZAÇÃO AUTOMÁTICA RETROATIVA DO STATUS DE ITENS JÁ BIPADOS
+        // FUNÇÃO DE ATUALIZAÇÃO AUTOMÁTICA RETROATIVA COM AS REGRAS CORRIGIDAS
         function triggerRetroactiveRecalculate() {
             if (!window.scannedItemsList || window.scannedItemsList.length === 0) return;
             
@@ -380,18 +382,22 @@
                     const hubLower = destHub.toLowerCase();
                     const statusLower = statusText.toLowerCase();
                     const isOurRegion = hubLower.includes('uberaba') || hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
-                    const isLMHubReceived = (statusText === 'LMHub_Received' || statusLower === 'lmhub_received');
 
-                    if (isLMHubReceived && isOurRegion) {
+                    // Regra Corrigida para LMHub_Assigning (Fundo Azul + Rota Correta)
+                    if (statusText === 'LMHub_Assigning' || statusLower.includes('assigning')) {
+                        actionText = 'DIRECIONAR A ROTA CORRETA';
+                    } 
+                    else if ((statusText === 'LMHub_Received' || statusLower === 'lmhub_received') && isOurRegion) {
                         actionText = 'MANTER FLUXO';
-                    } else if (isOurRegion && (statusText === 'LMHub_Assigning' || statusLower.includes('assigning') || statusLower.includes('received'))) {
+                    } 
+                    else if (isOurRegion && statusLower.includes('received')) {
                         actionText = 'MANTER FLUXO';
-                    } else {
+                    } 
+                    else {
                         actionText = 'IR PARA ÁREA DE TRATATIVA';
                     }
                 }
 
-                // Verifica se os dados atuais diferem do que estava gravado na lista de bips
                 if (item.statusOriginal !== statusText || item.destinationHub !== destHub || item.action !== actionText || item.encontrado !== isFound) {
                     updates[barcode] = {
                         ...item,
@@ -464,18 +470,22 @@
             if (isFound === 'SIM') {
                 const hubLower = destHub.toLowerCase();
                 const statusLower = statusText.toLowerCase();
-                
                 const isOurRegion = hubLower.includes('uberaba') || hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
-                const isLMHubReceived = (statusText === 'LMHub_Received' || statusLower === 'lmhub_received');
-
-                if (isLMHubReceived && isOurRegion) {
+                
+                // AJUSTE PRIORITÁRIO: VALIDAÇÃO CORRETA PARA LMHub_Assigning
+                if (statusText === 'LMHub_Assigning' || statusLower.includes('assigning')) {
+                    actionText = 'DIRECIONAR A ROTA CORRETA';
+                    alertColor = 'alert-blue';
+                    voiceMessage = 'Direcionar a rota correta';
+                }
+                else if ((statusText === 'LMHub_Received' || statusLower === 'lmhub_received') && isOurRegion) {
                     actionText = 'MANTER FLUXO';
                     alertColor = 'alert-green';
                     voiceMessage = 'Manter fluxo';
                 }
-                else if (isOurRegion && (statusText === 'LMHub_Assigning' || statusLower.includes('assigning') || statusLower.includes('received'))) {
+                else if (isOurRegion && statusLower.includes('received')) {
                     actionText = 'MANTER FLUXO';
-                    alertColor = 'alert-blue';
+                    alertColor = 'alert-green';
                     voiceMessage = 'Manter fluxo';
                 }
                 else if (statusLower.includes('delivering') || statusLower.includes('delivered')) {
@@ -550,6 +560,7 @@
         <button class="tab-btn" onclick="switchTab('report')">3. Relatório Executivo Diário</button>
     </div>
 
+    <!-- ABA 1: IMPORTAÇÃO -->
     <div id="tab-import" class="tab-content">
         <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px;">
             <div>
@@ -591,6 +602,7 @@
         </div>
     </div>
 
+    <!-- ABA 2: MONITOR REALTIME -->
     <div id="tab-dashboard" class="tab-content active">
         <div class="dashboard-layout">
             
@@ -679,6 +691,7 @@
         </div>
     </div>
 
+    <!-- ABA 3: RELATÓRIOS -->
     <div id="tab-report" class="tab-content">
         <div style="max-width: 1100px; margin: 0 auto;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px;">
@@ -728,6 +741,7 @@
         </div>
     </div>
 
+    <!-- Regras Logísticas e Controle Operacional da UI -->
     <script>
         window.filteredItemsList = [];
         window.currentPage = 1;

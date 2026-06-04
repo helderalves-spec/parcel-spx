@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Parcel Sweeper Hub - Executive Suite</title>
     
+    <!-- Dependências Externas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <style>
@@ -43,6 +44,7 @@
         .alert-orange { background: linear-gradient(135deg, #f59e0b, #d97706) !important; }
         .alert-purple { background: linear-gradient(135deg, #7c3aed, #6d28d9) !important; }
         .alert-blue { background: linear-gradient(135deg, #2563eb, #1d4ed8) !important; }
+        .alert-pink { background: linear-gradient(135deg, #ec4899, #db2777) !important; } /* Nova Cor Rosa para o XPT */
 
         /* Top Navbar */
         .navbar {
@@ -239,6 +241,7 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 
+    <!-- Script Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
@@ -486,10 +489,10 @@
                     alertColor = 'alert-blue';
                     voiceMessage = 'Direcionar a rota correta';
                 }
-                // 2º CASO: Monte Carmelo ou Catalão -> Direcionar ao XPT (Fundo Roxo)
+                // 2º CASO: Monte Carmelo ou Catalão -> Direcionar ao XPT (Alterado para Rosa: alert-pink)
                 else if (isXPT) {
                     actionText = 'DIRECIONAR AO XPT';
-                    alertColor = 'alert-purple';
+                    alertColor = 'alert-pink';
                     voiceMessage = 'Direcionar ao xis pê tê';
                 }
                 // 3º CASO: Outro Hub (Diferente de Uberaba) -> Estação Correta (Fundo Laranja)
@@ -571,6 +574,7 @@
         <button class="tab-btn" onclick="switchTab('report')">3. Relatório Executivo Diário</button>
     </div>
 
+    <!-- ABA 1: IMPORTAÇÃO -->
     <div id="tab-import" class="tab-content">
         <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px;">
             <div>
@@ -612,6 +616,7 @@
         </div>
     </div>
 
+    <!-- ABA 2: MONITOR REALTIME -->
     <div id="tab-dashboard" class="tab-content active">
         <div class="dashboard-layout">
             
@@ -700,6 +705,7 @@
         </div>
     </div>
 
+    <!-- ABA 3: RELATÓRIOS -->
     <div id="tab-report" class="tab-content">
         <div style="max-width: 1100px; margin: 0 auto;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px;">
@@ -749,6 +755,7 @@
         </div>
     </div>
 
+    <!-- Regras Logísticas e Controle Operacional da UI -->
     <script>
         window.filteredItemsList = [];
         window.currentPage = 1;

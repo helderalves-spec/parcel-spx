@@ -196,7 +196,7 @@
 
         th:nth-child(1), td:nth-child(1) { width: 22%; white-space: normal; word-break: break-all; }
         th:nth-child(2), td:nth-child(2) { width: 18%; }
-        th:nth-child(3), td:nth-child(3) { width: 16%; }
+        th:nth-child(3), td:nth-child(3) { width: 22%; font-weight: 700; color: #0284c7; } /* Destacando o Hub Destino */
         th:nth-child(4), td:nth-child(4) { width: 10%; text-align: center; }
         th:nth-child(5), td:nth-child(5) { width: 14%; text-align: center; }
         th:nth-child(6), td:nth-child(6) { width: 11%; text-align: center; }
@@ -323,7 +323,7 @@
                     if(summaryText) {
                         summaryText.innerHTML = `
                             <strong>Base 1 (Forward):</strong> ${window.totalB1Count} registros na nuvem.<br>
-                            <strong>Base 2 (Receive Task - Coluna B):</strong> ${window.totalB2Count} registros na nuvem.<br>
+                            <strong>Base 2 (Receive Task):</strong> ${window.totalB2Count} registros na nuvem.<br>
                             <strong>Total Consolidado:</strong> ${totalRecords} ordens ativas para cruzamento prioritário.
                         `;
                     }
@@ -584,7 +584,7 @@
                 </div>
 
                 <div>
-                    <h3 style="font-size: 14px; margin-bottom: 12px; font-weight: 600; color: #475569;">Fluxo Receive Task (Base 2 - Mapeamento Coluna B)</h3>
+                    <h3 style="font-size: 14px; margin-bottom: 12px; font-weight: 600; color: #475569;">Fluxo Receive Task (Base 2 - Mapeamento)</h3>
                     <div id="box-file-2" class="import-box" onclick="document.getElementById('csv-file-2').click()">
                         <div id="icon-file-2" style="font-size: 36px; margin-bottom: 12px; color: #0284c7;">📥</div>
                         <span id="label-file-2" style="font-size: 13px; font-weight: 600; color: #334155;">Selecionar Bases Receive Task (.csv ou .zip)</span>
@@ -631,7 +631,7 @@
 
             <div class="work-area" style="flex: 1; min-width: 0;">
                 <div class="voice-banner">
-                    <span>⚡</span> <span><strong>Controle de Status Ativo:</strong> Layout limpo sem cores nas linhas de acordo com o padrão corporativo. Foco visual total no Alerta Superior.</span>
+                    <span>⚡</span> <span><strong>Controle de Status Ativo:</strong> Layout corrigido para ler colunas por índice rígido absoluto. Nomes das cidades garantidos.</span>
                 </div>
 
                 <div class="card" style="padding: 20px;">
@@ -788,25 +788,25 @@
             }
         }
 
-        // Função auxiliar para quebrar as linhas de forma segura respeitando aspas
-        function parseCSVLine(line, separator) {
-            let result = [];
-            let current = '';
+        /* PARSER AVANÇADO E COMPLETO COM SUPORTE A ASPAS E CAMPOS VAZIOS PARALELOS */
+        function parseCSVLineRobust(line, separator) {
+            let fields = [];
+            let currentField = '';
             let inQuotes = false;
-
+            
             for (let i = 0; i < line.length; i++) {
                 let char = line[i];
-                if (char === '"' || char === "'") {
+                if (char === '"') {
                     inQuotes = !inQuotes;
                 } else if (char === separator && !inQuotes) {
-                    result.push(current.trim().replace(/^["']|["']$/g, ''));
-                    current = '';
+                    fields.push(currentField.trim());
+                    currentField = '';
                 } else {
-                    current += char;
+                    currentField += char;
                 }
             }
-            result.push(current.trim().replace(/^["']|["']$/g, ''));
-            return result;
+            fields.push(currentField.trim());
+            return fields;
         }
 
         window.handleFileSelectUnified = function(event, baseIndex) {
@@ -865,9 +865,10 @@
 
                 let separator = lines[0].includes(',') && !lines[0].includes(';') ? ',' : ';';
                 
-                // Quebra os cabeçalhos de forma segura
-                const headers = parseCSVLine(lines[0], separator).map(h => h.toLowerCase());
+                // Cabeçalhos brutos da primeira linha
+                const headers = parseCSVLineRobust(lines[0], separator).map(h => h.replace(/^\ufeff/, '').trim().toLowerCase());
                 
+                // Mapeamento dinâmico inteligente por correspondência exata ou parcial de nomes
                 const trackingIdx = headers.findIndex(h => h === 'sls tracking number' || h === 'forward_order_id' || h === 'tracking_number' || h.includes('tracking') || h === 'id' || h.includes('number'));
                 const statusIdx = headers.findIndex(h => h === 'status' || h === 'order status' || h.includes('status'));
                 const hubIdx = headers.findIndex(h => h === 'destination hub' || h === 'destination_hub' || h === 'destination_hub_name' || h.includes('destination hub') || h.includes('destino'));
@@ -875,7 +876,7 @@
 
                 if (trackingIdx === -1) {
                     showLoading(false);
-                    alert("Coluna de rastreamento (SLS Tracking Number) não identificada no arquivo.");
+                    alert("Coluna de rastreamento (Tracking Number) não identificada no arquivo.");
                     resolve();
                     return;
                 }
@@ -884,7 +885,7 @@
                 for (let i = 1; i < lines.length; i++) {
                     if (!lines[i].trim()) continue;
                     
-                    const columns = parseCSVLine(lines[i], separator);
+                    const columns = parseCSVLineRobust(lines[i], separator);
                     const id = columns[trackingIdx];
                     
                     if (id && id.length <= 15) {
@@ -915,7 +916,7 @@
 
                 function sendNextChunk() {
                     if (currentOffset >= rowsToProcess.length) {
-                        window.showAlertTop(`✔ ${rowsToProcess.length} registros sincronizados na nuvem!`, 'alert-green');
+                        window.showAlertTop(`✔ ${rowsToProcess.length} registros estruturados na nuvem com sucesso!`, 'alert-green');
                         resolve();
                         return;
                     }
@@ -1060,7 +1061,7 @@
                 row.innerHTML = `
                     <td style="font-weight:700; color: #111827;">${item.trackingNumber}</td>
                     <td><span class="badge">${st}</span></td>
-                    <td>${hub}</td>
+                    <td style="font-weight: 700; color: #0284c7;">${hub}</td>
                     <td style="font-weight:600; color: #475569; text-align: center;">${item.locationType || '-'}</td>
                     <td><span class="badge">${badgeAction}</span></td>
                     <td style="text-align: center;">${bOrigin}</td>

@@ -837,58 +837,58 @@
             const files = event.target.files;
             if (!files || files.length === 0) return;
 
-            showLoading(true, "Limpando registros antigos e estruturando nova carga...");
+            showLoading(true, "Processando e mesclando novos registros de arquivo com a nuvem...");
             const nodeName = baseIndex === 1 ? 'planilha_base1' : 'planilha_base2';
 
-            window.firebaseActions.removeNode(nodeName).then(() => {
-                let parsePromises = [];
+            // REMOVIDO: window.firebaseActions.removeNode(nodeName) para não apagar os arquivos antigos.
+            // Agora os novos arquivos entram somando e acumulando no Firebase!
+            let parsePromises = [];
 
-                Array.from(files).forEach(file => {
-                    const extension = file.name.split('.').pop().toLowerCase();
-                    
-                    if (extension === 'zip') {
-                        let zipPromise = new Promise((resolveZip) => {
-                            const reader = new FileReader();
-                            reader.onload = function(e) {
-                                JSZip.loadAsync(e.target.result).then(function(zip) {
-                                    let internalPromises = [];
-                                    zip.forEach(function(relativePath, zipEntry) {
-                                        if (!zipEntry.dir && zipEntry.name.endsWith('.csv')) {
-                                            internalPromises.push(zipEntry.async("string").then(content => {
-                                                return parseAndStoreCSVInChunks(content, baseIndex);
-                                            }));
-                                        }
-                                    });
-                                    Promise.all(internalPromises).then(() => resolveZip());
-                                }).catch(err => {
-                                    console.error(err);
-                                    resolveZip();
+            Array.from(files).forEach(file => {
+                const extension = file.name.split('.').pop().toLowerCase();
+                
+                if (extension === 'zip') {
+                    let zipPromise = new Promise((resolveZip) => {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            JSZip.loadAsync(e.target.result).then(function(zip) {
+                                let internalPromises = [];
+                                zip.forEach(function(relativePath, zipEntry) {
+                                    if (!zipEntry.dir && zipEntry.name.endsWith('.csv')) {
+                                        internalPromises.push(zipEntry.async("string").then(content => {
+                                            return parseAndStoreCSVInChunks(content, baseIndex);
+                                        }));
+                                    }
                                 });
-                            };
-                            reader.readAsArrayBuffer(file);
-                        });
-                        parsePromises.push(zipPromise);
-                    } else if (extension === 'csv') {
-                        let csvPromise = new Promise((resolveCsv) => {
-                            const reader = new FileReader();
-                            reader.onload = function(e) {
-                                parseAndStoreCSVInChunks(e.target.result, baseIndex).then(() => resolveCsv());
-                            };
-                            reader.readAsText(file, "UTF-8");
-                        });
-                        parsePromises.push(csvPromise);
-                    }
-                });
+                                Promise.all(internalPromises).then(() => resolveZip());
+                            }).catch(err => {
+                                console.error(err);
+                                resolveZip();
+                            });
+                        };
+                        reader.readAsArrayBuffer(file);
+                    });
+                    parsePromises.push(zipPromise);
+                } else if (extension === 'csv') {
+                    let csvPromise = new Promise((resolveCsv) => {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            parseAndStoreCSVInChunks(e.target.result, baseIndex).then(() => resolveCsv());
+                        };
+                        reader.readAsText(file, "UTF-8");
+                    });
+                    parsePromises.push(csvPromise);
+                }
+            });
 
-                // Executa a limpeza do campo apenas após processar todos os anexos
-                Promise.all(parsePromises).then(() => {
-                    showLoading(false);
-                    event.target.value = '';
-                }).catch(err => {
-                    console.error(err);
-                    showLoading(false);
-                    event.target.value = '';
-                });
+            // Executa a liberação do campo apenas após processar todos os anexos de uma vez só
+            Promise.all(parsePromises).then(() => {
+                showLoading(false);
+                event.target.value = '';
+            }).catch(err => {
+                console.error(err);
+                showLoading(false);
+                event.target.value = '';
             });
         };
 
@@ -953,7 +953,7 @@
 
                 function sendNextChunk() {
                     if (currentOffset >= rowsToProcess.length) {
-                        window.showAlertTop(`✔ ${rowsToProcess.length} registros sincronizados na nuvem!`, 'alert-green');
+                        window.showAlertTop(`✔ Registros adicionados com sucesso!`, 'alert-green');
                         resolve();
                         return;
                     }
@@ -1031,7 +1031,7 @@
             const tExpected = (window.totalB1Count || 0) + (window.totalB2Count || 0);
             const tScanned = window.scannedItemsList ? window.scannedItemsList.length : 0;
 
-            if(document.getElementById('ui-total-esperado')) document.getElementById('ui-total-esperado').innerText = tExpected;
+            if(document.getElementById('ui-total-expected')) document.getElementById('ui-total-expected').innerText = tExpected;
             if(document.getElementById('ui-b1-count')) document.getElementById('ui-b1-count').innerText = window.totalB1Count || 0;
             if(document.getElementById('ui-b2-count')) document.getElementById('ui-b2-count').innerText = window.totalB2Count || 0;
             if(document.getElementById('ui-total-bipado')) document.getElementById('ui-total-bipado').innerText = tScanned;

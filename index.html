@@ -44,7 +44,7 @@
         .alert-purple { background: linear-gradient(135deg, #7c3aed, #6d28d9) !important; }
         .alert-blue { background: linear-gradient(135deg, #2563eb, #1d4ed8) !important; }
         .alert-pink { background: linear-gradient(135deg, #ec4899, #db2777) !important; }
-        .alert-gray { background: linear-gradient(135deg, #6b7280, #4b5563) !important; } /* Nova Cor da Tarja para Acelerar */
+        .alert-gray { background: linear-gradient(135deg, #6b7280, #4b5563) !important; } /* Cor Cinza para Acelerar */
 
         /* Top Navbar */
         .navbar {
@@ -349,6 +349,7 @@
             
             let updates = {};
             let mudouAlgo = false;
+            const dateRegex = /\d{4}[-/]\d{2}[-/]\d{2}/;
 
             window.scannedItemsList.forEach(item => {
                 const barcode = item.trackingNumber;
@@ -390,11 +391,11 @@
                         statusText = `LMHub_Received_${locType}`;
                     }
 
-                    // Prioridade 1: Se o Hub for ACELERAR
-                    if (destHub === 'ACELERAR') {
+                    // CORREÇÃO LOGÍSTICA CRÍTICA: Prioridade Absoluta para campo com Data ou Texto "ACELERAR"
+                    if (destHub === 'ACELERAR' || dateRegex.test(destHub)) {
+                        destHub = 'ACELERAR';
                         actionText = 'ACELERAR';
                     }
-                    // Prioridade 2: Regras normais de fluxo
                     else if (statusText.startsWith('LMHub_Assigning') || statusLower.includes('assigning')) {
                         actionText = 'DIRECIONAR A ROTA CORRETA';
                     }
@@ -465,6 +466,7 @@
             let actionText = 'IR PARA ÁREA DE TRATATIVA';
             let alertColor = 'alert-red';
             let voiceMessage = 'Não encontrado, ir para área de tratativa';
+            const dateRegex = /\d{4}[-/]\d{2}[-/]\d{2}/;
 
             if (b1Data) {
                 isFound = 'SIM';
@@ -492,13 +494,13 @@
                     statusText = `LMHub_Received_${locType}`;
                 }
 
-                // CORREÇÃO AQUI: Se for do Hub ACELERAR, aplica as regras visuais cinza prioritárias
-                if (destHub === 'ACELERAR') {
+                // CORREÇÃO LOGÍSTICA CRÍTICA NO MOMENTO DO BIP: Intercepta a data e joga como ACELERAR cinza prioritário
+                if (destHub === 'ACELERAR' || dateRegex.test(destHub)) {
+                    destHub = 'ACELERAR';
                     actionText = 'ACELERAR';
                     alertColor = 'alert-gray';
                     voiceMessage = 'Acelerar';
                 }
-                // Demais lógicas normais do sistema
                 else if (statusText.startsWith('LMHub_Assigning') || statusLower.includes('assigning')) {
                     actionText = 'DIRECIONAR A ROTA CORRETA';
                     alertColor = 'alert-blue';
@@ -883,7 +885,7 @@
                 }
 
                 let rowsToProcess = [];
-                const dateRegex = /\d{2,4}[-/]\d{2}[-/]\d{2,4}/;
+                const dateRegex = /\d{4}[-/]\d{2}[-/]\d{2}/;
 
                 for (let i = 1; i < lines.length; i++) {
                     if (!lines[i].trim()) continue;

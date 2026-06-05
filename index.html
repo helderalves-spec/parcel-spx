@@ -44,7 +44,6 @@
         .alert-purple { background: linear-gradient(135deg, #7c3aed, #6d28d9) !important; }
         .alert-blue { background: linear-gradient(135deg, #2563eb, #1d4ed8) !important; }
         .alert-pink { background: linear-gradient(135deg, #ec4899, #db2777) !important; }
-        .alert-gray { background: linear-gradient(135deg, #6b7280, #4b5563) !important; } 
 
         /* Top Navbar */
         .navbar {
@@ -222,13 +221,6 @@
             border: 1px solid #cbd5e1;
         }
 
-        /* CLASSE PARA A TARJA CINZA */
-        .badge-cinza {
-            background-color: #e2e8f0 !important;
-            color: #475569 !important;
-            border: 1px solid #cbd5e1 !important;
-        }
-
         .voice-banner { background-color: #e0f2fe; border: 1px solid #bae6fd; padding: 12px 18px; border-radius: 8px; font-size: 13px; color: #0369a1; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
 
         /* Report Grid */
@@ -331,7 +323,7 @@
                     if(summaryText) {
                         summaryText.innerHTML = `
                             <strong>Base 1 (Forward):</strong> ${window.totalB1Count} registros na nuvem.<br>
-                            <strong>Base 2 (Receive Task):</strong> ${window.totalB2Count} registros na nuvem.<br>
+                            <strong>Base 2 (Receive Task - Coluna B):</strong> ${window.totalB2Count} registros na nuvem.<br>
                             <strong>Total Consolidado:</strong> ${totalRecords} ordens ativas para cruzamento prioritário.
                         `;
                     }
@@ -344,7 +336,6 @@
             window.refreshDashboardUI();
         }
 
-        // RECALCULO RETROATIVO (SEM REGRA DE ACELERAR E EXTRAINDO HUB CORRETO)
         function triggerRetroactiveRecalculate() {
             if (!window.scannedItemsList || window.scannedItemsList.length === 0) return;
             
@@ -365,21 +356,19 @@
                 let locType = '-'; 
                 let actionText = 'IR PARA ÁREA DE TRATATIVA';
 
-                if (b1Data && b2Data) originLabel = 'Ambas';
-                else if (b1Data) originLabel = 'Base 1';
-                else if (b2Data) originLabel = 'Base 2';
-
                 if (b1Data) {
                     isFound = 'SIM';
-                    statusText = (b1Data.status && b1Data.status !== 'N/A') ? b1Data.status : ((b2Data && b2Data.status) ? b2Data.status : 'N/A');
-                    destHub = (b1Data.destinationHub && b1Data.destinationHub !== 'N/A') ? b1Data.destinationHub : ((b2Data && b2Data.destinationHub) ? b2Data.destinationHub : 'N/A');
-                    locType = (b1Data.locationType && b1Data.locationType !== '-') ? b1Data.locationType : ((b2Data && b2Data.locationType) ? b2Data.locationType : '-');
+                    originLabel = b2Data ? 'Ambas' : 'Base 1';
+                    statusText = b2Data ? (b2Data.status || b1Data.status || 'N/A') : (b1Data.status || 'N/A');
+                    destHub = b1Data.destinationHub || b1Data.destination_hub || b1Data.destinationHubName || 'N/A';
+                    locType = b1Data.locationType || b1Data.location_type || (b2Data ? b2Data.locationType : '-');
                 } 
                 else if (b2Data) {
                     isFound = 'SIM';
+                    originLabel = 'Base 2';
                     statusText = b2Data.status || 'N/A';
-                    destHub = b2Data.destinationHub || 'N/A';
-                    locType = b2Data.locationType || '-';
+                    destHub = b2Data.destinationHub || b2Data.destination_hub || b2Data.destinationHubName || 'N/A';
+                    locType = b2Data.locationType || b2Data.location_type || '-';
                 }
 
                 if (isFound === 'SIM') {
@@ -399,7 +388,7 @@
                     else if (isXPT) {
                         actionText = 'DIRECIONAR AO XPT';
                     }
-                    else if (!isUberaba && destHub !== 'N/A') {
+                    else if (!isUberaba) {
                         actionText = 'DIRECIONAR A ESTAÇÃO CORRETA';
                     }
                     else if (statusText.startsWith('LMHub_Received')) {
@@ -410,7 +399,7 @@
                     }
                 }
 
-                if (item.statusOriginal !== statusText || item.destinationHub !== destHub || item.action !== actionText || item.encontrado !== isFound || item.locationType !== locType) {
+                if (item.statusOriginal !== statusText || item.destinationHub !== destHub || item.action !== actionText || item.encontrado !== isFound) {
                     updates[barcode] = {
                         ...item,
                         statusOriginal: statusText,
@@ -451,7 +440,6 @@
             }
         });
 
-        // BIPAGEM REALTIME - MAPEANDO HUB PURO
         function processBarcodeBip(barcode) {
             let b1Data = window.base1Map ? window.base1Map[barcode] : null;
             let b2Data = window.base2Map ? window.base2Map[barcode] : null;
@@ -465,21 +453,19 @@
             let alertColor = 'alert-red';
             let voiceMessage = 'Não encontrado, ir para área de tratativa';
 
-            if (b1Data && b2Data) originLabel = 'Ambas';
-            else if (b1Data) originLabel = 'Base 1';
-            else if (b2Data) originLabel = 'Base 2';
-
             if (b1Data) {
                 isFound = 'SIM';
-                statusText = (b1Data.status && b1Data.status !== 'N/A') ? b1Data.status : ((b2Data && b2Data.status) ? b2Data.status : 'N/A');
-                destHub = (b1Data.destinationHub && b1Data.destinationHub !== 'N/A') ? b1Data.destinationHub : ((b2Data && b2Data.destinationHub) ? b2Data.destinationHub : 'N/A');
-                locType = (b1Data.locationType && b1Data.locationType !== '-') ? b1Data.locationType : ((b2Data && b2Data.locationType) ? b2Data.locationType : '-');
+                originLabel = b2Data ? 'Ambas' : 'Base 1';
+                statusText = b2Data ? (b2Data.status || b1Data.status || 'N/A') : (b1Data.status || 'N/A');
+                destHub = b1Data.destinationHub || b1Data.destination_hub || b1Data.destinationHubName || 'N/A';
+                locType = b1Data.locationType || b1Data.location_type || (b2Data ? b2Data.locationType : '-');
             } 
             else if (b2Data) {
                 isFound = 'SIM';
+                originLabel = 'Base 2';
                 statusText = b2Data.status || 'N/A';
-                destHub = b2Data.destinationHub || 'N/A';
-                locType = b2Data.locationType || '-';
+                destHub = b2Data.destinationHub || b2Data.destination_hub || b2Data.destinationHubName || 'N/A';
+                locType = b2Data.locationType || b2Data.location_type || '-';
             }
 
             if (isFound === 'SIM') {
@@ -503,7 +489,7 @@
                     alertColor = 'alert-pink';
                     voiceMessage = 'Direcionar ao xis pê tê';
                 }
-                else if (!isUberaba && destHub !== 'N/A') {
+                else if (!isUberaba) {
                     actionText = 'DIRECIONAR A ESTAÇÃO CORRETA';
                     alertColor = 'alert-orange';
                     voiceMessage = 'Direcionar a estação correta';
@@ -529,7 +515,7 @@
                 voiceMessage = 'Não encontrado, ir para área de tratativa';
             }
 
-            window.showAlertTop(`📢 HUB: ${destHub.toUpperCase()} | ${actionText}`, alertColor);
+            window.showAlertTop(`📢 ${statusText.toUpperCase()} | ${actionText}`, alertColor);
             window.emitVoiceAlert(voiceMessage);
 
             const newBip = {
@@ -636,7 +622,7 @@
                     </div>
                 </div>
                 <div class="stats-list">
-                    <div class="stat-item"><span>Carga em Rede</span><span class="value" id="ui-total-expected">0</span></div>
+                    <div class="stat-item"><span>Carga em Rede</span><span class="value" id="ui-total-esperado">0</span></div>
                     <div class="stat-item"><span>Volumetria Base 1</span><span class="value" id="ui-b1-count">0</span></div>
                     <div class="stat-item"><span>Volumetria Base 2</span><span class="value" id="ui-b2-count">0</span></div>
                     <div class="stat-item"><span>Processados (Realtime)</span><span class="value" id="ui-total-bipado">0</span></div>
@@ -657,7 +643,7 @@
 
                 <div class="table-container" style="margin-top: 24px;">
                     <div class="table-header">
-                        <strong style="font-size: 16px; font-weight: 700; color: #0f172a;">Malha Operational de Triagem</strong>
+                        <strong style="font-size: 16px; font-weight: 700; color: #0f172a;">Malha Operacional de Triagem</strong>
                         
                         <div class="actions-group">
                             <input type="text" id="table-search" class="table-search-input" placeholder="🔎 Pesquisar por ID, status ou hub..." oninput="handleSearch()">
@@ -806,59 +792,51 @@
             const files = event.target.files;
             if (!files || files.length === 0) return;
 
-            showLoading(true, "Processando e mesclando novos registros de arquivo com a nuvem...");
+            showLoading(true, "Limpando registros antigos e estruturando nova carga...");
             const nodeName = baseIndex === 1 ? 'planilha_base1' : 'planilha_base2';
 
-            let parsePromises = [];
-
-            Array.from(files).forEach(file => {
-                const extension = file.name.split('.').pop().toLowerCase();
-                
-                if (extension === 'zip') {
-                    let zipPromise = new Promise((resolveZip) => {
+            window.firebaseActions.removeNode(nodeName).then(() => {
+                Array.from(files).forEach(file => {
+                    const extension = file.name.split('.').pop().toLowerCase();
+                    
+                    if (extension === 'zip') {
                         const reader = new FileReader();
                         reader.onload = function(e) {
                             JSZip.loadAsync(e.target.result).then(function(zip) {
-                                let internalPromises = [];
+                                let promises = [];
                                 zip.forEach(function(relativePath, zipEntry) {
                                     if (!zipEntry.dir && zipEntry.name.endsWith('.csv')) {
-                                        internalPromises.push(zipEntry.async("string").then(content => {
+                                        promises.push(zipEntry.async("string").then(content => {
                                             return parseAndStoreCSVInChunks(content, baseIndex);
                                         }));
                                     }
                                 });
-                                Promise.all(internalPromises).then(() => resolveZip());
-                            }).catch(err => {
-                                console.error(err);
-                                resolveZip();
+                                Promise.all(promises).then(() => { 
+                                    showLoading(false); 
+                                    event.target.value = ''; 
+                                })
+                                .catch(err => { console.error(err); showLoading(false); alert("Erro ao extrair ZIP."); });
                             });
                         };
                         reader.readAsArrayBuffer(file);
-                    });
-                    parsePromises.push(zipPromise);
-                } else if (extension === 'csv') {
-                    let csvPromise = new Promise((resolveCsv) => {
+                    } else if (extension === 'csv') {
                         const reader = new FileReader();
                         reader.onload = function(e) {
-                            parseAndStoreCSVInChunks(e.target.result, baseIndex).then(() => resolveCsv());
+                            parseAndStoreCSVInChunks(e.target.result, baseIndex).then(() => { 
+                                showLoading(false); 
+                                event.target.value = ''; 
+                            });
                         };
                         reader.readAsText(file, "UTF-8");
-                    });
-                    parsePromises.push(csvPromise);
-                }
-            });
-
-            Promise.all(parsePromises).then(() => {
-                showLoading(false);
-                event.target.value = '';
-            }).catch(err => {
-                console.error(err);
-                showLoading(false);
-                event.target.value = '';
+                    } else {
+                        alert("Selecione arquivos .csv ou .zip");
+                        showLoading(false);
+                        event.target.value = '';
+                    }
+                });
             });
         };
 
-        // CORREÇÃO ESSENCIAL: IDENTIFICANDO E EXTRAINDO A COLUNA CORRETA DO HUB DE DESTINO
         function parseAndStoreCSVInChunks(text, baseIndex) {
             return new Promise((resolve) => {
                 const lines = text.split(/\r?\n/);
@@ -874,18 +852,38 @@
                     statusIdx = 1; 
                 }
 
-                // Busca abrangente pelo cabeçalho do Hub de Destino
-                const hubIdx = headers.findIndex(h => h === 'destination_hub' || h === 'destination_hub_name' || h.includes('hub') || h.includes('destino'));
-                const locationIdx = headers.findIndex(h => h === 'location_type' || h === 'location type' || h.includes('office') || h.includes('home'));
+                // Mapeamento dinâmico e inteligente para capturar a coluna de Hub
+                let hubIdx = headers.findIndex(h => 
+                    h === 'destination_hub' || 
+                    h === 'destination_hub_name' || 
+                    h === 'destination_hub_code' ||
+                    h.includes('hub_name') ||
+                    h.includes('nome_hub') ||
+                    h.includes('hub destino') || 
+                    h.includes('hub de destino') ||
+                    h.includes('destino')
+                );
+
+                // Regra de segurança por índice de coluna comum
+                if (hubIdx === -1 && baseIndex === 2) {
+                    if (headers.includes('destination_hub_name')) hubIdx = headers.indexOf('destination_hub_name');
+                    else if (headers.length >= 4) hubIdx = 3; 
+                }
+
+                // Mapeamento automático da coluna Office / Home
+                let locationIdx = headers.findIndex(h => h === 'location_type' || h === 'location type' || h.includes('office') || h.includes('home') || h === 'loc');
+                if (locationIdx === -1) {
+                    locationIdx = 10; // Fallback estrutural padrão[cite: 3]
+                }
 
                 if (trackingIdx === -1) {
+                    showLoading(false);
                     alert("Coluna de rastreamento não identificada no arquivo.");
                     resolve();
                     return;
                 }
 
                 let rowsToProcess = [];
-
                 for (let i = 1; i < lines.length; i++) {
                     if (!lines[i].trim()) continue;
                     const columns = lines[i].split(separator).map(c => c.trim().replace(/^["']|["']$/g, ''));
@@ -919,7 +917,7 @@
 
                 function sendNextChunk() {
                     if (currentOffset >= rowsToProcess.length) {
-                        window.showAlertTop(`✔ Registros adicionados com sucesso!`, 'alert-green');
+                        window.showAlertTop(`✔ ${rowsToProcess.length} registros sincronizados na nuvem!`, 'alert-green');
                         resolve();
                         return;
                     }
@@ -944,7 +942,7 @@
             });
         }
 
-        window.navigator.calculateAndRenderReport = function() {
+        window.calculateAndRenderReport = function() {
             const totalBipados = window.scannedItemsList ? window.scannedItemsList.length : 0;
             const totalBipadosEl = document.getElementById('report-total-bipados');
             if(totalBipadosEl) totalBipadosEl.innerText = totalBipados;
@@ -997,7 +995,7 @@
             const tExpected = (window.totalB1Count || 0) + (window.totalB2Count || 0);
             const tScanned = window.scannedItemsList ? window.scannedItemsList.length : 0;
 
-            if(document.getElementById('ui-total-expected')) document.getElementById('ui-total-expected').innerText = tExpected;
+            if(document.getElementById('ui-total-esperado')) document.getElementById('ui-total-esperado').innerText = tExpected;
             if(document.getElementById('ui-b1-count')) document.getElementById('ui-b1-count').innerText = window.totalB1Count || 0;
             if(document.getElementById('ui-b2-count')) document.getElementById('ui-b2-count').innerText = window.totalB2Count || 0;
             if(document.getElementById('ui-total-bipado')) document.getElementById('ui-total-bipado').innerText = tScanned;
@@ -1064,7 +1062,7 @@
                 row.innerHTML = `
                     <td style="font-weight:700; color: #111827;">${item.trackingNumber}</td>
                     <td><span class="badge">${st}</span></td>
-                    <td style="font-weight:600; color: #1f2937;">${hub}</td>
+                    <td>${hub}</td>
                     <td style="font-weight:600; color: #475569; text-align: center;">${item.locationType || '-'}</td>
                     <td><span class="badge">${badgeAction}</span></td>
                     <td style="text-align: center;">${bOrigin}</td>

@@ -360,15 +360,15 @@
                     isFound = 'SIM';
                     originLabel = b2Data ? 'Ambas' : 'Base 1';
                     statusText = b2Data ? (b2Data.status || b1Data.status || 'N/A') : (b1Data.status || 'N/A');
-                    destHub = b1Data.destinationHub || b1Data.destination_hub || b1Data.destinationHubName || 'N/A';
-                    locType = b1Data.locationType || b1Data.location_type || (b2Data ? b2Data.locationType : '-');
+                    destHub = b1Data.destinationHub || 'N/A';
+                    locType = b1Data.locationType || (b2Data ? b2Data.locationType : '-');
                 } 
                 else if (b2Data) {
                     isFound = 'SIM';
                     originLabel = 'Base 2';
                     statusText = b2Data.status || 'N/A';
-                    destHub = b2Data.destinationHub || b2Data.destination_hub || b2Data.destinationHubName || 'N/A';
-                    locType = b2Data.locationType || b2Data.location_type || '-';
+                    destHub = b2Data.destinationHub || 'N/A';
+                    locType = b2Data.locationType || '-';
                 }
 
                 if (isFound === 'SIM') {
@@ -457,15 +457,15 @@
                 isFound = 'SIM';
                 originLabel = b2Data ? 'Ambas' : 'Base 1';
                 statusText = b2Data ? (b2Data.status || b1Data.status || 'N/A') : (b1Data.status || 'N/A');
-                destHub = b1Data.destinationHub || b1Data.destination_hub || b1Data.destinationHubName || 'N/A';
-                locType = b1Data.locationType || b1Data.location_type || (b2Data ? b2Data.locationType : '-');
+                destHub = b1Data.destinationHub || 'N/A';
+                locType = b1Data.locationType || (b2Data ? b2Data.locationType : '-');
             } 
             else if (b2Data) {
                 isFound = 'SIM';
                 originLabel = 'Base 2';
                 statusText = b2Data.status || 'N/A';
-                destHub = b2Data.destinationHub || b2Data.destination_hub || b2Data.destinationHubName || 'N/A';
-                locType = b2Data.locationType || b2Data.location_type || '-';
+                destHub = b2Data.destinationHub || 'N/A';
+                locType = b2Data.locationType || '-';
             }
 
             if (isFound === 'SIM') {
@@ -788,6 +788,27 @@
             }
         }
 
+        // Função auxiliar para quebrar as linhas de forma segura respeitando aspas
+        function parseCSVLine(line, separator) {
+            let result = [];
+            let current = '';
+            let inQuotes = false;
+
+            for (let i = 0; i < line.length; i++) {
+                let char = line[i];
+                if (char === '"' || char === "'") {
+                    inQuotes = !inQuotes;
+                } else if (char === separator && !inQuotes) {
+                    result.push(current.trim().replace(/^["']|["']$/g, ''));
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            result.push(current.trim().replace(/^["']|["']$/g, ''));
+            return result;
+        }
+
         window.handleFileSelectUnified = function(event, baseIndex) {
             const files = event.target.files;
             if (!files || files.length === 0) return;
@@ -840,45 +861,21 @@
         function parseAndStoreCSVInChunks(text, baseIndex) {
             return new Promise((resolve) => {
                 const lines = text.split(/\r?\n/);
-                if (lines.length < 2) { resolve(); return; }
+                if (lines.length < 1) { resolve(); return; }
 
                 let separator = lines[0].includes(',') && !lines[0].includes(';') ? ',' : ';';
-                const headers = lines[0].split(separator).map(h => h.trim().replace(/^["']|["']$/g, '').toLowerCase());
                 
-                const trackingIdx = headers.findIndex(h => h === 'forward_order_id' || h === 'tracking_number' || h.includes('tracking') || h === 'id' || h.includes('number'));
+                // Quebra os cabeçalhos de forma segura
+                const headers = parseCSVLine(lines[0], separator).map(h => h.toLowerCase());
                 
-                let statusIdx = headers.findIndex(h => h === 'order status' || h === 'status' || h.includes('status'));
-                if (baseIndex === 2 && headers[1] === 'order status') {
-                    statusIdx = 1; 
-                }
-
-                // Mapeamento dinâmico e inteligente para capturar a coluna de Hub
-                let hubIdx = headers.findIndex(h => 
-                    h === 'destination_hub' || 
-                    h === 'destination_hub_name' || 
-                    h === 'destination_hub_code' ||
-                    h.includes('hub_name') ||
-                    h.includes('nome_hub') ||
-                    h.includes('hub destino') || 
-                    h.includes('hub de destino') ||
-                    h.includes('destino')
-                );
-
-                // Regra de segurança por índice de coluna comum
-                if (hubIdx === -1 && baseIndex === 2) {
-                    if (headers.includes('destination_hub_name')) hubIdx = headers.indexOf('destination_hub_name');
-                    else if (headers.length >= 4) hubIdx = 3; 
-                }
-
-                // Mapeamento automático da coluna Office / Home
-                let locationIdx = headers.findIndex(h => h === 'location_type' || h === 'location type' || h.includes('office') || h.includes('home') || h === 'loc');
-                if (locationIdx === -1) {
-                    locationIdx = 10; // Fallback estrutural padrão[cite: 3]
-                }
+                const trackingIdx = headers.findIndex(h => h === 'sls tracking number' || h === 'forward_order_id' || h === 'tracking_number' || h.includes('tracking') || h === 'id' || h.includes('number'));
+                const statusIdx = headers.findIndex(h => h === 'status' || h === 'order status' || h.includes('status'));
+                const hubIdx = headers.findIndex(h => h === 'destination hub' || h === 'destination_hub' || h === 'destination_hub_name' || h.includes('destination hub') || h.includes('destino'));
+                const locationIdx = headers.findIndex(h => h === 'location type' || h === 'location_type' || h.includes('location type') || h.includes('office'));
 
                 if (trackingIdx === -1) {
                     showLoading(false);
-                    alert("Coluna de rastreamento não identificada no arquivo.");
+                    alert("Coluna de rastreamento (SLS Tracking Number) não identificada no arquivo.");
                     resolve();
                     return;
                 }
@@ -886,7 +883,8 @@
                 let rowsToProcess = [];
                 for (let i = 1; i < lines.length; i++) {
                     if (!lines[i].trim()) continue;
-                    const columns = lines[i].split(separator).map(c => c.trim().replace(/^["']|["']$/g, ''));
+                    
+                    const columns = parseCSVLine(lines[i], separator);
                     const id = columns[trackingIdx];
                     
                     if (id && id.length <= 15) {

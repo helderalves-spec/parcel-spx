@@ -331,7 +331,7 @@
                     if(summaryText) {
                         summaryText.innerHTML = `
                             <strong>Base 1 (Forward):</strong> ${window.totalB1Count} registros na nuvem.<br>
-                            <strong>Base 2 (Receive Task - Coluna B):</strong> ${window.totalB2Count} registros na nuvem.<br>
+                            <strong>Base 2 (Receive Task):</strong> ${window.totalB2Count} registros na nuvem.<br>
                             <strong>Total Consolidado:</strong> ${totalRecords} ordens ativas para cruzamento prioritário.
                         `;
                     }
@@ -349,7 +349,6 @@
             
             let updates = {};
             let mudouAlgo = false;
-            const dateRegex = /\d{4}[-/]\d{2}[-/]\d{2}/;
 
             window.scannedItemsList.forEach(item => {
                 const barcode = item.trackingNumber;
@@ -365,19 +364,20 @@
                 let locType = '-'; 
                 let actionText = 'IR PARA ÁREA DE TRATATIVA';
 
-                if (b1Data) {
+                // Se achar na Base 2, ela tem prioridade total e força o Hub a ser ACELERAR
+                if (b2Data) {
                     isFound = 'SIM';
-                    originLabel = b2Data ? 'Ambas' : 'Base 1';
-                    statusText = b2Data ? (b2Data.status || b1Data.status || 'N/A') : (b1Data.status || 'N/A');
-                    destHub = b1Data.destinationHub || b1Data.destination_hub || b1Data.destinationHubName || 'N/A';
-                    locType = b1Data.locationType || b1Data.location_type || (b2Data ? b2Data.locationType : '-');
-                } 
-                else if (b2Data) {
-                    isFound = 'SIM';
-                    originLabel = 'Base 2';
+                    originLabel = b1Data ? 'Ambas' : 'Base 2';
                     statusText = b2Data.status || 'N/A';
-                    destHub = b2Data.destinationHub || b2Data.destination_hub || b2Data.destinationHubName || 'N/A';
+                    destHub = 'ACELERAR'; // Forçado pois Base 2 não traz coluna de Hub e é puramente de aceleração
                     locType = b2Data.locationType || b2Data.location_type || '-';
+                } 
+                else if (b1Data) {
+                    isFound = 'SIM';
+                    originLabel = 'Base 1';
+                    statusText = b1Data.status || 'N/A';
+                    destHub = b1Data.destinationHub || b1Data.destination_hub || b1Data.destinationHubName || 'N/A';
+                    locType = b1Data.locationType || b1Data.location_type || '-';
                 }
 
                 if (isFound === 'SIM') {
@@ -391,8 +391,8 @@
                         statusText = `LMHub_Received_${locType}`;
                     }
 
-                    // CORREÇÃO LOGÍSTICA CRÍTICA: Prioridade Absoluta para campo com Data ou Texto "ACELERAR"
-                    if (destHub === 'ACELERAR' || dateRegex.test(destHub)) {
+                    // REGRA MÁXIMA DEFINITIVA: Se for Base 2 ou Hub for ACELERAR
+                    if (destHub === 'ACELERAR' || originLabel === 'Base 2' || originLabel === 'Ambas') {
                         destHub = 'ACELERAR';
                         actionText = 'ACELERAR';
                     }
@@ -466,21 +466,21 @@
             let actionText = 'IR PARA ÁREA DE TRATATIVA';
             let alertColor = 'alert-red';
             let voiceMessage = 'Não encontrado, ir para área de tratativa';
-            const dateRegex = /\d{4}[-/]\d{2}[-/]\d{2}/;
 
-            if (b1Data) {
+            // Base 2 Força o destino direto para ACELERAR
+            if (b2Data) {
                 isFound = 'SIM';
-                originLabel = b2Data ? 'Ambas' : 'Base 1';
-                statusText = b2Data ? (b2Data.status || b1Data.status || 'N/A') : (b1Data.status || 'N/A');
-                destHub = b1Data.destinationHub || b1Data.destination_hub || b1Data.destinationHubName || 'N/A';
-                locType = b1Data.locationType || b1Data.location_type || (b2Data ? b2Data.locationType : '-');
-            } 
-            else if (b2Data) {
-                isFound = 'SIM';
-                originLabel = 'Base 2';
+                originLabel = b1Data ? 'Ambas' : 'Base 2';
                 statusText = b2Data.status || 'N/A';
-                destHub = b2Data.destinationHub || b2Data.destination_hub || b2Data.destinationHubName || 'N/A';
+                destHub = 'ACELERAR';
                 locType = b2Data.locationType || b2Data.location_type || '-';
+            } 
+            else if (b1Data) {
+                isFound = 'SIM';
+                originLabel = 'Base 1';
+                statusText = b1Data.status || 'N/A';
+                destHub = b1Data.destinationHub || b1Data.destination_hub || b1Data.destinationHubName || 'N/A';
+                locType = b1Data.locationType || b1Data.location_type || '-';
             }
 
             if (isFound === 'SIM') {
@@ -494,8 +494,8 @@
                     statusText = `LMHub_Received_${locType}`;
                 }
 
-                // CORREÇÃO LOGÍSTICA CRÍTICA NO MOMENTO DO BIP: Intercepta a data e joga como ACELERAR cinza prioritário
-                if (destHub === 'ACELERAR' || dateRegex.test(destHub)) {
+                // VALIDAÇÃO EM REALTIME: Se for da Base 2 ou tiver flag ACELERAR mata qualquer outra condição secundária
+                if (destHub === 'ACELERAR' || originLabel === 'Base 2' || originLabel === 'Ambas') {
                     destHub = 'ACELERAR';
                     actionText = 'ACELERAR';
                     alertColor = 'alert-gray';
@@ -644,7 +644,7 @@
                     </div>
                 </div>
                 <div class="stats-list">
-                    <div class="stat-item"><span>Carga em Rede</span><span class="value" id="ui-total-esperado">0</span></div>
+                    <div class="stat-item"><span>Carga em Rede</span><span class="value" id="ui-total-expected">0</span></div>
                     <div class="stat-item"><span>Volumetria Base 1</span><span class="value" id="ui-b1-count">0</span></div>
                     <div class="stat-item"><span>Volumetria Base 2</span><span class="value" id="ui-b2-count">0</span></div>
                     <div class="stat-item"><span>Processados (Realtime)</span><span class="value" id="ui-total-bipado">0</span></div>
@@ -885,7 +885,6 @@
                 }
 
                 let rowsToProcess = [];
-                const dateRegex = /\d{4}[-/]\d{2}[-/]\d{2}/;
 
                 for (let i = 1; i < lines.length; i++) {
                     if (!lines[i].trim()) continue;
@@ -893,10 +892,12 @@
                     const id = columns[trackingIdx];
                     
                     if (id && id.length <= 15) {
-                        let hubValue = hubIdx !== -1 ? (columns[hubIdx] || 'N/A') : 'N/A';
-                        
-                        if (dateRegex.test(hubValue)) {
-                            hubValue = "ACELERAR";
+                        // AJUSTE SEGURO: Se for da Base 2, marca direto como ACELERAR. Senão, procura a coluna.
+                        let hubValue = 'N/A';
+                        if (baseIndex === 2) {
+                            hubValue = 'ACELERAR';
+                        } else if (hubIdx !== -1) {
+                            hubValue = columns[hubIdx] || 'N/A';
                         }
 
                         rowsToProcess.push({

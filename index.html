@@ -221,6 +221,13 @@
             border: 1px solid #cbd5e1;
         }
 
+        /* Estilo Cinza customizado para o Hub ACELERAR */
+        .text-acelerar {
+            color: #6b7280 !important;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
         .voice-banner { background-color: #e0f2fe; border: 1px solid #bae6fd; padding: 12px 18px; border-radius: 8px; font-size: 13px; color: #0369a1; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
 
         /* Report Grid */
@@ -388,7 +395,7 @@
                     else if (isXPT) {
                         actionText = 'DIRECIONAR AO XPT';
                     }
-                    else if (!isUberaba) {
+                    else if (!isUberaba && destHub !== 'ACELERAR') {
                         actionText = 'DIRECIONAR A ESTAÇÃO CORRETA';
                     }
                     else if (statusText.startsWith('LMHub_Received')) {
@@ -489,7 +496,7 @@
                     alertColor = 'alert-pink';
                     voiceMessage = 'Direcionar ao xis pê tê';
                 }
-                else if (!isUberaba) {
+                else if (!isUberaba && destHub !== 'ACELERAR') {
                     actionText = 'DIRECIONAR A ESTAÇÃO CORRETA';
                     alertColor = 'alert-orange';
                     voiceMessage = 'Direcionar a estação correta';
@@ -795,7 +802,6 @@
             showLoading(true, "Limpando registros antigos e estruturando nova carga...");
             const nodeName = baseIndex === 1 ? 'planilha_base1' : 'planilha_base2';
 
-            // ATUALIZAÇÃO SUCESSO: Força o reset do nó correspondente antes de subir a nova base
             window.firebaseActions.removeNode(nodeName).then(() => {
                 Array.from(files).forEach(file => {
                     const extension = file.name.split('.').pop().toLowerCase();
@@ -814,7 +820,7 @@
                                 });
                                 Promise.all(promises).then(() => { 
                                     showLoading(false); 
-                                    event.target.value = ''; // Libera o input para novas trocas consecutivas
+                                    event.target.value = '';
                                 })
                                 .catch(err => { console.error(err); showLoading(false); alert("Erro ao extrair ZIP."); });
                             });
@@ -825,7 +831,7 @@
                         reader.onload = function(e) {
                             parseAndStoreCSVInChunks(e.target.result, baseIndex).then(() => { 
                                 showLoading(false); 
-                                event.target.value = ''; // Libera o input para novas trocas consecutivas
+                                event.target.value = '';
                             });
                         };
                         reader.readAsText(file, "UTF-8");
@@ -864,16 +870,26 @@
                 }
 
                 let rowsToProcess = [];
+                // Regex simples para capturar se a string tem formato de data (ex: 2026-06-03, 03-06-2026, 03/06, etc)
+                const dateRegex = /\d{2,4}[-/]\d{2}[-/]\d{2,4}/;
+
                 for (let i = 1; i < lines.length; i++) {
                     if (!lines[i].trim()) continue;
                     const columns = lines[i].split(separator).map(c => c.trim().replace(/^["']|["']$/g, ''));
                     const id = columns[trackingIdx];
                     
                     if (id && id.length <= 15) {
+                        let hubValue = hubIdx !== -1 ? (columns[hubIdx] || 'N/A') : 'N/A';
+                        
+                        // ALTERAÇÃO SOLICITADA: Se o valor do Hub contiver um padrão de data, substitui por "ACELERAR"
+                        if (dateRegex.test(hubValue)) {
+                            hubValue = "ACELERAR";
+                        }
+
                         rowsToProcess.push({
                             id: id,
                             status: statusIdx !== -1 ? (columns[statusIdx] || 'N/A') : 'N/A',
-                            hub: hubIdx !== -1 ? (columns[hubIdx] || 'N/A') : 'N/A',
+                            hub: hubValue,
                             loc: columns[locationIdx] || '-'
                         });
                     }
@@ -1029,10 +1045,13 @@
                 if(item.origin === 'Base 2') bOrigin = `<span class="badge">Base 2</span>`;
                 if(item.origin === 'Ambas') bOrigin = `<span class="badge">Ambas</span>`;
 
+                // ALTERAÇÃO SOLICITADA: Aplica a cor cinza estilizada caso o Hub seja "ACELERAR"
+                let hubStyleClass = hub === "ACELERAR" ? 'class="text-acelerar"' : '';
+
                 row.innerHTML = `
                     <td style="font-weight:700; color: #111827;">${item.trackingNumber}</td>
                     <td><span class="badge">${st}</span></td>
-                    <td>${hub}</td>
+                    <td ${hubStyleClass}>${hub}</td>
                     <td style="font-weight:600; color: #475569; text-align: center;">${item.locationType || '-'}</td>
                     <td><span class="badge">${badgeAction}</span></td>
                     <td style="text-align: center;">${bOrigin}</td>

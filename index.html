@@ -222,6 +222,13 @@
             border: 1px solid #cbd5e1;
         }
 
+        /* NOVA CLASSE PARA A TARJA CINZA DO STATUS ACELERAR */
+        .badge-cinza {
+            background-color: #e2e8f0 !important;
+            color: #475569 !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+
         .text-acelerar {
             color: #2563eb !important;
             font-weight: 700;
@@ -384,33 +391,41 @@
                 }
 
                 if (isFound === 'SIM') {
-                    const hubLower = destHub.toLowerCase();
-                    const statusLower = statusText.toLowerCase();
-                    
-                    const isUberaba = hubLower.includes('uberaba');
-                    const isXPT = hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
-
-                    if (isUberaba && (statusText === 'LMHub_Received' || statusLower === 'lmhub_received' || statusLower.includes('received'))) {
-                        statusText = `LMHub_Received_${locType}`;
-                    }
-
-                    if (destHub === 'ACELERAR') {
+                    // REGRA SOLICITADA: Se o Hub Destino contiver uma DATA (ex: 04-06-2026), muda status para ACELERAR e apaga o Hub Destino
+                    const regexData = /^\d{2}-\d{2}-\d{4}/;
+                    if (regexData.test(destHub.trim())) {
+                        statusText = 'ACELERAR';
+                        destHub = 'N/A';
                         actionText = 'ACELERAR';
-                    }
-                    else if (statusText.startsWith('LMHub_Assigning') || statusLower.includes('assigning')) {
-                        actionText = 'DIRECIONAR A ROTA CORRETA';
-                    }
-                    else if (isXPT) {
-                        actionText = 'DIRECIONAR AO XPT';
-                    }
-                    else if (!isUberaba) {
-                        actionText = 'DIRECIONAR A ESTAÇÃO CORRETA';
-                    }
-                    else if (statusText.startsWith('LMHub_Received')) {
-                        actionText = 'MANTER FLUXO';
-                    } 
-                    else {
-                        actionText = 'IR PARA ÁREA DE TRATATIVA';
+                    } else {
+                        const hubLower = destHub.toLowerCase();
+                        const statusLower = statusText.toLowerCase();
+                        
+                        const isUberaba = hubLower.includes('uberaba');
+                        const isXPT = hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
+
+                        if (isUberaba && (statusText === 'LMHub_Received' || statusLower === 'lmhub_received' || statusLower.includes('received'))) {
+                            statusText = `LMHub_Received_${locType}`;
+                        }
+
+                        if (destHub === 'ACELERAR') {
+                            actionText = 'ACELERAR';
+                        }
+                        else if (statusText.startsWith('LMHub_Assigning') || statusLower.includes('assigning')) {
+                            actionText = 'DIRECIONAR A ROTA CORRETA';
+                        }
+                        else if (isXPT) {
+                            actionText = 'DIRECIONAR AO XPT';
+                        }
+                        else if (!isUberaba) {
+                            actionText = 'DIRECIONAR A ESTAÇÃO CORRETA';
+                        }
+                        else if (statusText.startsWith('LMHub_Received')) {
+                            actionText = 'MANTER FLUXO';
+                        } 
+                        else {
+                            actionText = 'IR PARA ÁREA DE TRATATIVA';
+                        }
                     }
                 }
 
@@ -488,50 +503,60 @@
             }
 
             if (isFound === 'SIM') {
-                const hubLower = destHub.toLowerCase();
-                const statusLower = statusText.toLowerCase();
-                
-                const isUberaba = hubLower.includes('uberaba');
-                const isXPT = hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
-
-                if (isUberaba && (statusText === 'LMHub_Received' || statusLower === 'lmhub_received' || statusLower.includes('received'))) {
-                    statusText = `LMHub_Received_${locType}`;
-                }
-
-                if (destHub === 'ACELERAR') {
+                // REGRA SOLICITADA: Se o Hub Destino contiver uma DATA (ex: 04-06-2026), altera status para ACELERAR e limpa Hub Destino
+                const regexData = /^\d{2}-\d{2}-\d{4}/;
+                if (regexData.test(destHub.trim())) {
+                    statusText = 'ACELERAR';
+                    destHub = 'N/A';
                     actionText = 'ACELERAR';
-                    alertColor = 'alert-blue';
+                    alertColor = 'alert-gray';
                     voiceMessage = 'Acelerar';
-                }
-                else if (statusText.startsWith('LMHub_Assigning') || statusLower.includes('assigning')) {
-                    actionText = 'DIRECIONAR A ROTA CORRETA';
-                    alertColor = 'alert-blue';
-                    voiceMessage = 'Direcionar a rota correta';
-                }
-                else if (isXPT) {
-                    actionText = 'DIRECIONAR AO XPT';
-                    alertColor = 'alert-pink';
-                    voiceMessage = 'Direcionar ao xis pê tê';
-                }
-                else if (!isUberaba) {
-                    actionText = 'DIRECIONAR A ESTAÇÃO CORRETA';
-                    alertColor = 'alert-orange';
-                    voiceMessage = 'Direcionar a estação correta';
-                }
-                else if (statusText.startsWith('LMHub_Received')) {
-                    actionText = 'MANTER FLUXO';
-                    alertColor = 'alert-green';
-                    voiceMessage = 'Manter fluxo';
-                }
-                else if (statusLower.includes('delivering') || statusLower.includes('delivered')) {
-                    actionText = 'IR PARA ÁREA DE TRATATIVA';
-                    alertColor = 'alert-red';
-                    voiceMessage = 'Pacote já em rota ou entregue, ir para área de tratativa';
-                }
-                else {
-                    actionText = 'IR PARA ÁREA DE TRATATIVA';
-                    alertColor = 'alert-red';
-                    voiceMessage = 'Verificar status na tratativa';
+                } else {
+                    const hubLower = destHub.toLowerCase();
+                    const statusLower = statusText.toLowerCase();
+                    
+                    const isUberaba = hubLower.includes('uberaba');
+                    const isXPT = hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
+
+                    if (isUberaba && (statusText === 'LMHub_Received' || statusLower === 'lmhub_received' || statusLower.includes('received'))) {
+                        statusText = `LMHub_Received_${locType}`;
+                    }
+
+                    if (destHub === 'ACELERAR') {
+                        actionText = 'ACELERAR';
+                        alertColor = 'alert-blue';
+                        voiceMessage = 'Acelerar';
+                    }
+                    else if (statusText.startsWith('LMHub_Assigning') || statusLower.includes('assigning')) {
+                        actionText = 'DIRECIONAR A ROTA CORRETA';
+                        alertColor = 'alert-blue';
+                        voiceMessage = 'Direcionar a rota correta';
+                    }
+                    else if (isXPT) {
+                        actionText = 'DIRECIONAR AO XPT';
+                        alertColor = 'alert-pink';
+                        voiceMessage = 'Direcionar ao xis pê tê';
+                    }
+                    else if (!isUberaba) {
+                        actionText = 'DIRECIONAR A ESTAÇÃO CORRETA';
+                        alertColor = 'alert-orange';
+                        voiceMessage = 'Direcionar a estação correta';
+                    }
+                    else if (statusText.startsWith('LMHub_Received')) {
+                        actionText = 'MANTER FLUXO';
+                        alertColor = 'alert-green';
+                        voiceMessage = 'Manter fluxo';
+                    }
+                    else if (statusLower.includes('delivering') || statusLower.includes('delivered')) {
+                        actionText = 'IR PARA ÁREA DE TRATATIVA';
+                        alertColor = 'alert-red';
+                        voiceMessage = 'Pacote já em rota ou entregue, ir para área de tratativa';
+                    }
+                    else {
+                        actionText = 'IR PARA ÁREA DE TRATATIVA';
+                        alertColor = 'alert-red';
+                        voiceMessage = 'Verificar status na tratativa';
+                    }
                 }
             } else {
                 actionText = 'IR PARA ÁREA DE TRATATIVA';
@@ -951,7 +976,7 @@
             });
         }
 
-        window.calculateAndRenderReport = function() {
+        window.navigator.calculateAndRenderReport = function() {
             const totalBipados = window.scannedItemsList ? window.scannedItemsList.length : 0;
             const totalBipadosEl = document.getElementById('report-total-bipados');
             if(totalBipadosEl) totalBipadosEl.innerText = totalBipados;
@@ -1068,11 +1093,17 @@
                 if(item.origin === 'Base 2') bOrigin = `<span class="badge">Base 2</span>`;
                 if(item.origin === 'Ambas') bOrigin = `<span class="badge">Ambas</span>`;
 
+                // ADICIONA A TARJA CINZA SE FOR "ACELERAR"
+                let badgeClassStatus = "badge";
+                if (st === "ACELERAR") {
+                    badgeClassStatus = "badge badge-cinza";
+                }
+
                 let hubStyleClass = hub === "ACELERAR" ? 'class="text-acelerar"' : '';
 
                 row.innerHTML = `
                     <td style="font-weight:700; color: #111827;">${item.trackingNumber}</td>
-                    <td><span class="badge">${st}</span></td>
+                    <td><span class="${badgeClassStatus}">${st}</span></td>
                     <td ${hubStyleClass}>${hub}</td>
                     <td style="font-weight:600; color: #475569; text-align: center;">${item.locationType || '-'}</td>
                     <td><span class="badge">${badgeAction}</span></td>

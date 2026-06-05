@@ -222,7 +222,7 @@
             border: 1px solid #cbd5e1;
         }
 
-        /* NOVA CLASSE PARA A TARJA CINZA DO STATUS ACELERAR */
+        /* CLASSE PARA A TARJA CINZA DO STATUS ACELERAR */
         .badge-cinza {
             background-color: #e2e8f0 !important;
             color: #475569 !important;
@@ -371,12 +371,10 @@
                 let locType = '-'; 
                 let actionText = 'IR PARA ÁREA DE TRATATIVA';
 
-                // Determina a Origem real
                 if (b1Data && b2Data) originLabel = 'Ambas';
                 else if (b1Data) originLabel = 'Base 1';
                 else if (b2Data) originLabel = 'Base 2';
 
-                // LÓGICA DE MESCLAGEM INTELIGENTE (Prioridade Base 1)
                 if (b1Data) {
                     isFound = 'SIM';
                     statusText = (b1Data.status && b1Data.status !== 'N/A') ? b1Data.status : ((b2Data && b2Data.status) ? b2Data.status : 'N/A');
@@ -391,7 +389,7 @@
                 }
 
                 if (isFound === 'SIM') {
-                    // REGRA SOLICITADA: Se o Hub Destino contiver uma DATA (ex: 04-06-2026), muda status para ACELERAR e apaga o Hub Destino
+                    // REGRA: Se o Hub Destino contiver uma DATA, muda status para ACELERAR e limpa o Hub Destino
                     const regexData = /^\d{2}-\d{2}-\d{4}/;
                     if (regexData.test(destHub.trim())) {
                         statusText = 'ACELERAR';
@@ -470,7 +468,7 @@
             }
         });
 
-        // BIPAGEM EM REALTIME: Lógica de prioridade total da Base 1 com fallback para a Base 2
+        // BIPAGEM EM REALTIME
         function processBarcodeBip(barcode) {
             let b1Data = window.base1Map ? window.base1Map[barcode] : null;
             let b2Data = window.base2Map ? window.base2Map[barcode] : null;
@@ -488,7 +486,6 @@
             else if (b1Data) originLabel = 'Base 1';
             else if (b2Data) originLabel = 'Base 2';
 
-            // REGRA EXECUTIVA DE MESCLAGEM COESIVA
             if (b1Data) {
                 isFound = 'SIM';
                 statusText = (b1Data.status && b1Data.status !== 'N/A') ? b1Data.status : ((b2Data && b2Data.status) ? b2Data.status : 'N/A');
@@ -503,7 +500,6 @@
             }
 
             if (isFound === 'SIM') {
-                // REGRA SOLICITADA: Se o Hub Destino contiver uma DATA (ex: 04-06-2026), altera status para ACELERAR e limpa Hub Destino
                 const regexData = /^\d{2}-\d{2}-\d{4}/;
                 if (regexData.test(destHub.trim())) {
                     statusText = 'ACELERAR';
@@ -692,7 +688,7 @@
 
                 <div class="table-container" style="margin-top: 24px;">
                     <div class="table-header">
-                        <strong style="font-size: 16px; font-weight: 700; color: #0f172a;">Malha Operacional de Triagem</strong>
+                        <strong style="font-size: 16px; font-weight: 700; color: #0f172a;">Malha Operational de Triagem</strong>
                         
                         <div class="actions-group">
                             <input type="text" id="table-search" class="table-search-input" placeholder="🔎 Pesquisar por ID, status ou hub..." oninput="handleSearch()">
@@ -845,43 +841,53 @@
             const nodeName = baseIndex === 1 ? 'planilha_base1' : 'planilha_base2';
 
             window.firebaseActions.removeNode(nodeName).then(() => {
+                let parsePromises = [];
+
                 Array.from(files).forEach(file => {
                     const extension = file.name.split('.').pop().toLowerCase();
                     
                     if (extension === 'zip') {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            JSZip.loadAsync(e.target.result).then(function(zip) {
-                                let promises = [];
-                                zip.forEach(function(relativePath, zipEntry) {
-                                    if (!zipEntry.dir && zipEntry.name.endsWith('.csv')) {
-                                        promises.push(zipEntry.async("string").then(content => {
-                                            return parseAndStoreCSVInChunks(content, baseIndex);
-                                        }));
-                                    }
+                        let zipPromise = new Promise((resolveZip) => {
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                JSZip.loadAsync(e.target.result).then(function(zip) {
+                                    let internalPromises = [];
+                                    zip.forEach(function(relativePath, zipEntry) {
+                                        if (!zipEntry.dir && zipEntry.name.endsWith('.csv')) {
+                                            internalPromises.push(zipEntry.async("string").then(content => {
+                                                return parseAndStoreCSVInChunks(content, baseIndex);
+                                            }));
+                                        }
+                                    });
+                                    Promise.all(internalPromises).then(() => resolveZip());
+                                }).catch(err => {
+                                    console.error(err);
+                                    resolveZip();
                                 });
-                                Promise.all(promises).then(() => { 
-                                    showLoading(false); 
-                                    event.target.value = '';
-                                })
-                                .catch(err => { console.error(err); showLoading(false); alert("Erro ao extrair ZIP."); });
-                            });
-                        };
-                        reader.readAsArrayBuffer(file);
+                            };
+                            reader.readAsArrayBuffer(file);
+                        });
+                        parsePromises.push(zipPromise);
                     } else if (extension === 'csv') {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            parseAndStoreCSVInChunks(e.target.result, baseIndex).then(() => { 
-                                showLoading(false); 
-                                event.target.value = '';
-                            });
-                        };
-                        reader.readAsText(file, "UTF-8");
-                    } else {
-                        alert("Selecione arquivos .csv ou .zip");
-                        showLoading(false);
-                        event.target.value = '';
+                        let csvPromise = new Promise((resolveCsv) => {
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                parseAndStoreCSVInChunks(e.target.result, baseIndex).then(() => resolveCsv());
+                            };
+                            reader.readAsText(file, "UTF-8");
+                        });
+                        parsePromises.push(csvPromise);
                     }
+                });
+
+                // Executa a limpeza do campo apenas após processar todos os anexos
+                Promise.all(parsePromises).then(() => {
+                    showLoading(false);
+                    event.target.value = '';
+                }).catch(err => {
+                    console.error(err);
+                    showLoading(false);
+                    event.target.value = '';
                 });
             });
         };
@@ -902,12 +908,9 @@
                 }
 
                 const hubIdx = headers.findIndex(h => h === 'destination_hub' || h === 'destination_hub_name' || h.includes('hub'));
-                
-                // MAPEAMENTO DINÂMICO DA COLUNA OFFICE / HOME (Evita conflito com index fixo)
                 const locationIdx = headers.findIndex(h => h === 'location_type' || h === 'location type' || h.includes('office') || h.includes('home'));
 
                 if (trackingIdx === -1) {
-                    showLoading(false);
                     alert("Coluna de rastreamento não identificada no arquivo.");
                     resolve();
                     return;
@@ -928,7 +931,6 @@
                             hubValue = columns[hubIdx] || 'N/A';
                         }
 
-                        // Se a coluna de localização existir no arquivo, pega o valor dela; caso contrário, joga '-'
                         let locValue = '-';
                         if (locationIdx !== -1 && columns[locationIdx]) {
                             locValue = columns[locationIdx];
@@ -1093,7 +1095,6 @@
                 if(item.origin === 'Base 2') bOrigin = `<span class="badge">Base 2</span>`;
                 if(item.origin === 'Ambas') bOrigin = `<span class="badge">Ambas</span>`;
 
-                // ADICIONA A TARJA CINZA SE FOR "ACELERAR"
                 let badgeClassStatus = "badge";
                 if (st === "ACELERAR") {
                     badgeClassStatus = "badge badge-cinza";

@@ -222,17 +222,11 @@
             border: 1px solid #cbd5e1;
         }
 
-        /* CLASSE PARA A TARJA CINZA DO STATUS ACELERAR */
+        /* CLASSE PARA A TARJA CINZA */
         .badge-cinza {
             background-color: #e2e8f0 !important;
             color: #475569 !important;
             border: 1px solid #cbd5e1 !important;
-        }
-
-        .text-acelerar {
-            color: #2563eb !important;
-            font-weight: 700;
-            letter-spacing: 0.5px;
         }
 
         .voice-banner { background-color: #e0f2fe; border: 1px solid #bae6fd; padding: 12px 18px; border-radius: 8px; font-size: 13px; color: #0369a1; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
@@ -350,7 +344,7 @@
             window.refreshDashboardUI();
         }
 
-        // RECALCULO RETROATIVO: Mesclagem inteligente focada na prioridade da Base 1
+        // RECALCULO RETROATIVO
         function triggerRetroactiveRecalculate() {
             if (!window.scannedItemsList || window.scannedItemsList.length === 0) return;
             
@@ -389,41 +383,30 @@
                 }
 
                 if (isFound === 'SIM') {
-                    // REGRA: Se o Hub Destino contiver uma DATA, muda status para ACELERAR e limpa o Hub Destino
-                    const regexData = /^\d{2}-\d{2}-\d{4}/;
-                    if (regexData.test(destHub.trim())) {
-                        statusText = 'ACELERAR';
-                        destHub = 'N/A';
-                        actionText = 'ACELERAR';
-                    } else {
-                        const hubLower = destHub.toLowerCase();
-                        const statusLower = statusText.toLowerCase();
-                        
-                        const isUberaba = hubLower.includes('uberaba');
-                        const isXPT = hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
+                    const hubLower = destHub.toLowerCase();
+                    const statusLower = statusText.toLowerCase();
+                    
+                    const isUberaba = hubLower.includes('uberaba');
+                    const isXPT = hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
 
-                        if (isUberaba && (statusText === 'LMHub_Received' || statusLower === 'lmhub_received' || statusLower.includes('received'))) {
-                            statusText = `LMHub_Received_${locType}`;
-                        }
+                    if (isUberaba && (statusText === 'LMHub_Received' || statusLower === 'lmhub_received' || statusLower.includes('received'))) {
+                        statusText = `LMHub_Received_${locType}`;
+                    }
 
-                        if (destHub === 'ACELERAR') {
-                            actionText = 'ACELERAR';
-                        }
-                        else if (statusText.startsWith('LMHub_Assigning') || statusLower.includes('assigning')) {
-                            actionText = 'DIRECIONAR A ROTA CORRETA';
-                        }
-                        else if (isXPT) {
-                            actionText = 'DIRECIONAR AO XPT';
-                        }
-                        else if (!isUberaba) {
-                            actionText = 'DIRECIONAR A ESTAÇÃO CORRETA';
-                        }
-                        else if (statusText.startsWith('LMHub_Received')) {
-                            actionText = 'MANTER FLUXO';
-                        } 
-                        else {
-                            actionText = 'IR PARA ÁREA DE TRATATIVA';
-                        }
+                    if (statusText.startsWith('LMHub_Assigning') || statusLower.includes('assigning')) {
+                        actionText = 'DIRECIONAR A ROTA CORRETA';
+                    }
+                    else if (isXPT) {
+                        actionText = 'DIRECIONAR AO XPT';
+                    }
+                    else if (!isUberaba && destHub !== 'N/A') {
+                        actionText = 'DIRECIONAR A ESTAÇÃO CORRETA';
+                    }
+                    else if (statusText.startsWith('LMHub_Received')) {
+                        actionText = 'MANTER FLUXO';
+                    } 
+                    else {
+                        actionText = 'IR PARA ÁREA DE TRATATIVA';
                     }
                 }
 
@@ -500,59 +483,45 @@
             }
 
             if (isFound === 'SIM') {
-                const regexData = /^\d{2}-\d{2}-\d{4}/;
-                if (regexData.test(destHub.trim())) {
-                    statusText = 'ACELERAR';
-                    destHub = 'N/A';
-                    actionText = 'ACELERAR';
-                    alertColor = 'alert-gray';
-                    voiceMessage = 'Acelerar';
-                } else {
-                    const hubLower = destHub.toLowerCase();
-                    const statusLower = statusText.toLowerCase();
-                    
-                    const isUberaba = hubLower.includes('uberaba');
-                    const isXPT = hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
+                const hubLower = destHub.toLowerCase();
+                const statusLower = statusText.toLowerCase();
+                
+                const isUberaba = hubLower.includes('uberaba');
+                const isXPT = hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
 
-                    if (isUberaba && (statusText === 'LMHub_Received' || statusLower === 'lmhub_received' || statusLower.includes('received'))) {
-                        statusText = `LMHub_Received_${locType}`;
-                    }
+                if (isUberaba && (statusText === 'LMHub_Received' || statusLower === 'lmhub_received' || statusLower.includes('received'))) {
+                    statusText = `LMHub_Received_${locType}`;
+                }
 
-                    if (destHub === 'ACELERAR') {
-                        actionText = 'ACELERAR';
-                        alertColor = 'alert-blue';
-                        voiceMessage = 'Acelerar';
-                    }
-                    else if (statusText.startsWith('LMHub_Assigning') || statusLower.includes('assigning')) {
-                        actionText = 'DIRECIONAR A ROTA CORRETA';
-                        alertColor = 'alert-blue';
-                        voiceMessage = 'Direcionar a rota correta';
-                    }
-                    else if (isXPT) {
-                        actionText = 'DIRECIONAR AO XPT';
-                        alertColor = 'alert-pink';
-                        voiceMessage = 'Direcionar ao xis pê tê';
-                    }
-                    else if (!isUberaba) {
-                        actionText = 'DIRECIONAR A ESTAÇÃO CORRETA';
-                        alertColor = 'alert-orange';
-                        voiceMessage = 'Direcionar a estação correta';
-                    }
-                    else if (statusText.startsWith('LMHub_Received')) {
-                        actionText = 'MANTER FLUXO';
-                        alertColor = 'alert-green';
-                        voiceMessage = 'Manter fluxo';
-                    }
-                    else if (statusLower.includes('delivering') || statusLower.includes('delivered')) {
-                        actionText = 'IR PARA ÁREA DE TRATATIVA';
-                        alertColor = 'alert-red';
-                        voiceMessage = 'Pacote já em rota ou entregue, ir para área de tratativa';
-                    }
-                    else {
-                        actionText = 'IR PARA ÁREA DE TRATATIVA';
-                        alertColor = 'alert-red';
-                        voiceMessage = 'Verificar status na tratativa';
-                    }
+                if (statusText.startsWith('LMHub_Assigning') || statusLower.includes('assigning')) {
+                    actionText = 'DIRECIONAR A ROTA CORRETA';
+                    alertColor = 'alert-blue';
+                    voiceMessage = 'Direcionar a rota correta';
+                }
+                else if (isXPT) {
+                    actionText = 'DIRECIONAR AO XPT';
+                    alertColor = 'alert-pink';
+                    voiceMessage = 'Direcionar ao xis pê tê';
+                }
+                else if (!isUberaba && destHub !== 'N/A') {
+                    actionText = 'DIRECIONAR A ESTAÇÃO CORRETA';
+                    alertColor = 'alert-orange';
+                    voiceMessage = 'Direcionar a estação correta';
+                }
+                else if (statusText.startsWith('LMHub_Received')) {
+                    actionText = 'MANTER FLUXO';
+                    alertColor = 'alert-green';
+                    voiceMessage = 'Manter fluxo';
+                }
+                else if (statusLower.includes('delivering') || statusLower.includes('delivered')) {
+                    actionText = 'IR PARA ÁREA DE TRATATIVA';
+                    alertColor = 'alert-red';
+                    voiceMessage = 'Pacote já em rota ou entregue, ir para área de tratativa';
+                }
+                else {
+                    actionText = 'IR PARA ÁREA DE TRATATIVA';
+                    alertColor = 'alert-red';
+                    voiceMessage = 'Verificar status na tratativa';
                 }
             } else {
                 actionText = 'IR PARA ÁREA DE TRATATIVA';
@@ -560,7 +529,7 @@
                 voiceMessage = 'Não encontrado, ir para área de tratativa';
             }
 
-            window.showAlertTop(`📢 ${statusText.toUpperCase()} | ${actionText}`, alertColor);
+            window.showAlertTop(`📢 HUB: ${destHub.toUpperCase()} | ${actionText}`, alertColor);
             window.emitVoiceAlert(voiceMessage);
 
             const newBip = {
@@ -840,8 +809,6 @@
             showLoading(true, "Processando e mesclando novos registros de arquivo com a nuvem...");
             const nodeName = baseIndex === 1 ? 'planilha_base1' : 'planilha_base2';
 
-            // REMOVIDO: window.firebaseActions.removeNode(nodeName) para não apagar os arquivos antigos.
-            // Agora os novos arquivos entram somando e acumulando no Firebase!
             let parsePromises = [];
 
             Array.from(files).forEach(file => {
@@ -881,7 +848,6 @@
                 }
             });
 
-            // Executa a liberação do campo apenas após processar todos os anexos de uma vez só
             Promise.all(parsePromises).then(() => {
                 showLoading(false);
                 event.target.value = '';
@@ -925,10 +891,8 @@
                     
                     if (id && id.length <= 15) {
                         let hubValue = 'N/A';
-                        if (baseIndex === 2) {
-                            hubValue = 'ACELERAR';
-                        } else if (hubIdx !== -1) {
-                            hubValue = columns[hubIdx] || 'N/A';
+                        if (hubIdx !== -1 && columns[hubIdx]) {
+                            hubValue = columns[hubIdx];
                         }
 
                         let locValue = '-';
@@ -999,7 +963,7 @@
                 
                 const pertencerRegiaoAtiva = hub.includes('uberaba') || hub.includes('carmelo') || hub.includes('catalao') || hub.includes('catalão');
 
-                if (status.startsWith('LMHub_Received') && !pertencerRegiaoAtiva && item.destinationHub !== 'ACELERAR') {
+                if (status.startsWith('LMHub_Received') && !pertencerRegiaoAtiva) {
                     status = 'LMHub_Received (Outros Hubs)';
                 } else {
                     if (status === 'LMHub_Received_Office' || status === 'LMHub_Received_office' || status === 'LMHub_Received_-') {
@@ -1095,17 +1059,10 @@
                 if(item.origin === 'Base 2') bOrigin = `<span class="badge">Base 2</span>`;
                 if(item.origin === 'Ambas') bOrigin = `<span class="badge">Ambas</span>`;
 
-                let badgeClassStatus = "badge";
-                if (st === "ACELERAR") {
-                    badgeClassStatus = "badge badge-cinza";
-                }
-
-                let hubStyleClass = hub === "ACELERAR" ? 'class="text-acelerar"' : '';
-
                 row.innerHTML = `
                     <td style="font-weight:700; color: #111827;">${item.trackingNumber}</td>
-                    <td><span class="${badgeClassStatus}">${st}</span></td>
-                    <td ${hubStyleClass}>${hub}</td>
+                    <td><span class="badge">${st}</span></td>
+                    <td>${hub}</td>
                     <td style="font-weight:600; color: #475569; text-align: center;">${item.locationType || '-'}</td>
                     <td><span class="badge">${badgeAction}</span></td>
                     <td style="text-align: center;">${bOrigin}</td>

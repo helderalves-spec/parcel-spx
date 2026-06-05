@@ -44,6 +44,7 @@
         .alert-purple { background: linear-gradient(135deg, #7c3aed, #6d28d9) !important; }
         .alert-blue { background: linear-gradient(135deg, #2563eb, #1d4ed8) !important; }
         .alert-pink { background: linear-gradient(135deg, #ec4899, #db2777) !important; }
+        .alert-gray { background: linear-gradient(135deg, #6b7280, #4b5563) !important; } /* Nova Cor da Tarja para Acelerar */
 
         /* Top Navbar */
         .navbar {
@@ -389,13 +390,18 @@
                         statusText = `LMHub_Received_${locType}`;
                     }
 
-                    if (statusText.startsWith('LMHub_Assigning') || statusLower.includes('assigning')) {
+                    // Prioridade 1: Se o Hub for ACELERAR
+                    if (destHub === 'ACELERAR') {
+                        actionText = 'ACELERAR';
+                    }
+                    // Prioridade 2: Regras normais de fluxo
+                    else if (statusText.startsWith('LMHub_Assigning') || statusLower.includes('assigning')) {
                         actionText = 'DIRECIONAR A ROTA CORRETA';
                     }
                     else if (isXPT) {
                         actionText = 'DIRECIONAR AO XPT';
                     }
-                    else if (!isUberaba && destHub !== 'ACELERAR') {
+                    else if (!isUberaba) {
                         actionText = 'DIRECIONAR A ESTAÇÃO CORRETA';
                     }
                     else if (statusText.startsWith('LMHub_Received')) {
@@ -486,7 +492,14 @@
                     statusText = `LMHub_Received_${locType}`;
                 }
 
-                if (statusText.startsWith('LMHub_Assigning') || statusLower.includes('assigning')) {
+                // CORREÇÃO AQUI: Se for do Hub ACELERAR, aplica as regras visuais cinza prioritárias
+                if (destHub === 'ACELERAR') {
+                    actionText = 'ACELERAR';
+                    alertColor = 'alert-gray';
+                    voiceMessage = 'Acelerar';
+                }
+                // Demais lógicas normais do sistema
+                else if (statusText.startsWith('LMHub_Assigning') || statusLower.includes('assigning')) {
                     actionText = 'DIRECIONAR A ROTA CORRETA';
                     alertColor = 'alert-blue';
                     voiceMessage = 'Direcionar a rota correta';
@@ -496,7 +509,7 @@
                     alertColor = 'alert-pink';
                     voiceMessage = 'Direcionar ao xis pê tê';
                 }
-                else if (!isUberaba && destHub !== 'ACELERAR') {
+                else if (!isUberaba) {
                     actionText = 'DIRECIONAR A ESTAÇÃO CORRETA';
                     alertColor = 'alert-orange';
                     voiceMessage = 'Direcionar a estação correta';
@@ -870,7 +883,6 @@
                 }
 
                 let rowsToProcess = [];
-                // Regex simples para capturar se a string tem formato de data (ex: 2026-06-03, 03-06-2026, 03/06, etc)
                 const dateRegex = /\d{2,4}[-/]\d{2}[-/]\d{2,4}/;
 
                 for (let i = 1; i < lines.length; i++) {
@@ -881,7 +893,6 @@
                     if (id && id.length <= 15) {
                         let hubValue = hubIdx !== -1 ? (columns[hubIdx] || 'N/A') : 'N/A';
                         
-                        // ALTERAÇÃO SOLICITADA: Se o valor do Hub contiver um padrão de data, substitui por "ACELERAR"
                         if (dateRegex.test(hubValue)) {
                             hubValue = "ACELERAR";
                         }
@@ -949,7 +960,7 @@
                 
                 const pertencerRegiaoAtiva = hub.includes('uberaba') || hub.includes('carmelo') || hub.includes('catalao') || hub.includes('catalão');
 
-                if (status.startsWith('LMHub_Received') && !pertencerRegiaoAtiva) {
+                if (status.startsWith('LMHub_Received') && !pertencerRegiaoAtiva && item.destinationHub !== 'ACELERAR') {
                     status = 'LMHub_Received (Outros Hubs)';
                 } else {
                     if (status === 'LMHub_Received_Office' || status === 'LMHub_Received_office' || status === 'LMHub_Received_-') {
@@ -1045,7 +1056,6 @@
                 if(item.origin === 'Base 2') bOrigin = `<span class="badge">Base 2</span>`;
                 if(item.origin === 'Ambas') bOrigin = `<span class="badge">Ambas</span>`;
 
-                // ALTERAÇÃO SOLICITADA: Aplica a cor cinza estilizada caso o Hub seja "ACELERAR"
                 let hubStyleClass = hub === "ACELERAR" ? 'class="text-acelerar"' : '';
 
                 row.innerHTML = `

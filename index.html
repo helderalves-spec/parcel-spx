@@ -57,7 +57,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
 
-        /* ALTERAÇÃO 1: Nome da marca textualmente na navbar (Lugar do logo circular) */
+        /* MODIFICAÇÃO 1: Nome textual ajustado no lugar do logo */
         .brand {
             font-size: 20px;
             color: #f8fafc;
@@ -66,15 +66,15 @@
             text-transform: uppercase;
         }
 
-        /* ALTERAÇÃO 2: Estilização do criador (helder.alves) */
+        /* MODIFICAÇÃO 2: Estilo com fonte aumentada para o perfil Criador: Helder.Alves */
         .user-profile {
             display: flex;
             align-items: center;
             gap: 12px;
-            font-size: 16px; /* Aumentei um pouco a fonte padrão */
+            font-size: 16px; /* Fonte aumentada conforme solicitado */
             color: #cbd5e1;
             background-color: #1e293b;
-            padding: 8px 16px; /* Ajustei o padding */
+            padding: 8px 16px; /* Leve ajuste de preenchimento para acompanhar o tamanho da fonte */
             border-radius: 20px;
             border: 1px solid #334155;
         }
@@ -85,7 +85,7 @@
         }
 
         .user-profile .creator-name {
-            font-weight: 700; /* Negrito no nome */
+            font-weight: 700;
             color: #f8fafc;
         }
 
@@ -230,6 +230,317 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+        import { getDatabase, ref, update, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC-98bTSJZekzIcbpWqvVPKzhsLPRSZbIA",
+            authDomain: "parcel-4854c.firebaseapp.com",
+            projectId: "parcel-4854c",
+            storageBucket: "parcel-4854c.firebasestorage.app",
+            messagingSenderId: "136698755428",
+            appId: "1:136698755428:web:710d834b548d91990b6271",
+            measurementId: "G-71NMSWMX4B"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const database = getDatabase(app);
+
+        window.firebaseActions = {
+            updateData: (path, data) => update(ref(database, path), data),
+            removeNode: (path) => remove(ref(database, path))
+        };
+
+        window.base1Map = {};
+        window.base2Map = {};
+        window.totalB1Count = 0;
+        window.totalB2Count = 0;
+        window.scannedItemsList = [];
+
+        onValue(ref(database, 'planilha_base1'), (snapshot) => {
+            window.base1Map = snapshot.val() || {};
+            window.totalB1Count = Object.keys(window.base1Map).length;
+            updateImportVisuals(1, window.totalB1Count);
+            checkAndUnlockScanner();
+            triggerRetroactiveRecalculate();
+        });
+
+        onValue(ref(database, 'planilha_base2'), (snapshot) => {
+            window.base2Map = snapshot.val() || {};
+            window.totalB2Count = Object.keys(window.base2Map).length;
+            updateImportVisuals(2, window.totalB2Count);
+            checkAndUnlockScanner();
+            triggerRetroactiveRecalculate();
+        });
+
+        onValue(ref(database, 'bips_triagem'), (snapshot) => {
+            const data = snapshot.val() || {};
+            const items = Object.keys(data).map(key => data[key]);
+            items.sort((a, b) => new Date(b.timestampBip) - new Date(a.timestampBip));
+            window.scannedItemsList = items;
+            window.refreshDashboardUI();
+            window.calculateAndRenderReport(); 
+        });
+
+        function updateImportVisuals(baseNum, count) {
+            const box = document.getElementById(`box-file-${baseNum}`);
+            const icon = document.getElementById(`icon-file-${baseNum}`);
+            const label = document.getElementById(`label-file-${baseNum}`);
+            if(!box || !icon || !label) return;
+
+            if (count > 0) {
+                box.classList.add('loaded');
+                icon.innerText = '✔';
+                label.innerText = `Base ${baseNum}: ${count} ordens salvas na nuvem`;
+            } else {
+                box.classList.remove('loaded');
+                icon.innerText = '📥';
+                label.innerText = baseNum === 1 ? "Selecionar Bases Forward (.csv ou .zip)" : "Selecionar Bases Receive Task (.csv ou .zip)";
+            }
+        }
+
+        function checkAndUnlockScanner() {
+            const totalRecords = window.totalB1Count + window.totalB2Count;
+            const scannerInput = document.getElementById('main-barcode-scanner');
+            const summaryCard = document.getElementById('import-summary-card');
+            const summaryText = document.getElementById('import-summary-text');
+
+            if (scannerInput) {
+                if (totalRecords > 0) {
+                    scannerInput.disabled = false;
+                    scannerInput.placeholder = "Passe o leitor de código de barras corporativo...";
+                    if(summaryCard) summaryCard.style.display = 'block';
+                    if(summaryText) {
+                        summaryText.innerHTML = `
+                            <strong>Base 1 (Forward):</strong> ${window.totalB1Count} registros na nuvem.<br>
+                            <strong>Base 2 (Receive Task):</strong> ${window.totalB2Count} registros na nuvem.<br>
+                            <strong>Total Consolidado:</strong> ${totalRecords} ordens ativas para cruzamento prioritário.
+                        `;
+                    }
+                } else {
+                    scannerInput.disabled = true;
+                    scannerInput.placeholder = "Aguardando sincronização segura das bases com a nuvem...";
+                    if(summaryCard) summaryCard.style.display = 'none';
+                }
+            }
+            window.refreshDashboardUI();
+        }
+
+        function triggerRetroactiveRecalculate() {
+            if (!window.scannedItemsList || window.scannedItemsList.length === 0) return;
+            
+            let updates = {};
+            let mudouAlgo = false;
+
+            window.scannedItemsList.forEach(item => {
+                const barcode = item.trackingNumber;
+                if(!barcode) return;
+
+                let b1Data = window.base1Map ? window.base1Map[barcode] : null;
+                let b2Data = window.base2Map ? window.base2Map[barcode] : null;
+
+                let originLabel = 'NÃO ENCONTRADO';
+                let isFound = 'NÃO';
+                let statusText = 'NÃO ENCONTRADO';
+                let destHub = 'N/A';
+                let locType = '-'; 
+                let actionText = 'IR PARA ÁREA DE TRATATIVA';
+                let currentClass = 'alert-red'; 
+
+                if (b1Data) {
+                    isFound = 'SIM';
+                    originLabel = b2Data ? 'Ambas' : 'Base 1';
+                    statusText = b2Data ? (b2Data.status || b1Data.status || 'N/A') : (b1Data.status || 'N/A');
+                    destHub = b1Data.destinationHub || 'N/A';
+                    locType = b1Data.locationType || (b2Data ? b2Data.locationType : '-');
+                } 
+                else if (b2Data) {
+                    isFound = 'SIM';
+                    originLabel = 'Base 2';
+                    statusText = b2Data.status || 'N/A';
+                    destHub = b2Data.destinationHub || 'N/A';
+                    locType = b2Data.locationType || '-';
+                }
+
+                if (isFound === 'SIM') {
+                    const hubLower = destHub.toLowerCase();
+                    const statusLower = statusText.toLowerCase();
+                    
+                    const isUberaba = hubLower.includes('uberaba');
+                    const isXPT = hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
+
+                    if (isUberaba && (statusText === 'LMHub_Received' || statusLower === 'lmhub_received' || statusLower.includes('received'))) {
+                        statusText = `LMHub_Received_${locType}`;
+                    }
+
+                    if (statusText.startsWith('LMHub_Assigning') || statusLower.includes('assigning')) {
+                        actionText = 'DIRECIONAR A ROTA CORRETA';
+                        currentClass = 'alert-blue';
+                    }
+                    else if (isXPT) {
+                        actionText = 'DIRECIONAR AO XPT';
+                        currentClass = 'alert-pink';
+                    }
+                    else if (!isUberaba) {
+                        actionText = 'DIRECIONAR A ESTAÇÃO CORRETA';
+                        currentClass = 'alert-orange';
+                    }
+                    else if (statusText.startsWith('LMHub_Received')) {
+                        actionText = 'MANTER FLUXO';
+                        currentClass = 'alert-green';
+                    } 
+                    else {
+                        actionText = 'IR PARA ÁREA DE TRATATIVA';
+                        currentClass = 'alert-red';
+                    }
+                }
+
+                if (item.statusOriginal !== statusText || item.destinationHub !== destHub || item.action !== actionText || item.encontrado !== isFound || item.alertClass !== currentClass) {
+                    updates[barcode] = {
+                        ...item,
+                        statusOriginal: statusText,
+                        destinationHub: destHub,
+                        locationType: locType,
+                        action: actionText,
+                        origin: originLabel,
+                        encontrado: isFound,
+                        alertClass: currentClass
+                    };
+                    mudouAlgo = true;
+                }
+            });
+
+            if (mudouAlgo) {
+                window.firebaseActions.updateData('bips_triagem', updates);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const scannerInput = document.getElementById('main-barcode-scanner');
+            if (scannerInput) {
+                scannerInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        const code = this.value.trim();
+                        if (code) {
+                            if (code.length > 15) {
+                                window.updateOperationalAlert(`❌ ERRO: CÓDIGO INVÁLIDO (${code.length} DÍGITOS). BIPAGEM NÃO PERMITIDA!`, 'alert-red');
+                                window.emitVoiceAlert('Código inválido');
+                                this.value = ''; 
+                                e.preventDefault();
+                                return;
+                            }
+                            processBarcodeBip(code);
+                            this.value = ''; 
+                        }
+                    }
+                });
+            }
+        });
+
+        function processBarcodeBip(barcode) {
+            let b1Data = window.base1Map ? window.base1Map[barcode] : null;
+            let b2Data = window.base2Map ? window.base2Map[barcode] : null;
+
+            let originLabel = 'NÃO ENCONTRADO';
+            let isFound = 'NÃO';
+            let statusText = 'NÃO ENCONTRADO';
+            let destHub = 'N/A';
+            let locType = '-'; 
+            let actionText = 'IR PARA ÁREA DE TRATATIVA';
+            let alertColor = 'alert-red';
+            let voiceMessage = 'Não encontrado, ir para área de tratativa';
+
+            if (b1Data) {
+                isFound = 'SIM';
+                originLabel = b2Data ? 'Ambas' : 'Base 1';
+                statusText = b2Data ? (b2Data.status || b1Data.status || 'N/A') : (b1Data.status || 'N/A');
+                destHub = b1Data.destinationHub || 'N/A';
+                locType = b1Data.locationType || (b2Data ? b2Data.locationType : '-');
+            } 
+            else if (b2Data) {
+                isFound = 'SIM';
+                originLabel = 'Base 2';
+                statusText = b2Data.status || 'N/A';
+                destHub = b2Data.destinationHub || 'N/A';
+                locType = b2Data.locationType || '-';
+            }
+
+            if (isFound === 'SIM') {
+                const hubLower = destHub.toLowerCase();
+                const statusLower = statusText.toLowerCase();
+                
+                const isUberaba = hubLower.includes('uberaba');
+                const isXPT = hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
+
+                if (isUberaba && (statusText === 'LMHub_Received' || statusLower === 'lmhub_received' || statusLower.includes('received'))) {
+                    statusText = `LMHub_Received_${locType}`;
+                }
+
+                if (statusText.startsWith('LMHub_Assigning') || statusLower.includes('assigning')) {
+                    actionText = 'DIRECIONAR A ROTA CORRETA';
+                    alertColor = 'alert-blue';
+                    voiceMessage = 'Direcionar a rota correta';
+                }
+                else if (isXPT) {
+                    actionText = 'DIRECIONAR AO XPT';
+                    alertColor = 'alert-pink';
+                    voiceMessage = 'Direcionar ao xis pê tê';
+                }
+                else if (!isUberaba) {
+                    actionText = 'DIRECIONAR A ESTAÇÃO CORRETA';
+                    alertColor = 'alert-orange';
+                    voiceMessage = 'Direcionar a estação correta';
+                }
+                else if (statusText.startsWith('LMHub_Received')) {
+                    actionText = 'MANTER FLUXO';
+                    alertColor = 'alert-green';
+                    voiceMessage = 'Manter fluxo';
+                }
+                else if (statusLower.includes('delivering') || statusLower.includes('delivered')) {
+                    actionText = 'IR PARA ÁREA DE TRATATIVA';
+                    alertColor = 'alert-red';
+                    voiceMessage = 'Pacote já em rota ou entregue, ir para área de tratativa';
+                }
+                else {
+                    actionText = 'IR PARA ÁREA DE TRATATIVA';
+                    alertColor = 'alert-red';
+                    voiceMessage = 'Verificar status na tratativa';
+                }
+            } else {
+                actionText = 'IR PARA ÁREA DE TRATATIVA';
+                alertColor = 'alert-red';
+                voiceMessage = 'Não encontrado, ir para área de tratativa';
+            }
+
+            window.updateOperationalAlert(`📢 ${statusText.toUpperCase()} | ${actionText}`, alertColor);
+            window.emitVoiceAlert(voiceMessage);
+
+            const newBip = {
+                trackingNumber: barcode,
+                statusOriginal: statusText,
+                destinationHub: destHub,
+                locationType: locType,
+                action: actionText,
+                origin: originLabel,
+                encontrado: isFound,
+                alertClass: alertColor,
+                timestampBip: new Date().toISOString()
+            };
+
+            window.firebaseActions.updateData('bips_triagem/' + barcode, newBip);
+        }
+
+        window.updateOperationalAlert = function(msg, cssClass) {
+            const container = document.getElementById('live-operational-alert');
+            if (container) {
+                container.className = `operational-alert-container ${cssClass}`;
+                container.innerHTML = msg;
+            }
+        };
+    </script>
 </head>
 <body>
 
@@ -242,12 +553,17 @@
         <div class="brand">
             PRÉ TRATATIVA PARCEL SWEEPER
         </div>
-        
         <div class="user-profile">
             <span class="creator-prefix">Criador:</span>
             <span class="creator-name">Helder.Alves</span>
         </div>
     </div>
 
+    <div class="tab-nav">
+        <button class="tab-btn" onclick="switchTab('import')">1. Importação de Bases</button>
+        <button class="tab-btn active" onclick="switchTab('dashboard')">2. Monitor de Bipagem Realtime</button>
+        <button class="tab-btn" onclick="switchTab('report')">3. Relatório Executivo Diário</button>
+    </div>
+    
     </body>
 </html>

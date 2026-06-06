@@ -37,13 +37,13 @@
             top: 0;
             z-index: 1000;
         }
-        /* Definição de Cores da Tarja Superior */
-        .alert-green { background: linear-gradient(135deg, #10b981, #059669) !important; }
-        .alert-red { background: linear-gradient(135deg, #ef4444, #dc2626) !important; }
-        .alert-orange { background: linear-gradient(135deg, #f59e0b, #d97706) !important; }
-        .alert-purple { background: linear-gradient(135deg, #7c3aed, #6d28d9) !important; }
-        .alert-blue { background: linear-gradient(135deg, #2563eb, #1d4ed8) !important; }
-        .alert-pink { background: linear-gradient(135deg, #ec4899, #db2777) !important; }
+        /* Definição de Cores da Tarja Superior e das Células da Tabela */
+        .alert-green { background: linear-gradient(135deg, #10b981, #059669) !important; color: #ffffff !important; }
+        .alert-red { background: linear-gradient(135deg, #ef4444, #dc2626) !important; color: #ffffff !important; }
+        .alert-orange { background: linear-gradient(135deg, #f59e0b, #d97706) !important; color: #ffffff !important; }
+        .alert-purple { background: linear-gradient(135deg, #7c3aed, #6d28d9) !important; color: #ffffff !important; }
+        .alert-blue { background: linear-gradient(135deg, #2563eb, #1d4ed8) !important; color: #ffffff !important; }
+        .alert-pink { background: linear-gradient(135deg, #ec4899, #db2777) !important; color: #ffffff !important; }
 
         /* Top Navbar */
         .navbar {
@@ -189,10 +189,23 @@
         .page-btn:hover:not(:disabled) { border-color: #2563eb; color: #2563eb; }
         .page-btn:disabled { background: #f3f4f6; color: #9ca3af; cursor: not-allowed; }
 
-        .table-scroll { overflow-x: auto; max-height: 550px; }
+        .table-scroll { overflow-x: auto; max-height: 550px; position: relative; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; table-layout: fixed; }
         th, td { padding: 16px 20px; border-bottom: 1px solid #f3f4f6; color: #374151; overflow: hidden; text-overflow: ellipsis; }
-        th { background-color: #f8fafc; color: #475569; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+        
+        /* MODIFICAÇÃO: CABEÇALHO DA TABELA TRAVADO (STICKY) */
+        th { 
+            background-color: #f8fafc; 
+            color: #475569; 
+            font-weight: 600; 
+            text-transform: uppercase; 
+            font-size: 11px; 
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: inset 0 -1px 0 #e5e7eb;
+        }
 
         th:nth-child(1), td:nth-child(1) { width: 22%; white-space: normal; word-break: break-all; }
         th:nth-child(2), td:nth-child(2) { width: 18%; }
@@ -219,6 +232,22 @@
             background-color: #f1f5f9; 
             color: #334155; 
             border: 1px solid #cbd5e1;
+        }
+
+        /* MODIFICAÇÃO: Estilo da Tarja Completa dentro da célula da Tabela */
+        .action-tarja {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 12px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.2px;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
         .voice-banner { background-color: #e0f2fe; border: 1px solid #bae6fd; padding: 12px 18px; border-radius: 8px; font-size: 13px; color: #0369a1; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
@@ -355,6 +384,7 @@
                 let destHub = 'N/A';
                 let locType = '-'; 
                 let actionText = 'IR PARA ÁREA DE TRATATIVA';
+                let currentClass = 'alert-red'; // Classe padrão para não encontrado
 
                 if (b1Data) {
                     isFound = 'SIM';
@@ -384,22 +414,27 @@
 
                     if (statusText.startsWith('LMHub_Assigning') || statusLower.includes('assigning')) {
                         actionText = 'DIRECIONAR A ROTA CORRETA';
+                        currentClass = 'alert-blue';
                     }
                     else if (isXPT) {
                         actionText = 'DIRECIONAR AO XPT';
+                        currentClass = 'alert-pink';
                     }
                     else if (!isUberaba) {
                         actionText = 'DIRECIONAR A ESTAÇÃO CORRETA';
+                        currentClass = 'alert-orange';
                     }
                     else if (statusText.startsWith('LMHub_Received')) {
                         actionText = 'MANTER FLUXO';
+                        currentClass = 'alert-green';
                     } 
                     else {
                         actionText = 'IR PARA ÁREA DE TRATATIVA';
+                        currentClass = 'alert-red';
                     }
                 }
 
-                if (item.statusOriginal !== statusText || item.destinationHub !== destHub || item.action !== actionText || item.encontrado !== isFound) {
+                if (item.statusOriginal !== statusText || item.destinationHub !== destHub || item.action !== actionText || item.encontrado !== isFound || item.alertClass !== currentClass) {
                     updates[barcode] = {
                         ...item,
                         statusOriginal: statusText,
@@ -407,7 +442,8 @@
                         locationType: locType,
                         action: actionText,
                         origin: originLabel,
-                        encontrado: isFound
+                        encontrado: isFound,
+                        alertClass: currentClass
                     };
                     mudouAlgo = true;
                 }
@@ -526,6 +562,7 @@
                 action: actionText,
                 origin: originLabel,
                 encontrado: isFound,
+                alertClass: alertColor, // Armazena a classe de cor da tarja
                 timestampBip: new Date().toISOString()
             };
 
@@ -631,7 +668,7 @@
 
             <div class="work-area" style="flex: 1; min-width: 0;">
                 <div class="voice-banner">
-                    <span>⚡</span> <span><strong>Controle de Status Ativo:</strong> Layout corrigido para ler colunas por índice rígido absoluto. Nomes das cidades garantidos.</span>
+                    <span>⚡</span> <span><strong>Controle de Status Ativo:</strong> Layout corrigido para ler colunas por índice rígido absoluto com parser RFC-4180. Cabeçalho fixado com sucesso.</span>
                 </div>
 
                 <div class="card" style="padding: 20px;">
@@ -788,7 +825,7 @@
             }
         }
 
-        /* PARSER ABSOLUTO PREMIUM CORRIGIDO: Protege colunas vazias consecutivas */
+        /* PARSER RFC-4180 COMPLETO: Analisa aspas e ignora separadores internos */
         function parseCSVLineRobust(line, separator) {
             let fields = [];
             let currentField = '';
@@ -797,7 +834,7 @@
             for (let i = 0; i < line.length; i++) {
                 let char = line[i];
                 if (char === '"') {
-                    inQuotes = !inQuotes;
+                    inQuotes = !inQuotes; // Inverte o estado se encontrar aspas
                 } else if (char === separator && !inQuotes) {
                     fields.push(currentField.trim());
                     currentField = '';
@@ -867,6 +904,7 @@
                 
                 const headers = parseCSVLineRobust(lines[0], separator).map(h => h.replace(/^\ufeff/, '').trim().toLowerCase());
                 
+                // Mapeamento preciso para os padrões das planilhas Shopee
                 const trackingIdx = headers.findIndex(h => h === 'sls tracking number' || h === 'forward_order_id' || h === 'tracking_number' || h.includes('tracking') || h === 'id' || h.includes('number'));
                 const statusIdx = headers.findIndex(h => h === 'status' || h === 'order status' || h.includes('status'));
                 const hubIdx = headers.findIndex(h => h === 'destination hub' || h === 'destination_hub' || h === 'destination_hub_name' || h.includes('destination hub') || h.includes('destino'));
@@ -889,7 +927,7 @@
                     if (id && id.length <= 15) {
                         let hubValue = 'N/A';
                         if (hubIdx !== -1 && columns[hubIdx]) {
-                            hubValue = columns[hubIdx];
+                            hubValue = columns[hubIdx].replace(/^["']|["']$/g, '').trim(); // Remove aspas residuais se houver
                         }
 
                         let locValue = '-';
@@ -1051,6 +1089,8 @@
                 let hub = item.destinationHub || 'N/A';
                 
                 let badgeAction = item.action || "TRATATIVA";
+                let alertColorClass = item.alertClass || "alert-red"; // Pega a classe salva ou joga pra vermelho por segurança
+                
                 let bScanned = item.encontrado === 'SIM' ? `<span class="badge">Sincronizado</span>` : `<span class="badge">Divergente</span>`;
                 let bOrigin = `<span class="badge">Base 1</span>`;
                 if(item.origin === 'Base 2') bOrigin = `<span class="badge">Base 2</span>`;
@@ -1061,7 +1101,7 @@
                     <td><span class="badge">${st}</span></td>
                     <td style="font-weight: 700; color: #0284c7;">${hub}</td>
                     <td style="font-weight:600; color: #475569; text-align: center;">${item.locationType || '-'}</td>
-                    <td><span class="badge">${badgeAction}</span></td>
+                    <td><div class="action-tarja ${alertColorClass}">${badgeAction}</div></td>
                     <td style="text-align: center;">${bOrigin}</td>
                     <td>${bScanned}</td>
                 `;

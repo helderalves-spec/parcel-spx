@@ -23,26 +23,25 @@
             min-height: 100vh;
         }
 
-        /* BARRA DE ALERTA DINÂMICA PREMIUM (PERSISTENTE) */
-        .top-alert-bar {
-            padding: 16px 24px;
-            font-size: 20px;
-            font-weight: 700;
+        /* CONTAINER DE ALERTA OPERACIONAL LOCALIZADO (SUBSTITUTO DO VOICE BANNER) */
+        .operational-alert-container {
+            padding: 24px;
+            font-size: 24px;
+            font-weight: 800;
             text-align: center;
             color: #ffffff;
-            display: none;
-            letter-spacing: -0.3px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            border-bottom: 3px solid rgba(0,0,0,0.1);
+            letter-spacing: -0.5px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+            border-bottom: 4px solid rgba(0, 0, 0, 0.1);
         }
         
-        .alert-idle { background-color: #4b5563; display: block; }
-        .alert-green { background: linear-gradient(135deg, #10b981, #059669); display: block; }
-        .alert-red { background: linear-gradient(135deg, #ef4444, #dc2626); display: block; }
-        .alert-orange { background: linear-gradient(135deg, #f59e0b, #d97706); display: block; }
-        .alert-purple { background: linear-gradient(135deg, #7c3aed, #6d28d9); display: block; }
-        .alert-blue { background: linear-gradient(135deg, #2563eb, #1d4ed8); display: block; }
-        .alert-pink { background: linear-gradient(135deg, #ec4899, #db2777); display: block; }
+        .alert-idle { background: linear-gradient(135deg, #4b5563, #374151); }
+        .alert-green { background: linear-gradient(135deg, #10b981, #059669); }
+        .alert-red { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .alert-orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .alert-purple { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
+        .alert-blue { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+        .alert-pink { background: linear-gradient(135deg, #ec4899, #db2777); }
 
         /* Top Navbar */
         .navbar {
@@ -524,7 +523,7 @@
         window.updateTopAlertBar = function(msg, cssClass) {
             const bar = document.getElementById('top-live-banner');
             if (bar) {
-                bar.className = `top-alert-bar ${cssClass}`;
+                bar.className = `operational-alert-container ${cssClass}`;
                 bar.innerText = msg;
             }
         };
@@ -537,7 +536,7 @@
         <div id="loading-text" style="font-size: 14px; font-weight:600; color:#374151;">Processando dados na nuvem...</div>
     </div>
 
-    <div id="top-live-banner" class="top-alert-bar alert-idle">
+    <div id="top-live-banner" class="operational-alert-container alert-idle">
         SISTEMA ONLINE - AGUARDANDO LEITURA DE PRODUTO
     </div>
 

@@ -223,22 +223,6 @@
             border: 1px solid #cbd5e1;
         }
 
-        .action-tarja {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-weight: 700;
-            font-size: 12px;
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 0.2px;
-            width: 100%;
-            color: white !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
         /* Report Grid */
         .report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 32px; }
         .report-card { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 28px 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); position: relative; }
@@ -889,10 +873,8 @@
                         <td><span style="color: #64748b; font-weight: 500;">${item.statusOriginal || 'N/A'}</span></td>
                         <td>${item.destinationHub || 'N/A'}</td>
                         <td style="text-align: center;">${locBadge}</td>
-                        <td style="text-align: center;">
-                            <div class="action-tarja ${item.alertClass || 'alert-red'}">
-                                ${item.action || 'IR PARA ÁREA DE TRATATIVA'}
-                            </div>
+                        <td style="text-align: center; font-weight: 700;">
+                            ${item.action || 'IR PARA ÁREA DE TRATATIVA'}
                         </td>
                         <td style="text-align: center;">${originBadge}</td>
                         <td style="text-align: center;">${validationBadge}</td>

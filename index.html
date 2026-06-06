@@ -23,208 +23,198 @@
             min-height: 100vh;
         }
 
-        /* CONTAINER DE ALERTA OPERACIONAL LOCALIZADO (SUBSTITUTO DO VOICE BANNER) */
-        .operational-alert-container {
-            padding: 24px;
-            font-size: 24px;
-            font-weight: 800;
+        /* BARRA DE ALERTA DINÂMICA PREMIUM (PERSISTENTE) */
+        .top-alert-bar {
+            padding: 16px 24px;
+            font-size: 20px;
+            font-weight: 700;
             text-align: center;
             color: #ffffff;
-            letter-spacing: -0.5px;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
-            border-radius: 12px;
-            margin-bottom: 24px;
-            transition: all 0.25s ease;
-            text-transform: uppercase;
+            display: none;
+            letter-spacing: -0.3px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border-bottom: 3px solid rgba(0,0,0,0.1);
         }
         
-        /* Definição de Cores das Tarjas superiores */
-        .alert-idle { background: linear-gradient(135deg, #64748b, #475569) !important; color: #f8fafc; }
-        .alert-green { background: linear-gradient(135deg, #10b981, #059669) !important; }
-        .alert-red { background: linear-gradient(135deg, #ef4444, #dc2626) !important; }
-        .alert-orange { background: linear-gradient(135deg, #f59e0b, #d97706) !important; }
-        .alert-purple { background: linear-gradient(135deg, #7c3aed, #6d28d9) !important; }
-        .alert-blue { background: linear-gradient(135deg, #2563eb, #1d4ed8) !important; }
-        .alert-pink { background: linear-gradient(135deg, #ec4899, #db2777) !important; }
+        .alert-idle { background-color: #4b5563; display: block; }
+        .alert-green { background: linear-gradient(135deg, #10b981, #059669); display: block; }
+        .alert-red { background: linear-gradient(135deg, #ef4444, #dc2626); display: block; }
+        .alert-orange { background: linear-gradient(135deg, #f59e0b, #d97706); display: block; }
+        .alert-purple { background: linear-gradient(135deg, #7c3aed, #6d28d9); display: block; }
+        .alert-blue { background: linear-gradient(135deg, #2563eb, #1d4ed8); display: block; }
+        .alert-pink { background: linear-gradient(135deg, #ec4899, #db2777); display: block; }
 
         /* Top Navbar */
         .navbar {
             background-color: #0f172a;
-            padding: 16px 32px;
+            padding: 14px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
         .brand {
-            font-size: 20px;
+            font-size: 18px;
             color: #f8fafc;
-            font-weight: 800;
+            font-weight: 700;
             letter-spacing: -0.5px;
-            text-transform: uppercase;
         }
 
         .user-profile {
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-size: 16px;
+            gap: 8px;
+            font-size: 13px;
             color: #cbd5e1;
             background-color: #1e293b;
-            padding: 8px 16px;
-            border-radius: 20px;
+            padding: 6px 12px;
+            border-radius: 16px;
             border: 1px solid #334155;
-        }
-        
-        .user-profile .creator-prefix {
-            font-weight: 400;
-            color: #94a3b8;
         }
 
         .user-profile .creator-name {
-            font-weight: 700;
-            color: #f8fafc;
+            font-weight: 600;
+            color: #38bdf8;
         }
 
         /* Navigation Tabs */
         .tab-nav {
-            background-color: #0f172a;
-            padding: 0 32px;
+            background-color: #1e293b;
+            padding: 0 24px;
             display: flex;
-            gap: 8px;
-            border-bottom: 1px solid #1e293b;
+            gap: 4px;
+            border-bottom: 1px solid #334155;
         }
 
         .tab-btn {
-            padding: 14px 24px;
-            font-size: 14px;
+            padding: 12px 18px;
+            font-size: 13px;
             font-weight: 600;
-            color: #64748b;
+            color: #94a3b8;
             background: none;
             border: none;
-            border-bottom: 3px solid transparent;
+            border-bottom: 2px solid transparent;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.15s ease;
         }
 
         .tab-btn:hover { color: #f8fafc; }
         .tab-btn.active { color: #38bdf8; border-bottom-color: #38bdf8; }
 
         /* Main Content Container */
-        .tab-content { display: none; padding: 32px; flex: 1; }
+        .tab-content { display: none; padding: 24px; flex: 1; }
         .tab-content.active { display: block; }
 
-        .dashboard-layout { display: flex; gap: 32px; max-width: 100%; margin: 0 auto; width: 100%; }
+        .dashboard-layout { display: flex; gap: 24px; max-width: 1400px; margin: 0 auto; width: 100%; }
 
         /* Sidebar */
         .sidebar {
-            width: 320px;
+            width: 280px;
             background: #ffffff;
             border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 32px 24px;
+            border-radius: 8px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             height: fit-content;
-            flex-shrink: 0;
         }
 
         .chart-box {
             position: relative;
-            width: 180px;
-            height: 180px;
+            width: 140px;
+            height: 140px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 32px;
+            margin-bottom: 20px;
         }
 
-        .circle-bg { fill: none; stroke: #f3f4f6; stroke-width: 10; }
+        .circle-bg { fill: none; stroke: #f3f4f6; stroke-width: 8; }
         .circle-progress {
             fill: none;
             stroke: #2563eb;
-            stroke-width: 10;
+            stroke-width: 8;
             stroke-dasharray: 440;
             stroke-dashoffset: 440;
             stroke-linecap: round;
             transform: rotate(-90deg);
             transform-origin: 50% 50%;
-            transition: stroke-dashoffset 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: stroke-dashoffset 0.3s ease;
         }
 
-        .chart-text { position: absolute; text-align: center; width: 100%; }
-        .chart-percentage { font-size: 28px; font-weight: 800; color: #111827; letter-spacing: -0.5px; }
-        .chart-label { font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px; }
+        .chart-text { position: absolute; text-align: center; }
+        .chart-percentage { font-size: 22px; font-weight: 700; color: #111827; }
+        .chart-label { font-size: 11px; color: #6b7280; margin-top: 2px; }
 
-        .stats-list { width: 100%; border-top: 1px solid #f3f4f6; padding-top: 24px; }
-        .stat-item { display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-bottom: 16px; color: #4b5563; }
-        .stat-item .value { font-weight: 700; color: #111827; background-color: #f3f4f6; padding: 4px 10px; border-radius: 6px; }
+        .stats-list { width: 100%; border-top: 1px solid #f3f4f6; padding-top: 16px; }
+        .stat-item { display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-bottom: 12px; color: #4b5563; }
+        .stat-item .value { font-weight: 600; color: #111827; }
 
         /* Cards Gerais */
-        .card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03); }
-        .import-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+        .card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .import-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
         /* Área do Scanner */
-        .scanner-container { background: #f8fafc; border: 1px solid #cbd5e1; padding: 20px; border-radius: 8px; display: flex; gap: 16px; align-items: center; }
-        .scanner-label { font-size: 13px; font-weight: 800; color: #334155; letter-spacing: 0.5px; }
-        .scanner-input { flex: 1; padding: 14px 18px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 16px; font-weight: 600; background-color: #ffffff; letter-spacing: 0.5px; transition: all 0.2s; }
-        .scanner-input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15); }
+        .scanner-container { background: #f8fafc; border: 1px solid #e2e8f0; padding: 16px; border-radius: 6px; display: flex; gap: 12px; align-items: center; }
+        .scanner-label { font-size: 12px; font-weight: 700; color: #475569; }
+        .scanner-input { flex: 1; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 14px; background-color: #ffffff; }
+        .scanner-input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,0.1); }
 
         /* Import Box */
-        .import-box { border: 2px dashed #cbd5e1; border-radius: 12px; background-color: #ffffff; padding: 48px 24px; text-align: center; cursor: pointer; transition: all 0.2s ease; }
+        .import-box { border: 2px dashed #cbd5e1; border-radius: 8px; background-color: #fafafa; padding: 32px 16px; text-align: center; cursor: pointer; transition: all 0.15s ease; }
         .import-box:hover { border-color: #2563eb; background-color: #f8fafc; }
         .import-box.loaded { border-color: #10b981; background-color: #f0fdf4; border-style: solid; }
 
         /* Tabelas */
-        .table-container { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.02), 0 4px 6px -2px rgba(0,0,0,0.01); width: 100%; }
-        .table-header { padding: 20px 24px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; background-color: #ffffff; flex-wrap: wrap; gap: 16px; }
-        .table-search-input { padding: 10px 16px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 13px; width: 280px; background-color: #f9fafb; transition: all 0.2s; }
-        .actions-group { display: flex; gap: 12px; align-items: center; }
+        .table-container { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); width: 100%; }
+        .table-header { padding: 16px 20px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; background-color: #ffffff; flex-wrap: wrap; gap: 12px; }
+        .table-search-input { padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 4px; font-size: 13px; width: 240px; }
+        .actions-group { display: flex; gap: 8px; align-items: center; }
 
-        .export-btn, .pdf-btn, .reset-btn { padding: 10px 18px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; border: none; transition: all 0.2s ease; }
-        .export-btn { background-color: #ffffff; color: #374151; border: 1px solid #e5e7eb; }
-        .export-btn:hover { background-color: #f9fafb; border-color: #d1d5db; }
-        .pdf-btn { background-color: #2563eb; color: white; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.15); }
+        .export-btn, .pdf-btn, .reset-btn { padding: 8px 14px; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: none; }
+        .export-btn { background-color: #ffffff; color: #374151; border: 1px solid #d1d5db; }
+        .export-btn:hover { background-color: #f9fafb; }
+        .pdf-btn { background-color: #2563eb; color: white; }
         .pdf-btn:hover { background-color: #1d4ed8; }
         .reset-btn { background-color: #ef4444; color: white; }
         .reset-btn:hover { background-color: #dc2626; }
 
         /* Paginação */
-        .pagination-container { padding: 16px 24px; background: #ffffff; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #4b5563; }
-        .pagination-buttons { display: flex; gap: 6px; }
-        .page-btn { background: #ffffff; border: 1px solid #e5e7eb; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; border-radius: 6px; color: #374151; transition: all 0.15s; }
-        .page-btn:hover:not(:disabled) { border-color: #2563eb; color: #2563eb; }
+        .pagination-container { padding: 12px 20px; background: #ffffff; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #4b5563; }
+        .pagination-buttons { display: flex; gap: 4px; }
+        .page-btn { background: #ffffff; border: 1px solid #d1d5db; padding: 4px 10px; font-size: 12px; cursor: pointer; border-radius: 4px; }
+        .page-btn:hover:not(:disabled) { background: #f9fafb; border-color: #9ca3af; }
         .page-btn:disabled { background: #f3f4f6; color: #9ca3af; cursor: not-allowed; }
 
-        .table-scroll { overflow-x: auto; max-height: 550px; }
+        .table-scroll { overflow-x: auto; max-height: 500px; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; table-layout: fixed; }
-        th, td { padding: 16px 20px; border-bottom: 1px solid #f3f4f6; color: #374151; overflow: hidden; text-overflow: ellipsis; }
-        th { background-color: #f8fafc; color: #475569; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+        th, td { padding: 12px 16px; border-bottom: 1px solid #e5e7eb; color: #374151; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        th { background-color: #f9fafb; color: #4b5563; font-weight: 600; }
 
-        th:nth-child(1), td:nth-child(1) { width: 22%; white-space: normal; word-break: break-all; }
-        th:nth-child(2), td:nth-child(2) { width: 18%; }
-        th:nth-child(3), td:nth-child(3) { width: 22%; background-color: #ffffff; color: #374151; }
+        th:nth-child(1), td:nth-child(1) { width: 20%; }
+        th:nth-child(2), td:nth-child(2) { width: 15%; }
+        th:nth-child(3), td:nth-child(3) { width: 25%; background-color: #fffbeb; color: #b45309; font-weight: 600; }
         th:nth-child(4), td:nth-child(4) { width: 10%; text-align: center; }
-        th:nth-child(5), td:nth-child(5) { width: 14%; text-align: center; }
-        th:nth-child(6), td:nth-child(6) { width: 11%; text-align: center; }
-        th:nth-child(7), td:nth-child(7) { width: 11%; text-align: center; }
+        th:nth-child(5), td:nth-child(5) { width: 12%; text-align: center; }
+        th:nth-child(6), td:nth-child(6) { width: 8%; text-align: center; }
+        th:nth-child(7), td:nth-child(7) { width: 10%; text-align: center; }
 
-        tr:hover td { background-color: #f8fafc; }
+        tr:hover td { background-color: #f9fafb; }
 
         /* Report Grid */
-        .report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 32px; }
-        .report-card { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 28px 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); position: relative; }
-        .report-card-blue { border-top: 4px solid #2563eb; }
-        .report-card-purple { border-top: 4px solid #7c3aed; }
-        .report-card-title { font-size: 12px; color: #6b7280; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
-        .report-card-value { font-size: 36px; font-weight: 800; color: #111827; line-height: 1; letter-spacing: -1px; }
+        .report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .report-card { background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .report-card-blue { border-left: 4px solid #2563eb; }
+        .report-card-purple { border-left: 4px solid #7c3aed; }
+        .report-card-title { font-size: 12px; color: #6b7280; font-weight: 600; text-transform: uppercase; margin-bottom: 4px; }
+        .report-card-value { font-size: 28px; font-weight: 700; color: #111827; }
 
         /* Loading Overlay */
-        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); color: white; font-size: 18px; font-weight: bold; display: none; align-items: center; justify-content: center; flex-direction: column; z-index: 9999; text-align: center; padding: 20px; }
-        .spinner { border: 4px solid rgba(255, 255, 255, 0.1); width: 55px; height: 55px; border-radius: 50%; border-left-color: #38bdf8; animation: spin 1s linear infinite; margin-bottom: 18px; }
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); display: none; align-items: center; justify-content: center; flex-direction: column; z-index: 9999; }
+        .spinner { border: 4px solid rgba(0,0,0,0.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: #2563eb; animation: spin 1s linear infinite; margin-bottom: 12px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 
@@ -292,7 +282,7 @@
             if (count > 0) {
                 box.classList.add('loaded');
                 icon.innerText = '✔';
-                label.innerText = `Base ${baseNum}: ${count} ordens salvas na nuvem`;
+                label.innerText = `Base ${baseNum}: ${count} registros ativos na nuvem`;
             } else {
                 box.classList.remove('loaded');
                 icon.innerText = '📥';
@@ -309,18 +299,18 @@
             if (scannerInput) {
                 if (totalRecords > 0) {
                     scannerInput.disabled = false;
-                    scannerInput.placeholder = "Passe o leitor de código de barras corporativo...";
+                    scannerInput.placeholder = "Passe o leitor de código de barras...";
                     if(summaryCard) summaryCard.style.display = 'block';
                     if(summaryText) {
                         summaryText.innerHTML = `
-                            <strong>Base 1 (Forward):</strong> ${window.totalB1Count} registros na nuvem.<br>
-                            <strong>Base 2 (Receive Task):</strong> ${window.totalB2Count} registros na nuvem.<br>
-                            <strong>Total Consolidado:</strong> ${totalRecords} ordens ativas para cruzamento prioritário.
+                            <strong>Base 1 (Forward):</strong> ${window.totalB1Count} registros.<br>
+                            <strong>Base 2 (Receive Task):</strong> ${window.totalB2Count} registros.<br>
+                            <strong>Total carregado:</strong> ${totalRecords} ordens prontas para validação cruzada.
                         `;
                     }
                 } else {
                     scannerInput.disabled = true;
-                    scannerInput.placeholder = "Aguardando sincronização segura das bases com a nuvem...";
+                    scannerInput.placeholder = "Aguardando importação das bases...";
                     if(summaryCard) summaryCard.style.display = 'none';
                 }
             }
@@ -424,7 +414,7 @@
                         const code = this.value.trim();
                         if (code) {
                             if (code.length > 15) {
-                                window.updateOperationalAlert(`❌ ERRO: CÓDIGO INVÁLIDO (${code.length} DÍGITOS). BIPAGEM NÃO PERMITIDA!`, 'alert-red');
+                                window.updateTopAlertBar(`❌ ERRO: CÓDIGO COM TAMANHO INCORRETO (${code.length} DÍGITOS). BIPAGEM CANCELADA!`, 'alert-red');
                                 window.emitVoiceAlert('Código inválido');
                                 this.value = ''; 
                                 e.preventDefault();
@@ -513,7 +503,7 @@
                 voiceMessage = 'Não encontrado, ir para área de tratativa';
             }
 
-            window.updateOperationalAlert(`📢 ${statusText.toUpperCase()} | ${actionText}`, alertColor);
+            window.updateTopAlertBar(`📢 STATUS: ${statusText.toUpperCase()} | AÇÃO RECOMENDADA: ${actionText}`, alertColor);
             window.emitVoiceAlert(voiceMessage);
 
             const newBip = {
@@ -531,11 +521,11 @@
             window.firebaseActions.updateData('bips_triagem/' + barcode, newBip);
         }
 
-        window.updateOperationalAlert = function(msg, cssClass) {
-            const container = document.getElementById('live-operational-alert');
-            if (container) {
-                container.className = `operational-alert-container ${cssClass}`;
-                container.innerHTML = msg;
+        window.updateTopAlertBar = function(msg, cssClass) {
+            const bar = document.getElementById('top-live-banner');
+            if (bar) {
+                bar.className = `top-alert-bar ${cssClass}`;
+                bar.innerText = msg;
             }
         };
     </script>
@@ -544,7 +534,11 @@
 
     <div id="loading-screen" class="loading-overlay">
         <div class="spinner"></div>
-        <div id="loading-text">Processando e estruturando registros operacionais...</div>
+        <div id="loading-text" style="font-size: 14px; font-weight:600; color:#374151;">Processando dados na nuvem...</div>
+    </div>
+
+    <div id="top-live-banner" class="top-alert-bar alert-idle">
+        SISTEMA ONLINE - AGUARDANDO LEITURA DE PRODUTO
     </div>
 
     <div class="navbar">
@@ -552,96 +546,91 @@
             Pré Tratativa Parcel sweeper
         </div>
         <div class="user-profile">
-            <span class="creator-prefix">Criador:</span>
-            <span class="creator-name">Helder.Alves</span>
+            <span>Criador: <span class="creator-name">Helder.Alves</span></span>
         </div>
     </div>
 
     <div class="tab-nav">
         <button class="tab-btn" onclick="switchTab('import')">1. Importação de Bases</button>
-        <button class="tab-btn active" onclick="switchTab('dashboard')">2. Monitor de Bipagem Realtime</button>
-        <button class="tab-btn" onclick="switchTab('report')">3. Relatório Executivo Diário</button>
+        <button class="tab-btn active" onclick="switchTab('dashboard')">2. Painel Operacional Realtime</button>
+        <button class="tab-btn" onclick="switchTab('report')">3. Relatório de Turno</button>
     </div>
 
     <div id="tab-import" class="tab-content">
-        <div class="card" style="margin-bottom: 32px;">
+        <div class="card" style="margin-bottom: 20px;">
             <div class="import-grid">
                 <div>
                     <div class="import-box" id="box-file-1" onclick="document.getElementById('file-input-1').click()">
-                        <div id="icon-file-1" style="font-size: 40px; margin-bottom: 12px;">📥</div>
-                        <div id="label-file-1" style="font-size: 14px; font-weight: 600; color: #475569;">Selecionar Bases Forward (.csv ou .zip)</div>
+                        <div id="icon-file-1" style="font-size: 32px; margin-bottom: 8px;">📥</div>
+                        <div id="label-file-1" style="font-size: 13px; font-weight: 600; color: #475569;">Selecionar Bases Forward (.csv ou .zip)</div>
                     </div>
                     <input type="file" id="file-input-1" accept=".csv,.zip" style="display: none;" onchange="handleFileSelect(1, this)">
-                    <div style="margin-top: 12px; display: flex; gap: 8px;">
-                        <button class="export-btn" style="background: #f1f5f9; padding: 6px 12px; font-size: 11px;" onclick="window.clearFirebaseNode('planilha_base1')">Limpar Nuvem Base 1</button>
+                    <div style="margin-top: 8px; display: flex; gap: 8px;">
+                        <button class="export-btn" style="background: #f9fafb; padding: 4px 8px; font-size: 11px;" onclick="window.clearFirebaseNode('planilha_base1')">Limpar Base 1</button>
                     </div>
                 </div>
 
                 <div>
                     <div class="import-box" id="box-file-2" onclick="document.getElementById('file-input-2').click()">
-                        <div id="icon-file-2" style="font-size: 40px; margin-bottom: 12px;">📥</div>
-                        <div id="label-file-2" style="font-size: 14px; font-weight: 600; color: #475569;">Selecionar Bases Receive Task (.csv ou .zip)</div>
+                        <div id="icon-file-2" style="font-size: 32px; margin-bottom: 8px;">📥</div>
+                        <div id="label-file-2" style="font-size: 13px; font-weight: 600; color: #475569;">Selecionar Bases Receive Task (.csv ou .zip)</div>
                     </div>
                     <input type="file" id="file-input-2" accept=".csv,.zip" style="display: none;" onchange="handleFileSelect(2, this)">
-                    <div style="margin-top: 12px; display: flex; gap: 8px;">
-                        <button class="export-btn" style="background: #f1f5f9; padding: 6px 12px; font-size: 11px;" onclick="window.clearFirebaseNode('planilha_base2')">Limpar Nuvem Base 2</button>
+                    <div style="margin-top: 8px; display: flex; gap: 8px;">
+                        <button class="export-btn" style="background: #f9fafb; padding: 4px 8px; font-size: 11px;" onclick="window.clearFirebaseNode('planilha_base2')">Limpar Base 2</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="card" id="import-summary-card" style="display: none; border-left: 4px solid #10b981;">
-            <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #0f172a;">Status de Sincronização Cloud Ativa:</h4>
-            <p id="import-summary-text" style="font-size: 13px; color: #475569; line-height: 1.6;"></p>
+            <h4 style="font-size: 14px; margin-bottom: 6px;">Status de Sincronização Cloud:</h4>
+            <p id="import-summary-text" style="font-size: 13px; color: #475569; line-height: 1.5;"></p>
         </div>
     </div>
 
     <div id="tab-dashboard" class="tab-content active">
-        
-        <div id="live-operational-alert" class="operational-alert-container alert-idle">
-            SISTEMA AGUARDANDO LEITURA DE CÓDIGO DE BARRAS
-        </div>
-
         <div class="dashboard-layout">
+            
             <div class="sidebar">
                 <div class="chart-box">
-                    <svg width="180" height="180">
-                        <circle class="circle-bg" cx="90" cy="90" r="70"/>
-                        <circle id="progress-circle" class="circle-progress" cx="90" cy="90" r="70"/>
+                    <svg width="140" height="140">
+                        <circle class="circle-bg" cx="70" cy="70" r="55"/>
+                        <circle id="progress-circle" class="circle-progress" cx="70" cy="70" r="55"/>
                     </svg>
                     <div class="chart-text">
                         <div id="pct-encontrado" class="chart-percentage">0%</div>
-                        <div class="chart-label">Encontrado</div>
+                        <div class="chart-label">Encontrados</div>
                     </div>
                 </div>
 
                 <div class="stats-list">
                     <div class="stat-item">
-                        <span>Total de Bips Efetuados:</span>
+                        <span>Total Bipados:</span>
                         <span id="stat-total-bips" class="value">0</span>
                     </div>
                     <div class="stat-item">
-                        <span>Cruzados com Sucesso:</span>
-                        <span id="stat-total-achados" class="value" style="color: #059669; background-color: #d1fae5;">0</span>
+                        <span>Encontrados:</span>
+                        <span id="stat-total-achados" class="value" style="color: #059669;">0</span>
                     </div>
                     <div class="stat-item">
-                        <span>Inexistentes nas Planilhas:</span>
-                        <span id="stat-total-perdidos" class="value" style="color: #dc2626; background-color: #fee2e2;">0</span>
+                        <span>Não Encontrados:</span>
+                        <span id="stat-total-perdidos" class="value" style="color: #dc2626;">0</span>
                     </div>
                 </div>
                 
-                <div class="scanner-container" style="width: 100%; margin-top: 12px; padding: 12px; flex-direction: column; align-items: stretch; background: #fff; border: none;">
-                    <button class="reset-btn" style="width: 100%; justify-content: center; padding: 12px;" onclick="window.clearOnlyScans()">
-                        🗑 Zerar Bips Realtime
+                <div class="scanner-container" style="width: 100%; margin-top: 12px; padding: 0; background: none; border: none;">
+                    <button class="reset-btn" style="width: 100%; justify-content: center;" onclick="window.clearOnlyScans()">
+                        🗑 Zerar Bips do Turno
                     </button>
                 </div>
             </div>
 
-            <div style="flex: 1; display: flex; flex-direction: column; gap: 24px;">
-                <div class="card" style="padding: 20px;">
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 20px;">
+                <div class="card" style="padding: 12px 20px;">
                     <div class="scanner-container">
-                        <span class="scanner-label">SCANNER:</span>
-                        <input type="text" id="main-barcode-scanner" class="scanner-input" placeholder="Aguardando sincronização segura das bases com a nuvem..." disabled autocomplete="off">
+                        <span class="scanner-label">LEITOR:</span>
+                        <input type="text" id="main-barcode-scanner" class="scanner-input" placeholder="Aguardando bases..." disabled autocomplete="off">
                     </div>
                 </div>
 
@@ -650,7 +639,7 @@
                         <input type="text" id="table-search" class="table-search-input" placeholder="Filtrar por Código de Barras..." oninput="refreshDashboardUI()">
                         <div class="actions-group">
                             <button class="export-btn" onclick="window.exportToExcelXLSX()">
-                                📥 Exportar Triagem (.csv)
+                                Exportar Triagem (.csv)
                             </button>
                         </div>
                     </div>
@@ -662,22 +651,22 @@
                                     <th>Código de Barras</th>
                                     <th>Status Original</th>
                                     <th>Hub de Destino</th>
-                                    <th>Tipo Local</th>
-                                    <th>Ação Operacional Recomendada</th>
+                                    <th style="text-align: center;">Office/Home</th>
+                                    <th style="text-align: center;">Ação Operacional</th>
                                     <th style="text-align: center;">Origem</th>
                                     <th style="text-align: center;">Validação</th>
                                 </tr>
                             </thead>
                             <tbody id="dashboard-tbody">
                                 <tr>
-                                    <td colspan="7" style="text-align: center; color: #9ca3af; padding: 40px;">Nenhum pacote bipado na sessão atual. Passe um código válido acima.</td>
+                                    <td colspan="7" style="text-align: center; color: #9ca3af; padding: 30px;">Nenhum pacote bipado nesta sessão.</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
 
                     <div class="pagination-container">
-                        <span id="pagination-info">Mostrando 0-0 de 0 registros</span>
+                        <span id="pagination-info">Mostrando 0-0 de 0 bips</span>
                         <div class="pagination-buttons">
                             <button id="btn-prev-page" class="page-btn" onclick="changePage(-1)" disabled>Anterior</button>
                             <button id="btn-next-page" class="page-btn" onclick="changePage(1)" disabled>Próximo</button>
@@ -685,6 +674,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 
@@ -694,35 +684,32 @@
                 <div class="report-card-title">Volume Total Escaneado</div>
                 <div id="rep-vol-total" class="report-card-value">0</div>
             </div>
-            <div class="report-card" style="border-top: 4px solid #10b981;">
-                <div class="report-card-title">Manter Fluxo Operacional</div>
-                <div id="rep-vol-manter" class="report-card-value" style="color: #10b981;">0</div>
-            </div>
             <div class="report-card report-card-purple">
-                <div class="report-card-title">Direcionar à Rota Correta</div>
-                <div id="rep-vol-rota" class="report-card-value" style="color: #7c3aed;">0</div>
+                <div class="report-card-title">Manter Fluxo</div>
+                <div id="rep-vol-manter" class="report-card-value">0</div>
             </div>
-            <div class="report-card" style="border-top: 4px solid #f59e0b;">
+            <div class="report-card" style="border-left: 4px solid #10b981;">
+                <div class="report-card-title">Direcionar Rota Correta</div>
+                <div id="rep-vol-rota" class="report-card-value">0</div>
+            </div>
+            <div class="report-card" style="border-left: 4px solid #f59e0b;">
                 <div class="report-card-title">Direcionar Outra Estação</div>
-                <div id="rep-vol-estacao" class="report-card-value" style="color: #f59e0b;">0</div>
+                <div id="rep-vol-estacao" class="report-card-value">0</div>
             </div>
-            <div class="report-card" style="border-top: 4px solid #ec4899;">
+            <div class="report-card" style="border-left: 4px solid #ec4899;">
                 <div class="report-card-title">Direcionar ao XPT</div>
-                <div id="rep-vol-xpt" class="report-card-value" style="color: #ec4899;">0</div>
+                <div id="rep-vol-xpt" class="report-card-value">0</div>
             </div>
-            <div class="report-card" style="border-top: 4px solid #ef4444;">
-                <div class="report-card-title">Retidos / Área de Tratativa</div>
-                <div id="rep-vol-tratativa" class="report-card-value" style="color: #ef4444;">0</div>
+            <div class="report-card" style="border-left: 4px solid #ef4444;">
+                <div class="report-card-title">Área de Tratativa</div>
+                <div id="rep-vol-tratativa" class="report-card-value">0</div>
             </div>
         </div>
 
-        <div class="card" style="padding: 32px; text-align: center; background: #fafafa; border: 2px dashed #e2e8f0;">
-            <h3 style="font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">Exportação Consolidada do Turno</h3>
-            <p style="font-size: 14px; color: #64748b; margin-bottom: 24px; max-width: 500px; margin-left: auto; margin-right: auto;">
-                Gere um arquivo estruturado pronto para auditoria da supervisão contendo os KPIs cruciais de volumetria e distribuição de bips.
-            </p>
-            <button class="pdf-btn" style="padding: 12px 28px; font-size: 14px;" onclick="window.exportFullReportTXT()">
-                📥 Baixar Relatório Executivo (.txt)
+        <div class="card" style="padding: 24px; text-align: center;">
+            <p style="font-size: 14px; color: #4b5563; margin-bottom: 16px;">Gere um arquivo resumido das estatísticas consolidadas do turno atual.</p>
+            <button class="pdf-btn" onclick="window.exportFullReportTXT()">
+                Baixar Relatório Consolidado (.txt)
             </button>
         </div>
     </div>
@@ -745,7 +732,7 @@
                 setTimeout(() => {
                     const scanner = document.getElementById('main-barcode-scanner');
                     if(scanner && !scanner.disabled) scanner.focus();
-                }, 100);
+                }, 50);
             }
         };
 
@@ -788,7 +775,7 @@
             
             const circle = document.getElementById('progress-circle');
             if (circle) {
-                const radius = 70;
+                const radius = 55;
                 const circumference = 2 * Math.PI * radius; 
                 const offset = circumference - (pct / 100) * circumference;
                 circle.style.strokeDasharray = `${circumference} ${circumference}`;
@@ -796,7 +783,7 @@
             }
 
             if (totalItems === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #9ca3af; padding: 40px;">Nenhum registro corresponde aos filtros ou bips.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #9ca3af; padding: 30px;">Nenhum registro encontrado.</td></tr>`;
                 updatePaginationControls(0, 0, 0);
                 return;
             }
@@ -811,31 +798,27 @@
 
             let html = '';
             pageItems.forEach(item => {
-                let badgeStyle = "background-color: #fee2e2; color: #dc2626;"; 
-                let actionBadge = "background-color: #fee2e2; color: #dc2626; font-weight:700;";
+                let badgeStyle = "background-color: #fee2e2; color: #dc2626; padding: 2px 6px; border-radius: 4px; font-weight: 600; font-size: 11px;";
+                let actionStyle = "color: #dc2626; font-weight: 600;";
 
                 if (item.encontrado === 'SIM') {
-                    badgeStyle = "background-color: #d1fae5; color: #059669;";
-                    if (item.alertClass === 'alert-green') actionBadge = "background-color: #d1fae5; color: #059669; font-weight:700;";
-                    else if (item.alertClass === 'alert-blue') actionBadge = "background-color: #dbeafe; color: #2563eb; font-weight:700;";
-                    else if (item.alertClass === 'alert-orange') actionBadge = "background-color: #ffedd5; color: #ea580c; font-weight:700;";
-                    else if (item.alertClass === 'alert-pink') actionBadge = "background-color: #fce7f3; color: #db2777; font-weight:700;";
+                    badgeStyle = "background-color: #d1fae5; color: #059669; padding: 2px 6px; border-radius: 4px; font-weight: 600; font-size: 11px;";
+                    if (item.alertClass === 'alert-green') actionStyle = "color: #059669; font-weight: 600;";
+                    else if (item.alertClass === 'alert-blue') actionStyle = "color: #2563eb; font-weight: 600;";
+                    else if (item.alertClass === 'alert-orange') actionStyle = "color: #ea580c; font-weight: 600;";
+                    else if (item.alertClass === 'alert-pink') actionStyle = "color: #db2777; font-weight: 600;";
                 }
 
                 html += `
                     <tr>
-                        <td style="font-weight: 700; letter-spacing:0.3px;">${item.trackingNumber || ''}</td>
-                        <td style="color:#4b5563;">${item.statusOriginal || 'N/A'}</td>
-                        <td style="font-weight:600; color:#1e293b;">${item.destinationHub || 'N/A'}</td>
-                        <td style="text-align:center; font-weight:600;">${item.locationType || '-'}</td>
-                        <td>
-                            <div style="padding: 6px 12px; border-radius: 6px; text-align: center; font-size:11px; ${actionBadge}">
-                                ${item.action || 'REVISAR'}
-                            </div>
-                        </td>
-                        <td style="text-align: center; color: #64748b; font-weight:600;">${item.origin || '-'}</td>
+                        <td style="font-weight: 600;">${item.trackingNumber || ''}</td>
+                        <td>${item.statusOriginal || 'N/A'}</td>
+                        <td>${item.destinationHub || 'N/A'}</td>
+                        <td style="text-align: center;">${item.locationType || '-'}</td>
+                        <td style="text-align: center; ${actionStyle}">${item.action || 'REVISAR'}</td>
+                        <td style="text-align: center; color: #64748b;">${item.origin || '-'}</td>
                         <td style="text-align: center;">
-                            <span style="padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; ${badgeStyle}">
+                            <span class="${badgeStyle}">
                                 ${item.encontrado || 'NÃO'}
                             </span>
                         </td>
@@ -911,31 +894,22 @@
             });
 
             let txt = `==================================================\n`;
-            txt += `         RELATÓRIO EXECUTIVO DE TRIAGEM            \n`;
-            txt += `         PARCEL SWEEPER - HUB EXECUTIVE            \n`;
+            txt += `         RELATÓRIO DE ALTERAÇÃO E TRIAGEM         \n`;
             txt += `==================================================\n`;
-            txt += `Data do Relatório : ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR')}\n`;
-            txt += `Responsável       : Helder.Alves\n`;
+            txt += `Data: ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR')}\n`;
             txt += `--------------------------------------------------\n`;
-            txt += `INDICADORES DE VOLUMETRIA GERAL:\n`;
-            txt += `  - Volume Total Processado (Bips): ${total}\n`;
-            txt += `  - Manter Fluxo Operacional       : ${manter} (${total>0?Math.round(manter/total*100):0}%)\n`;
-            txt += `  - Direcionar para Rota Correta  : ${rota} (${total>0?Math.round(rota/total*100):0}%)\n`;
-            txt += `  - Direcionar Outra Estação      : ${estacao} (${total>0?Math.round(estacao/total*100):0}%)\n`;
-            txt += `  - Direcionar ao XPT             : ${xpt} (${total>0?Math.round(xpt/total*100):0}%)\n`;
-            txt += `  - Retidos na Área de Tratativa  : ${tratativa} (${total>0?Math.round(tratativa/total*100):0}%)\n`;
-            txt += `--------------------------------------------------\n\n`;
-            txt += `DETALHAMENTO ANALÍTICO DOS RECONHECIMENTOS:\n`;
-            txt += `Tracking ID | Status Original | Hub Destino | Acao Recomendada\n`;
-            
-            window.scannedItemsList.forEach(i => {
-                txt += `${i.trackingNumber} | ${i.statusOriginal} | ${i.destinationHub} | ${i.action}\n`;
-            });
+            txt += `Volume Total Processado: ${total}\n`;
+            txt += `  - Manter Fluxo: ${manter}\n`;
+            txt += `  - Direcionar Rota Correta: ${rota}\n`;
+            txt += `  - Direcionar Outra Estação: ${estacao}\n`;
+            txt += `  - Direcionar ao XPT: ${xpt}\n`;
+            txt += `  - Retidos na Área de Tratativa: ${tratativa}\n`;
+            txt += `--------------------------------------------------\n`;
 
             let blob = new Blob([txt], { type: "text/plain;charset=utf-8;" });
             let link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.setAttribute("download", `Relatorio_Executivo_Triagem_${new Date().toISOString().slice(0,10)}.txt`);
+            link.setAttribute("download", `Relatorio_Turno_${new Date().toISOString().slice(0,10)}.txt`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -962,11 +936,9 @@
             if (!file) return;
 
             const loadingScreen = document.getElementById('loading-screen');
-            const loadingText = document.getElementById('loading-text');
             if (loadingScreen) loadingScreen.style.display = 'flex';
 
             if (file.name.endsWith('.zip')) {
-                if(loadingText) loadingText.innerText = "Descompactando arquivo ZIP de alta performance...";
                 JSZip.loadAsync(file).then(zip => {
                     const csvFile = Object.keys(zip.files).find(name => name.endsWith('.csv'));
                     if (!csvFile) {
@@ -978,11 +950,10 @@
                         parseAndUploadCSV(content, baseNum);
                     });
                 }).catch(err => {
-                    alert('Falha crítica ao ler pacote ZIP: ' + err.message);
+                    alert('Falha ao ler pacote ZIP: ' + err.message);
                     if (loadingScreen) loadingScreen.style.display = 'none';
                 });
             } else {
-                if(loadingText) loadingText.innerText = "Lendo e parseando linhas do banco corporativo...";
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     parseAndUploadCSV(e.target.result, baseNum);
@@ -992,9 +963,6 @@
         }
 
         function parseAndUploadCSV(text, baseNum) {
-            const loadingText = document.getElementById('loading-text');
-            if(loadingText) loadingText.innerText = "Estruturando colunas e preparando lote de upload...";
-            
             const lines = text.split(/\r?\n/);
             if (lines.length < 2) {
                 if (document.getElementById('loading-screen')) document.getElementById('loading-screen').style.display = 'none';
@@ -1008,7 +976,7 @@
             const idxLocType = header.findIndex(h => h.trim().replace(/^"|"$/g, '') === 'Location Type');
 
             if (idxTracking === -1 || idxStatus === -1 || idxHub === -1) {
-                alert('Erro de Cabeçalho: Verifique se as colunas "SLS Tracking Number", "Status" e "Destination Hub" estão presentes.');
+                alert('Erro de Cabeçalho: Verifique as colunas obrigatórias.');
                 if (document.getElementById('loading-screen')) document.getElementById('loading-screen').style.display = 'none';
                 return;
             }
@@ -1046,15 +1014,13 @@
                 }
             }
 
-            if(loadingText) loadingText.innerText = `Fazendo upload de ${count} ordens para o Firebase Realtime Database...`;
-            
             const nodePath = baseNum === 1 ? 'planilha_base1' : 'planilha_base2';
             window.firebaseActions.updateData(nodePath, batch).then(() => {
                 if (document.getElementById('loading-screen')) document.getElementById('loading-screen').style.display = 'none';
-                alert(`Sucesso! ${count} ordens da Base ${baseNum} sincronizadas na nuvem.`);
+                alert(`Sucesso! Base ${baseNum} sincronizada.`);
             }).catch(err => {
                 if (document.getElementById('loading-screen')) document.getElementById('loading-screen').style.display = 'none';
-                alert('Falha no upload em lote para nuvem: ' + err.message);
+                alert('Falha no upload para nuvem: ' + err.message);
             });
         }
 

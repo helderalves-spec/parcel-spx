@@ -23,7 +23,7 @@
             min-height: 100vh;
         }
 
-        /* BARRA DE ALERTA DINÂMICA (PERSISTENTE) */
+        /* BARRA DE ALERTA DINÂMICA PREMIUM (PERSISTENTE) */
         .top-alert-bar {
             padding: 16px 24px;
             font-size: 20px;
@@ -37,8 +37,7 @@
             top: 0;
             z-index: 1000;
         }
-        
-        /* Definição de Cores das Tarjas */
+        /* Definição de Cores da Tarja Superior */
         .alert-green { background: linear-gradient(135deg, #10b981, #059669) !important; }
         .alert-red { background: linear-gradient(135deg, #ef4444, #dc2626) !important; }
         .alert-orange { background: linear-gradient(135deg, #f59e0b, #d97706) !important; }
@@ -108,7 +107,7 @@
 
         .dashboard-layout { display: flex; gap: 32px; max-width: 100%; margin: 0 auto; width: 100%; }
 
-        /* Sidebar */
+        /* Sidebar Executiva */
         .sidebar {
             width: 320px;
             background: #ffffff;
@@ -164,7 +163,7 @@
         .scanner-input { flex: 1; padding: 14px 18px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 16px; font-weight: 600; background-color: #ffffff; letter-spacing: 0.5px; transition: all 0.2s; }
         .scanner-input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15); }
 
-        /* Import Box */
+        /* Caixas de Importação */
         .import-box { border: 2px dashed #cbd5e1; border-radius: 12px; background-color: #ffffff; padding: 48px 24px; text-align: center; cursor: pointer; transition: all 0.2s ease; }
         .import-box:hover { border-color: #2563eb; background-color: #f8fafc; }
         .import-box.loaded { border-color: #10b981; background-color: #f0fdf4; border-style: solid; }
@@ -197,8 +196,7 @@
 
         th:nth-child(1), td:nth-child(1) { width: 22%; white-space: normal; word-break: break-all; }
         th:nth-child(2), td:nth-child(2) { width: 18%; }
-        /* CORREÇÃO DO HUB: Fundo limpo e cor cinza padrão do sistema */
-        th:nth-child(3), td:nth-child(3) { width: 22%; background-color: #ffffff; color: #374151; }
+        th:nth-child(3), td:nth-child(3) { width: 22%; font-weight: 700; color: #0284c7; }
         th:nth-child(4), td:nth-child(4) { width: 10%; text-align: center; }
         th:nth-child(5), td:nth-child(5) { width: 14%; text-align: center; }
         th:nth-child(6), td:nth-child(6) { width: 11%; text-align: center; }
@@ -221,23 +219,6 @@
             background-color: #f1f5f9; 
             color: #334155; 
             border: 1px solid #cbd5e1;
-        }
-
-        /* CORREÇÃO DA TARJA: Layout leve e estilizado em CSS para a Próxima Ação */
-        .action-tarja {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-weight: 700;
-            font-size: 12px;
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 0.2px;
-            width: 100%;
-            color: white !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
         .voice-banner { background-color: #e0f2fe; border: 1px solid #bae6fd; padding: 12px 18px; border-radius: 8px; font-size: 13px; color: #0369a1; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
@@ -374,7 +355,6 @@
                 let destHub = 'N/A';
                 let locType = '-'; 
                 let actionText = 'IR PARA ÁREA DE TRATATIVA';
-                let currentClass = 'alert-red'; 
 
                 if (b1Data) {
                     isFound = 'SIM';
@@ -404,27 +384,22 @@
 
                     if (statusText.startsWith('LMHub_Assigning') || statusLower.includes('assigning')) {
                         actionText = 'DIRECIONAR A ROTA CORRETA';
-                        currentClass = 'alert-blue';
                     }
                     else if (isXPT) {
                         actionText = 'DIRECIONAR AO XPT';
-                        currentClass = 'alert-pink';
                     }
                     else if (!isUberaba) {
                         actionText = 'DIRECIONAR A ESTAÇÃO CORRETA';
-                        currentClass = 'alert-orange';
                     }
                     else if (statusText.startsWith('LMHub_Received')) {
                         actionText = 'MANTER FLUXO';
-                        currentClass = 'alert-green';
                     } 
                     else {
                         actionText = 'IR PARA ÁREA DE TRATATIVA';
-                        currentClass = 'alert-red';
                     }
                 }
 
-                if (item.statusOriginal !== statusText || item.destinationHub !== destHub || item.action !== actionText || item.encontrado !== isFound || item.alertClass !== currentClass) {
+                if (item.statusOriginal !== statusText || item.destinationHub !== destHub || item.action !== actionText || item.encontrado !== isFound) {
                     updates[barcode] = {
                         ...item,
                         statusOriginal: statusText,
@@ -432,8 +407,7 @@
                         locationType: locType,
                         action: actionText,
                         origin: originLabel,
-                        encontrado: isFound,
-                        alertClass: currentClass
+                        encontrado: isFound
                     };
                     mudouAlgo = true;
                 }
@@ -552,7 +526,6 @@
                 action: actionText,
                 origin: originLabel,
                 encontrado: isFound,
-                alertClass: alertColor,
                 timestampBip: new Date().toISOString()
             };
 
@@ -658,13 +631,13 @@
 
             <div class="work-area" style="flex: 1; min-width: 0;">
                 <div class="voice-banner">
-                    <span>⚡</span> <span><strong>Controle de Status Ativo:</strong> Layout corrigido para ler colunas por índice rígido absoluto com parser RFC-4180. Cabeçalho fixado com sucesso.</span>
+                    <span>⚡</span> <span><strong>Controle de Status Ativo:</strong> Layout corrigido para ler colunas por índice rígido absoluto. Nomes das cidades garantidos.</span>
                 </div>
 
                 <div class="card" style="padding: 20px;">
                     <div class="scanner-container">
                         <span class="scanner-label">ENTRADA DO LEITOR (BR):</span>
-                        <input type="text" id="main-barcode-scanner" class="scanner-input" placeholder="Passe o leitor de código de barras corporativo..." disabled>
+                        <input type="text" id="main-barcode-scanner" class="scanner-input" placeholder="Aguardando inicialização..." disabled>
                     </div>
                 </div>
 
@@ -737,367 +710,373 @@
             <div class="report-grid">
                 <div class="report-card report-card-blue">
                     <div class="report-card-title">Volume Total Processado</div>
-                    <div class="report-card-value" id="rep-total">0</div>
+                    <div class="report-card-value" id="report-total-bipados">0</div>
                 </div>
-                <div class="report-card report-card-purple" style="border-top-color: #10b981;">
-                    <div class="report-card-title">Sucesso (Manter Fluxo)</div>
-                    <div class="report-card-value" style="color: #059669;" id="rep-fluxo">0</div>
-                </div>
-                <div class="report-card report-card-purple" style="border-top-color: #f59e0b;">
-                    <div class="report-card-title">Estação Incorreta</div>
-                    <div class="report-card-value" style="color: #d97706;" id="rep-estacao">0</div>
-                </div>
-                <div class="report-card report-card-purple" style="border-top-color: #ef4444;">
-                    <div class="report-card-title">Área de Tratativa</div>
-                    <div class="report-card-value" style="color: #dc2626;" id="rep-tratativa">0</div>
+                <div class="report-card report-card-purple">
+                    <div class="report-card-title">Clusters de Status Identificados</div>
+                    <div class="report-card-value" id="report-total-status">0</div>
                 </div>
             </div>
 
-            <div class="card" style="padding: 32px;">
-                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 20px; color: #0f172a;">Distribuição Detalhada de Ações por Erro de Destino</h3>
-                <div id="report-details-container" style="display: flex; flex-direction: column; gap: 12px; font-size: 14px; color: #4b5563;">
-                    Aguardando processamento de dados realtime para consolidação do relatório...
+            <div class="table-container">
+                <div class="table-header" style="background-color: #ffffff; padding: 24px;">
+                    <strong style="font-size: 16px; color: #0f172a; font-weight: 700;">Distribuição Proporcional da Carga de Trabalho</strong>
+                </div>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 50%; padding-left: 24px;">Status Identificado (Rastreabilidade)</th>
+                                <th style="text-align: center; width: 25%;">Volume Absoluto</th>
+                                <th style="text-align: center; width: 25%;">Representatividade na Malha</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-table-body">
+                            <tr>
+                                <td colspan="3" style="text-align: center; color: #94a3b8; padding: 48px; font-style: italic;">
+                                    Aguardando processamento inicial de pacotes para cálculo estatístico.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        let currentPage = 1;
-        const rowsPerPage = 50;
-        let showAllRows = false;
-        let filteredList = [];
+        window.filteredItemsList = [];
+        window.currentPage = 1;
+        window.itemsPerPage = 50;
+        window.showAllItems = false;
+        window.currentSearchQuery = "";
 
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            
-            document.getElementById(`tab-${tabId}`).classList.add('active');
-            const btnIndex = tabId === 'import' ? 0 : (tabId === 'dashboard' ? 1 : 2);
-            document.querySelectorAll('.tab-btn')[btnIndex].classList.add('active');
-        }
-
-        window.emitVoiceAlert = function(text) {
+        window.emitVoiceAlert = function(messageText) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(text);
+                let utterance = new SpeechSynthesisUtterance(messageText);
                 utterance.lang = 'pt-BR';
-                utterance.rate = 1.1;
                 window.speechSynthesis.speak(utterance);
             }
         };
 
-        window.refreshDashboardUI = function() {
-            document.getElementById('ui-b1-count').innerText = window.totalB1Count.toLocaleString();
-            document.getElementById('ui-b2-count').innerText = window.totalB2Count.toLocaleString();
+        window.switchTab = function(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             
-            const totalEsperado = window.totalB1Count + window.totalB2Count;
-            document.getElementById('ui-total-esperado').innerText = totalEsperado.toLocaleString();
-
-            const totalBipado = window.scannedItemsList.length;
-            document.getElementById('ui-total-bipado').innerText = totalBipado.toLocaleString();
-
-            let percentage = 0;
-            if (totalEsperado > 0) {
-                percentage = (totalBipado / totalEsperado) * 100;
+            if(tabId === 'import') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('tab-import').classList.add('active');
+            } else if (tabId === 'dashboard') {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('tab-dashboard').classList.add('active');
+                const inputEl = document.getElementById('main-barcode-scanner');
+                setTimeout(() => { if(inputEl && !inputEl.disabled) inputEl.focus(); }, 100);
+            } else if (tabId === 'report') {
+                document.querySelectorAll('.tab-btn')[2].classList.add('active');
+                document.getElementById('tab-report').classList.add('active');
+                window.calculateAndRenderReport();
             }
-            if(percentage > 100) percentage = 100;
-
-            document.getElementById('ui-percentage').innerText = percentage.toFixed(2) + '%';
-            
-            const offset = 440 - (440 * percentage) / 100;
-            document.getElementById('progress-circle').style.strokeDashoffset = offset;
-
-            applySearchAndPaginationFilter();
         };
 
-        function applySearchAndPaginationFilter() {
-            const query = document.getElementById('table-search').value.toLowerCase().trim();
-            
-            if (!query) {
-                filteredList = [...window.scannedItemsList];
-            } else {
-                filteredList = window.scannedItemsList.filter(item => {
-                    return (item.trackingNumber && item.trackingNumber.toLowerCase().includes(query)) ||
-                           (item.statusOriginal && item.statusOriginal.toLowerCase().includes(query)) ||
-                           (item.destinationHub && item.destinationHub.toLowerCase().includes(query)) ||
-                           (item.action && item.action.toLowerCase().includes(query));
-                });
+        function showLoading(show, message = "") {
+            const overlay = document.getElementById('loading-screen');
+            const txt = document.getElementById('loading-text');
+            if (overlay) {
+                if(message) txt.innerText = message;
+                overlay.style.display = show ? 'flex' : 'none';
             }
-
-            renderOperationalTable();
         }
 
-        function handleSearch() {
-            currentPage = 1;
-            applySearchAndPaginationFilter();
-        }
-
-        function toggleShowAll() {
-            showAllRows = !showAllRows;
-            document.getElementById('btn-show-all').innerText = showAllRows ? "Paginar" : "Ver Tudo";
-            renderOperationalTable();
-        }
-
-        function changePage(step) {
-            currentPage += step;
-            renderOperationalTable();
-        }
-
-        function renderOperationalTable() {
-            const tbody = document.getElementById('live-table-body');
-            const pagBar = document.getElementById('pagination-bar');
-            
-            if (!tbody) return;
-
-            if (filteredList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #94a3b8; padding: 48px; font-style: italic;">Nenhum registro correspondente encontrado.</td></tr>`;
-                pagBar.style.display = 'none';
-                return;
-            }
-
-            pagBar.style.display = 'flex';
-            
-            let start = (currentPage - 1) * rowsPerPage;
-            let end = start + rowsPerPage;
-            
-            if (showAllRows) {
-                start = 0;
-                end = filteredList.length;
-            }
-
-            if (start >= filteredList.length && filteredList.length > 0) {
-                currentPage = 1;
-                start = 0;
-                end = rowsPerPage;
-            }
-
-            const pageItems = filteredList.slice(start, end);
-            
-            document.getElementById('pagination-info-text').innerText = `Exibindo ${start + 1}-${Math.min(end, filteredList.length)} de ${filteredList.length}`;
-            document.getElementById('btn-page-current').innerText = currentPage;
-            document.getElementById('btn-page-prev').disabled = (currentPage === 1 || showAllRows);
-            document.getElementById('btn-page-next').disabled = (end >= filteredList.length || showAllRows);
-
-            let html = '';
-            pageItems.forEach(item => {
-                const validationBadge = item.encontrado === 'SIM' 
-                    ? `<span class="badge" style="background-color: #e0f2fe; color: #0369a1; border-color: #bae6fd;">OK</span>`
-                    : `<span class="badge" style="background-color: #fef2f2; color: #991b1b; border-color: #fee2e2;">FALHA</span>`;
-
-                const originBadge = `<span class="badge">${item.origin || 'N/A'}</span>`;
-                const locBadge = `<span class="badge" style="background-color: #f8fafc;">${item.locationType || '-'}</span>`;
-
-                html += `
-                    <tr>
-                        <td><strong>${item.trackingNumber}</strong></td>
-                        <td><span style="color: #64748b; font-weight: 500;">${item.statusOriginal || 'N/A'}</span></td>
-                        <td>${item.destinationHub || 'N/A'}</td>
-                        <td style="text-align: center;">${locBadge}</td>
-                        <td style="text-align: center;">
-                            <div class="action-tarja ${item.alertClass || 'alert-red'}">
-                                ${item.action || 'IR PARA ÁREA DE TRATATIVA'}
-                            </div>
-                        </td>
-                        <td style="text-align: center;">${originBadge}</td>
-                        <td style="text-align: center;">${validationBadge}</td>
-                    </tr>
-                `;
-            });
-
-            tbody.innerHTML = html;
-        }
-
-        window.calculateAndRenderReport = function() {
-            let total = window.scannedItemsList.length;
-            let fluxo = 0, estacao = 0, tratativa = 0;
-            let hubCountMap = {};
-
-            window.scannedItemsList.forEach(item => {
-                const action = item.action || '';
-                if (action.includes('MANTER FLUXO')) fluxo++;
-                else if (action.includes('ESTAÇÃO CORRETA')) estacao++;
-                else tratativa++;
-
-                const hub = item.destinationHub || 'NÃO ENCONTRADO';
-                if (!hubCountMap[hub]) hubCountMap[hub] = { total: 0, tratativa: 0, fluxo: 0, estacao: 0 };
-                hubCountMap[hub].total++;
-                if (action.includes('MANTER FLUXO')) hubCountMap[hub].fluxo++;
-                else if (action.includes('ESTAÇÃO CORRETA')) hubCountMap[hub].estacao++;
-                else hubCountMap[hub].tratativa++;
-            });
-
-            document.getElementById('rep-total').innerText = total;
-            document.getElementById('rep-fluxo').innerText = fluxo;
-            document.getElementById('rep-estacao').innerText = estacao;
-            document.getElementById('rep-tratativa').innerText = tratativa;
-
-            const container = document.getElementById('report-details-container');
-            if (!container) return;
-
-            if (total === 0) {
-                container.innerHTML = 'Aguardando processamento de dados realtime para consolidação do relatório...';
-                return;
-            }
-
-            let html = '';
-            for (let hub in hubCountMap) {
-                const stats = hubCountMap[hub];
-                html += `
-                    <div style="padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px; background-color: #f8fafc;">
-                        <strong style="color: #1f2937; font-size: 15px;">📍 Hub: ${hub}</strong>
-                        <div style="display: flex; gap: 24px; margin-top: 8px; font-size: 13px;">
-                            <span>📦 Total no Hub: <strong>${stats.total}</strong></span>
-                            <span style="color: #059669;">✔ Fluxo Correto: <strong>${stats.fluxo}</strong></span>
-                            <span style="color: #d97706;">⚠ Estação Errada: <strong>${stats.estacao}</strong></span>
-                            <span style="color: #dc2626;">❌ Tratativa: <strong>${stats.tratativa}</strong></span>
-                        </div>
-                    </div>
-                `;
-            }
-            container.innerHTML = html;
-        };
-
-        function parseRFC4180CSV(text) {
-            let lines = [];
-            let row = [""];
+        /* PARSER ABSOLUTO PREMIUM CORRIGIDO: Protege colunas vazias consecutivas */
+        function parseCSVLineRobust(line, separator) {
+            let fields = [];
+            let currentField = '';
             let inQuotes = false;
-
-            for (let i = 0; i < text.length; i++) {
-                let c = text[i];
-                let next = text[i+1];
-
-                if (c === '"') {
-                    if (inQuotes && next === '"') {
-                        row[row.length - 1] += '"';
-                        i++;
-                    } else {
-                        inQuotes = !inQuotes;
-                    }
-                } else if (c === ',' && !inQuotes) {
-                    row.push("");
-                } else if ((c === '\r' || c === '\n') && !inQuotes) {
-                    if (c === '\r' && next === '\n') { i++; }
-                    lines.push(row);
-                    row = [""];
+            
+            for (let i = 0; i < line.length; i++) {
+                let char = line[i];
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === separator && !inQuotes) {
+                    fields.push(currentField.trim());
+                    currentField = '';
                 } else {
-                    row[row.length - 1] += c;
+                    currentField += char;
                 }
             }
-            if (row.length > 1 || row[0] !== "") {
-                lines.push(row);
-            }
-            return lines;
+            fields.push(currentField.trim());
+            return fields;
         }
 
-        window.handleFileSelectUnified = function(event, baseNum) {
+        window.handleFileSelectUnified = function(event, baseIndex) {
             const files = event.target.files;
             if (!files || files.length === 0) return;
 
-            showLoading(true, "Lendo e interpretando pacotes de dados de triagem...");
+            showLoading(true, "Limpando registros antigos e estruturando nova carga...");
+            const nodeName = baseIndex === 1 ? 'planilha_base1' : 'planilha_base2';
 
-            let filePromises = [];
-
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                if (file.name.toLowerCase().endsWith('.zip')) {
-                    const p = file.arrayBuffer().then(buf => {
-                        return JSZip.loadAsync(buf).then(zip => {
-                            let zipPromises = [];
-                            zip.forEach((relativePath, zipEntry) => {
-                                if (!zipEntry.dir && relativePath.toLowerCase().endsWith('.csv')) {
-                                    const zp = zipEntry.async("string").then(csvText => {
-                                        processCsvContentText(csvText, baseNum);
-                                    });
-                                    zipPromises.push(zp);
-                                }
-                            });
-                            return Promise.all(zipPromises);
-                        });
-                    });
-                    filePromises.push(p);
-                } else {
-                    const p = new Promise((resolve) => {
+            window.firebaseActions.removeNode(nodeName).then(() => {
+                Array.from(files).forEach(file => {
+                    const extension = file.name.split('.').pop().toLowerCase();
+                    
+                    if (extension === 'zip') {
                         const reader = new FileReader();
                         reader.onload = function(e) {
-                            processCsvContentText(e.target.result, baseNum);
-                            resolve();
+                            JSZip.loadAsync(e.target.result).then(function(zip) {
+                                let promises = [];
+                                zip.forEach(function(relativePath, zipEntry) {
+                                    if (!zipEntry.dir && zipEntry.name.endsWith('.csv')) {
+                                        promises.push(zipEntry.async("string").then(content => {
+                                            return parseAndStoreCSVInChunks(content, baseIndex);
+                                        }));
+                                    }
+                                });
+                                Promise.all(promises).then(() => { 
+                                    showLoading(false); 
+                                    event.target.value = ''; 
+                                })
+                                .catch(err => { console.error(err); showLoading(false); alert("Erro ao extrair ZIP."); });
+                            });
+                        };
+                        reader.readAsArrayBuffer(file);
+                    } else if (extension === 'csv') {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            parseAndStoreCSVInChunks(e.target.result, baseIndex).then(() => { 
+                                showLoading(false); 
+                                event.target.value = ''; 
+                            });
                         };
                         reader.readAsText(file, "UTF-8");
-                    });
-                    filePromises.push(p);
-                }
-            }
-
-            Promise.all(filePromises).then(() => {
-                showLoading(false);
-                event.target.value = ''; 
-            }).catch(err => {
-                showLoading(false);
-                alert("Erro crítico no processamento das bases: " + err);
-                event.target.value = '';
+                    } else {
+                        alert("Selecione arquivos .csv ou .zip");
+                        showLoading(false);
+                        event.target.value = '';
+                    }
+                });
             });
         };
 
-        function processCsvContentText(text, baseNum) {
-            const rows = parseRFC4180CSV(text);
-            if (rows.length < 2) return;
+        function parseAndStoreCSVInChunks(text, baseIndex) {
+            return new Promise((resolve) => {
+                const lines = text.split(/\r?\n/);
+                if (lines.length < 1) { resolve(); return; }
 
-            const headerRow = rows[0].map(h => h.trim().replace(/^\uFEFF/, '').replace(/^"|"$/g, ''));
-            
-            let trackingIdx = headerRow.indexOf('SLS Tracking Number');
-            if (trackingIdx === -1) trackingIdx = headerRow.indexOf('Tracking Number');
-            if (trackingIdx === -1) trackingIdx = 1; 
+                let separator = lines[0].includes(',') && !lines[0].includes(';') ? ',' : ';';
+                
+                const headers = parseCSVLineRobust(lines[0], separator).map(h => h.replace(/^\ufeff/, '').trim().toLowerCase());
+                
+                const trackingIdx = headers.findIndex(h => h === 'sls tracking number' || h === 'forward_order_id' || h === 'tracking_number' || h.includes('tracking') || h === 'id' || h.includes('number'));
+                const statusIdx = headers.findIndex(h => h === 'status' || h === 'order status' || h.includes('status'));
+                const hubIdx = headers.findIndex(h => h === 'destination hub' || h === 'destination_hub' || h === 'destination_hub_name' || h.includes('destination hub') || h.includes('destino'));
+                const locationIdx = headers.findIndex(h => h === 'location type' || h === 'location_type' || h.includes('location type') || h.includes('office'));
 
-            let statusIdx = headerRow.indexOf('Status');
-            if (statusIdx === -1) statusIdx = 22; 
+                if (trackingIdx === -1) {
+                    showLoading(false);
+                    alert("Coluna de rastreamento (Tracking Number) não identificada no arquivo.");
+                    resolve();
+                    return;
+                }
 
-            let hubIdx = headerRow.indexOf('Destination Hub');
-            if (hubIdx === -1) hubIdx = 44; 
+                let rowsToProcess = [];
+                for (let i = 1; i < lines.length; i++) {
+                    if (!lines[i].trim()) continue;
+                    
+                    const columns = parseCSVLineRobust(lines[i], separator);
+                    const id = columns[trackingIdx];
+                    
+                    if (id && id.length <= 15) {
+                        let hubValue = 'N/A';
+                        if (hubIdx !== -1 && columns[hubIdx]) {
+                            hubValue = columns[hubIdx];
+                        }
 
-            let locTypeIdx = headerRow.indexOf('Location Type');
-            if (locTypeIdx === -1) locTypeIdx = 10; 
+                        let locValue = '-';
+                        if (locationIdx !== -1 && columns[locationIdx]) {
+                            locValue = columns[locationIdx];
+                        }
 
-            let chunkUpdates = {};
-            let countCount = 0;
+                        rowsToProcess.push({
+                            id: id,
+                            status: statusIdx !== -1 ? (columns[statusIdx] || 'N/A') : 'N/A',
+                            hub: hubValue,
+                            loc: locValue
+                        });
+                    }
+                }
 
-            for (let i = 1; i < rows.length; i++) {
-                const columns = rows[i];
-                if (columns.length <= Math.max(trackingIdx, statusIdx, hubIdx)) continue;
+                if (rowsToProcess.length === 0) { resolve(); return; }
 
-                const trackingNumber = columns[trackingIdx] ? columns[trackingIdx].trim() : '';
-                if (!trackingNumber || trackingNumber === 'SLS Tracking Number' || trackingNumber === 'Tracking Number') continue;
+                const chunkSize = 500;
+                let currentOffset = 0;
+                const nodeName = baseIndex === 1 ? 'planilha_base1' : 'planilha_base2';
 
-                const statusVal = columns[statusIdx] ? columns[statusIdx].trim() : 'N/A';
-                const destinationHub = columns[hubIdx] ? columns[hubIdx].trim() : 'N/A';
-                const locationType = columns[locTypeIdx] ? columns[locTypeIdx].trim() : '-';
+                function sendNextChunk() {
+                    if (currentOffset >= rowsToProcess.length) {
+                        window.showAlertTop(`✔ ${rowsToProcess.length} registros estruturados na nuvem com sucesso!`, 'alert-green');
+                        resolve();
+                        return;
+                    }
+                    
+                    let chunkObject = {};
+                    let limit = Math.min(currentOffset + chunkSize, rowsToProcess.length);
+                    for (let k = currentOffset; k < limit; k++) {
+                        const row = rowsToProcess[k];
+                        chunkObject[row.id] = {
+                            trackingNumber: row.id,
+                            status: row.status,
+                            destinationHub: row.hub,
+                            locationType: row.loc
+                        };
+                    }
 
-                chunkUpdates[trackingNumber] = {
-                    status: statusVal,
-                    destinationHub: destinationHub,
-                    locationType: locationType
-                };
-                countCount++;
-            }
-
-            if (countCount > 0) {
-                const nodeName = baseNum === 1 ? 'planilha_base1' : 'planilha_base2';
-                window.firebaseActions.updateData(nodeName, chunkUpdates);
-            }
+                    window.firebaseActions.updateData(nodeName, chunkObject)
+                        .then(() => { currentOffset += chunkSize; sendNextChunk(); })
+                        .catch(err => { console.error(err); resolve(); });
+                }
+                sendNextChunk();
+            });
         }
 
-        function showLoading(show, message = "") {
-            const screen = document.getElementById('loading-screen');
-            const txt = document.getElementById('loading-text');
-            if(screen) screen.style.display = show ? 'flex' : 'none';
-            if(txt && message) txt.innerText = message;
-        }
+        window.calculateAndRenderReport = function() {
+            const totalBipados = window.scannedItemsList ? window.scannedItemsList.length : 0;
+            const totalBipadosEl = document.getElementById('report-total-bipados');
+            if(totalBipadosEl) totalBipadosEl.innerText = totalBipados;
 
-        window.clearDatabaseNode = function(node) {
-            if(confirm(`Deseja limpar todos os registros de ${node}?`)) {
-                window.firebaseActions.removeNode(node);
+            const tbody = document.getElementById('report-table-body');
+            if(!tbody) return;
+
+            if (totalBipados === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 48px; font-style: italic;">Aguardando pacotes.</td></tr>`;
+                if(document.getElementById('report-total-status')) document.getElementById('report-total-status').innerText = 0;
+                return;
             }
+
+            let statusMap = {};
+            window.scannedItemsList.forEach(item => {
+                let status = item.statusOriginal || 'N/A';
+                let hub = (item.destinationHub || '').toLowerCase();
+                
+                const pertencerRegiaoAtiva = hub.includes('uberaba') || hub.includes('carmelo') || hub.includes('catalao') || hub.includes('catalão');
+
+                if (status.startsWith('LMHub_Received') && !pertencerRegiaoAtiva) {
+                    status = 'LMHub_Received (Outros Hubs)';
+                } else {
+                    if (status === 'LMHub_Received_Office' || status === 'LMHub_Received_office' || status === 'LMHub_Received_-') {
+                        status = 'LMHub_Received_office / -';
+                    }
+                }
+                
+                statusMap[status] = (statusMap[status] || 0) + 1;
+            });
+
+            let statusSortedKeys = Object.keys(statusMap).sort((a, b) => a.localeCompare(b));
+            if(document.getElementById('report-total-status')) document.getElementById('report-total-status').innerText = statusSortedKeys.length;
+
+            tbody.innerHTML = "";
+            statusSortedKeys.forEach(statusKey => {
+                let qtd = statusMap[statusKey];
+                let percent = ((qtd / totalBipados) * 100).toFixed(2);
+                let row = document.createElement('tr');
+                row.innerHTML = `
+                    <td style="font-weight: 600; color: #1f2937; padding-left: 24px;">${statusKey}</td>
+                    <td style="text-align: center; font-weight: 700; color: #111827;">${qtd}</td>
+                    <td style="text-align: center; font-weight: 700; color: #2563eb;">${percent}%</td>
+                `;
+                tbody.appendChild(row);
+            });
         };
+
+        window.refreshDashboardUI = function() {
+            const tExpected = (window.totalB1Count || 0) + (window.totalB2Count || 0);
+            const tScanned = window.scannedItemsList ? window.scannedItemsList.length : 0;
+
+            if(document.getElementById('ui-total-esperado')) document.getElementById('ui-total-esperado').innerText = tExpected;
+            if(document.getElementById('ui-b1-count')) document.getElementById('ui-b1-count').innerText = window.totalB1Count || 0;
+            if(document.getElementById('ui-b2-count')) document.getElementById('ui-b2-count').innerText = window.totalB2Count || 0;
+            if(document.getElementById('ui-total-bipado')) document.getElementById('ui-total-bipado').innerText = tScanned;
+
+            let percentage = tExpected > 0 ? (tScanned / tExpected) * 100 : 0;
+            if(document.getElementById('ui-percentage')) document.getElementById('ui-percentage').innerText = percentage.toFixed(2) + '%';
+
+            let circumference = 2 * Math.PI * 70;
+            let offset = circumference - (percentage / 100) * circumference;
+            if(offset < 0) offset = 0;
+            if(document.getElementById('progress-circle')) document.getElementById('progress-circle').style.strokeDashoffset = offset;
+
+            renderTableData();
+        };
+
+        function renderTableData() {
+            let query = window.currentSearchQuery ? window.currentSearchQuery.toLowerCase() : "";
+            if(window.scannedItemsList) {
+                window.filteredItemsList = query ? window.scannedItemsList.filter(item => 
+                    (item.trackingNumber || '').toLowerCase().includes(query) ||
+                    (item.statusOriginal || '').toLowerCase().includes(query) ||
+                    (item.destinationHub || '').toLowerCase().includes(query)
+                ) : [...window.scannedItemsList];
+            } else { window.filteredItemsList = []; }
+
+            const tbody = document.getElementById('live-table-body');
+            if(!tbody) return;
+            tbody.innerHTML = "";
+
+            const paginationBar = document.getElementById('pagination-bar');
+            if (window.filteredItemsList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #94a3b8; padding: 48px;">Nenhum registro encontrado.</td></tr>`;
+                if(paginationBar) paginationBar.style.display = 'none';
+                return;
+            }
+
+            if(paginationBar) paginationBar.style.display = 'flex';
+            let totalItems = window.filteredItemsList.length;
+            let totalPages = Math.ceil(totalItems / window.itemsPerPage);
+            
+            let start = (window.currentPage - 1) * window.itemsPerPage;
+            let end = start + window.itemsPerPage;
+            let sliceItems = window.showAllItems ? window.filteredItemsList : window.filteredItemsList.slice(start, end);
+
+            if(document.getElementById('pagination-info-text')) {
+                document.getElementById('pagination-info-text').innerText = `Exibindo ${start + 1}-${Math.min(end, totalItems)} de ${totalItems} registros`;
+            }
+
+            if(document.getElementById('btn-page-prev')) document.getElementById('btn-page-prev').disabled = window.currentPage === 1 || window.showAllItems;
+            if(document.getElementById('btn-page-next')) document.getElementById('btn-page-next').disabled = window.currentPage === totalPages || window.showAllItems;
+            if(document.getElementById('btn-page-current')) document.getElementById('btn-page-current').innerText = window.currentPage;
+
+            sliceItems.forEach(item => {
+                let row = document.createElement('tr');
+                let st = item.statusOriginal || 'N/A';
+                let hub = item.destinationHub || 'N/A';
+                
+                let badgeAction = item.action || "TRATATIVA";
+                let bScanned = item.encontrado === 'SIM' ? `<span class="badge">Sincronizado</span>` : `<span class="badge">Divergente</span>`;
+                let bOrigin = `<span class="badge">Base 1</span>`;
+                if(item.origin === 'Base 2') bOrigin = `<span class="badge">Base 2</span>`;
+                if(item.origin === 'Ambas') bOrigin = `<span class="badge">Ambas</span>`;
+
+                row.innerHTML = `
+                    <td style="font-weight:700; color: #111827;">${item.trackingNumber}</td>
+                    <td><span class="badge">${st}</span></td>
+                    <td style="font-weight: 700; color: #0284c7;">${hub}</td>
+                    <td style="font-weight:600; color: #475569; text-align: center;">${item.locationType || '-'}</td>
+                    <td><span class="badge">${badgeAction}</span></td>
+                    <td style="text-align: center;">${bOrigin}</td>
+                    <td>${bScanned}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        window.handleSearch = function() {
+            window.currentSearchQuery = document.getElementById('table-search') ? document.getElementById('table-search').value : "";
+            window.currentPage = 1;
+            renderTableData();
+        };
+
+        window.changePage = function(amount) { window.currentPage += amount; renderTableData(); };
+        window.toggleShowAll = function() { window.showAllItems = !window.showAllItems; renderTableData(); };
 
         window.exportToExcelXLSX = function() {
             if (!window.scannedItemsList || window.scannedItemsList.length === 0) return;
@@ -1116,6 +1095,7 @@
 
         window.clearOnlyScans = function() { if(confirm("Zerar histórico de bips realtime?")) window.firebaseActions.removeNode('bips_triagem'); };
         window.clearOnlyBases = function() { if(confirm("Limpar dados das duas planilhas na nuvem?")) { window.firebaseActions.removeNode('planilha_base1'); window.firebaseActions.removeNode('planilha_base2'); } };
+        window.clearDatabaseNode = function(nodeName) { if(confirm("Limpar este nó do banco de dados?")) window.firebaseActions.removeNode(nodeName); };
     </script>
 </body>
 </html>

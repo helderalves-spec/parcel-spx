@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pré Tratativa Parcel sweeper</title>
+    <title>Parcel Sweeper Hub - Executive Suite</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
@@ -32,188 +32,191 @@
             color: #ffffff;
             letter-spacing: -0.5px;
             box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
-            border-bottom: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            margin-bottom: 24px;
+            transition: all 0.25s ease;
+            text-transform: uppercase;
         }
         
-        .alert-idle { background: linear-gradient(135deg, #4b5563, #374151); }
-        .alert-green { background: linear-gradient(135deg, #10b981, #059669); }
-        .alert-red { background: linear-gradient(135deg, #ef4444, #dc2626); }
-        .alert-orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
-        .alert-purple { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
-        .alert-blue { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
-        .alert-pink { background: linear-gradient(135deg, #ec4899, #db2777); }
+        /* Definição de Cores das Tarjas superiores */
+        .alert-idle { background: linear-gradient(135deg, #64748b, #475569) !important; color: #f8fafc; }
+        .alert-green { background: linear-gradient(135deg, #10b981, #059669) !important; }
+        .alert-red { background: linear-gradient(135deg, #ef4444, #dc2626) !important; }
+        .alert-orange { background: linear-gradient(135deg, #f59e0b, #d97706) !important; }
+        .alert-purple { background: linear-gradient(135deg, #7c3aed, #6d28d9) !important; }
+        .alert-blue { background: linear-gradient(135deg, #2563eb, #1d4ed8) !important; }
+        .alert-pink { background: linear-gradient(135deg, #ec4899, #db2777) !important; }
 
         /* Top Navbar */
         .navbar {
             background-color: #0f172a;
-            padding: 14px 24px;
+            padding: 16px 32px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
 
         .brand {
-            font-size: 18px;
-            color: #f8fafc;
-            font-weight: 700;
-            letter-spacing: -0.5px;
+            font-size: 16px;
+            color: #94a3b8;
+            font-weight: 500;
+            letter-spacing: -0.2px;
         }
+
+        .brand span { color: #475569; margin: 0 8px; }
+        .brand strong { color: #f8fafc; font-weight: 700; }
 
         .user-profile {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
             font-size: 13px;
             color: #cbd5e1;
             background-color: #1e293b;
-            padding: 6px 12px;
-            border-radius: 16px;
+            padding: 6px 14px;
+            border-radius: 20px;
             border: 1px solid #334155;
-        }
-
-        .user-profile .creator-name {
-            font-weight: 600;
-            color: #38bdf8;
         }
 
         /* Navigation Tabs */
         .tab-nav {
-            background-color: #1e293b;
-            padding: 0 24px;
+            background-color: #0f172a;
+            padding: 0 32px;
             display: flex;
-            gap: 4px;
-            border-bottom: 1px solid #334155;
+            gap: 8px;
+            border-bottom: 1px solid #1e293b;
         }
 
         .tab-btn {
-            padding: 12px 18px;
-            font-size: 13px;
+            padding: 14px 24px;
+            font-size: 14px;
             font-weight: 600;
-            color: #94a3b8;
+            color: #64748b;
             background: none;
             border: none;
-            border-bottom: 2px solid transparent;
+            border-bottom: 3px solid transparent;
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: all 0.2s ease;
         }
 
         .tab-btn:hover { color: #f8fafc; }
         .tab-btn.active { color: #38bdf8; border-bottom-color: #38bdf8; }
 
         /* Main Content Container */
-        .tab-content { display: none; padding: 24px; flex: 1; }
+        .tab-content { display: none; padding: 32px; flex: 1; }
         .tab-content.active { display: block; }
 
-        .dashboard-layout { display: flex; gap: 24px; max-width: 1400px; margin: 0 auto; width: 100%; }
+        .dashboard-layout { display: flex; gap: 32px; max-width: 100%; margin: 0 auto; width: 100%; }
 
         /* Sidebar */
         .sidebar {
-            width: 280px;
+            width: 320px;
             background: #ffffff;
             border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 20px;
+            border-radius: 12px;
+            padding: 32px 24px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
             height: fit-content;
+            flex-shrink: 0;
         }
 
         .chart-box {
             position: relative;
-            width: 140px;
-            height: 140px;
+            width: 180px;
+            height: 180px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 20px;
+            margin-bottom: 32px;
         }
 
-        .circle-bg { fill: none; stroke: #f3f4f6; stroke-width: 8; }
+        .circle-bg { fill: none; stroke: #f3f4f6; stroke-width: 10; }
         .circle-progress {
             fill: none;
             stroke: #2563eb;
-            stroke-width: 8;
+            stroke-width: 10;
             stroke-dasharray: 440;
             stroke-dashoffset: 440;
             stroke-linecap: round;
             transform: rotate(-90deg);
             transform-origin: 50% 50%;
-            transition: stroke-dashoffset 0.3s ease;
+            transition: stroke-dashoffset 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .chart-text { position: absolute; text-align: center; }
-        .chart-percentage { font-size: 22px; font-weight: 700; color: #111827; }
-        .chart-label { font-size: 11px; color: #6b7280; margin-top: 2px; }
+        .chart-text { position: absolute; text-align: center; width: 100%; }
+        .chart-percentage { font-size: 28px; font-weight: 800; color: #111827; letter-spacing: -0.5px; }
+        .chart-label { font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px; }
 
-        .stats-list { width: 100%; border-top: 1px solid #f3f4f6; padding-top: 16px; }
-        .stat-item { display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-bottom: 12px; color: #4b5563; }
-        .stat-item .value { font-weight: 600; color: #111827; }
+        .stats-list { width: 100%; border-top: 1px solid #f3f4f6; padding-top: 24px; }
+        .stat-item { display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-bottom: 16px; color: #4b5563; }
+        .stat-item .value { font-weight: 700; color: #111827; background-color: #f3f4f6; padding: 4px 10px; border-radius: 6px; }
 
         /* Cards Gerais */
-        .card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .import-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03); }
+        .import-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
 
         /* Área do Scanner */
-        .scanner-container { background: #f8fafc; border: 1px solid #e2e8f0; padding: 16px; border-radius: 6px; display: flex; gap: 12px; align-items: center; }
-        .scanner-label { font-size: 12px; font-weight: 700; color: #475569; }
-        .scanner-input { flex: 1; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 14px; background-color: #ffffff; }
-        .scanner-input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,0.1); }
+        .scanner-container { background: #f8fafc; border: 1px solid #cbd5e1; padding: 20px; border-radius: 8px; display: flex; gap: 16px; align-items: center; }
+        .scanner-label { font-size: 13px; font-weight: 800; color: #334155; letter-spacing: 0.5px; }
+        .scanner-input { flex: 1; padding: 14px 18px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 16px; font-weight: 600; background-color: #ffffff; letter-spacing: 0.5px; transition: all 0.2s; }
+        .scanner-input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15); }
 
         /* Import Box */
-        .import-box { border: 2px dashed #cbd5e1; border-radius: 8px; background-color: #fafafa; padding: 32px 16px; text-align: center; cursor: pointer; transition: all 0.15s ease; }
+        .import-box { border: 2px dashed #cbd5e1; border-radius: 12px; background-color: #ffffff; padding: 48px 24px; text-align: center; cursor: pointer; transition: all 0.2s ease; }
         .import-box:hover { border-color: #2563eb; background-color: #f8fafc; }
         .import-box.loaded { border-color: #10b981; background-color: #f0fdf4; border-style: solid; }
 
         /* Tabelas */
-        .table-container { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); width: 100%; }
-        .table-header { padding: 16px 20px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; background-color: #ffffff; flex-wrap: wrap; gap: 12px; }
-        .table-search-input { padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 4px; font-size: 13px; width: 240px; }
-        .actions-group { display: flex; gap: 8px; align-items: center; }
+        .table-container { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.02), 0 4px 6px -2px rgba(0,0,0,0.01); width: 100%; }
+        .table-header { padding: 20px 24px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; background-color: #ffffff; flex-wrap: wrap; gap: 16px; }
+        .table-search-input { padding: 10px 16px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 13px; width: 280px; background-color: #f9fafb; transition: all 0.2s; }
+        .actions-group { display: flex; gap: 12px; align-items: center; }
 
-        .export-btn, .pdf-btn, .reset-btn { padding: 8px 14px; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: none; }
-        .export-btn { background-color: #ffffff; color: #374151; border: 1px solid #d1d5db; }
-        .export-btn:hover { background-color: #f9fafb; }
-        .pdf-btn { background-color: #2563eb; color: white; }
+        .export-btn, .pdf-btn, .reset-btn { padding: 10px 18px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; border: none; transition: all 0.2s ease; }
+        .export-btn { background-color: #ffffff; color: #374151; border: 1px solid #e5e7eb; }
+        .export-btn:hover { background-color: #f9fafb; border-color: #d1d5db; }
+        .pdf-btn { background-color: #2563eb; color: white; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.15); }
         .pdf-btn:hover { background-color: #1d4ed8; }
         .reset-btn { background-color: #ef4444; color: white; }
         .reset-btn:hover { background-color: #dc2626; }
 
         /* Paginação */
-        .pagination-container { padding: 12px 20px; background: #ffffff; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #4b5563; }
-        .pagination-buttons { display: flex; gap: 4px; }
-        .page-btn { background: #ffffff; border: 1px solid #d1d5db; padding: 4px 10px; font-size: 12px; cursor: pointer; border-radius: 4px; }
-        .page-btn:hover:not(:disabled) { background: #f9fafb; border-color: #9ca3af; }
+        .pagination-container { padding: 16px 24px; background: #ffffff; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #4b5563; }
+        .pagination-buttons { display: flex; gap: 6px; }
+        .page-btn { background: #ffffff; border: 1px solid #e5e7eb; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; border-radius: 6px; color: #374151; transition: all 0.15s; }
+        .page-btn:hover:not(:disabled) { border-color: #2563eb; color: #2563eb; }
         .page-btn:disabled { background: #f3f4f6; color: #9ca3af; cursor: not-allowed; }
 
-        .table-scroll { overflow-x: auto; max-height: 500px; }
+        .table-scroll { overflow-x: auto; max-height: 550px; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; table-layout: fixed; }
-        th, td { padding: 12px 16px; border-bottom: 1px solid #e5e7eb; color: #374151; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        th { background-color: #f9fafb; color: #4b5563; font-weight: 600; }
+        th, td { padding: 16px 20px; border-bottom: 1px solid #f3f4f6; color: #374151; overflow: hidden; text-overflow: ellipsis; }
+        th { background-color: #f8fafc; color: #475569; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
 
-        th:nth-child(1), td:nth-child(1) { width: 20%; }
-        th:nth-child(2), td:nth-child(2) { width: 15%; }
-        th:nth-child(3), td:nth-child(3) { width: 25%; background-color: #fffbeb; color: #b45309; font-weight: 600; }
+        th:nth-child(1), td:nth-child(1) { width: 22%; white-space: normal; word-break: break-all; }
+        th:nth-child(2), td:nth-child(2) { width: 18%; }
+        th:nth-child(3), td:nth-child(3) { width: 22%; background-color: #ffffff; color: #374151; }
         th:nth-child(4), td:nth-child(4) { width: 10%; text-align: center; }
-        th:nth-child(5), td:nth-child(5) { width: 12%; text-align: center; }
-        th:nth-child(6), td:nth-child(6) { width: 8%; text-align: center; }
-        th:nth-child(7), td:nth-child(7) { width: 10%; text-align: center; }
+        th:nth-child(5), td:nth-child(5) { width: 14%; text-align: center; }
+        th:nth-child(6), td:nth-child(6) { width: 11%; text-align: center; }
+        th:nth-child(7), td:nth-child(7) { width: 11%; text-align: center; }
 
-        tr:hover td { background-color: #f9fafb; }
+        tr:hover td { background-color: #f8fafc; }
 
         /* Report Grid */
-        .report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
-        .report-card { background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .report-card-blue { border-left: 4px solid #2563eb; }
-        .report-card-purple { border-left: 4px solid #7c3aed; }
-        .report-card-title { font-size: 12px; color: #6b7280; font-weight: 600; text-transform: uppercase; margin-bottom: 4px; }
-        .report-card-value { font-size: 28px; font-weight: 700; color: #111827; }
+        .report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 32px; }
+        .report-card { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 28px 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); position: relative; }
+        .report-card-blue { border-top: 4px solid #2563eb; }
+        .report-card-purple { border-top: 4px solid #7c3aed; }
+        .report-card-title { font-size: 12px; color: #6b7280; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
+        .report-card-value { font-size: 36px; font-weight: 800; color: #111827; line-height: 1; letter-spacing: -1px; }
 
         /* Loading Overlay */
-        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); display: none; align-items: center; justify-content: center; flex-direction: column; z-index: 9999; }
-        .spinner { border: 4px solid rgba(0,0,0,0.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: #2563eb; animation: spin 1s linear infinite; margin-bottom: 12px; }
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); color: white; font-size: 18px; font-weight: bold; display: none; align-items: center; justify-content: center; flex-direction: column; z-index: 9999; text-align: center; padding: 20px; }
+        .spinner { border: 4px solid rgba(255, 255, 255, 0.1); width: 55px; height: 55px; border-radius: 50%; border-left-color: #38bdf8; animation: spin 1s linear infinite; margin-bottom: 18px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 
@@ -281,7 +284,7 @@
             if (count > 0) {
                 box.classList.add('loaded');
                 icon.innerText = '✔';
-                label.innerText = `Base ${baseNum}: ${count} registros ativos na nuvem`;
+                label.innerText = `Base ${baseNum}: ${count} ordens salvas na nuvem`;
             } else {
                 box.classList.remove('loaded');
                 icon.innerText = '📥';
@@ -298,18 +301,18 @@
             if (scannerInput) {
                 if (totalRecords > 0) {
                     scannerInput.disabled = false;
-                    scannerInput.placeholder = "Passe o leitor de código de barras...";
+                    scannerInput.placeholder = "Passe o leitor de código de barras corporativo...";
                     if(summaryCard) summaryCard.style.display = 'block';
                     if(summaryText) {
                         summaryText.innerHTML = `
-                            <strong>Base 1 (Forward):</strong> ${window.totalB1Count} registros.<br>
-                            <strong>Base 2 (Receive Task):</strong> ${window.totalB2Count} registros.<br>
-                            <strong>Total carregado:</strong> ${totalRecords} ordens prontas para validação cruzada.
+                            <strong>Base 1 (Forward):</strong> ${window.totalB1Count} registros na nuvem.<br>
+                            <strong>Base 2 (Receive Task):</strong> ${window.totalB2Count} registros na nuvem.<br>
+                            <strong>Total Consolidado:</strong> ${totalRecords} ordens ativas para cruzamento prioritário.
                         `;
                     }
                 } else {
                     scannerInput.disabled = true;
-                    scannerInput.placeholder = "Aguardando importação das bases...";
+                    scannerInput.placeholder = "Aguardando sincronização segura das bases com a nuvem...";
                     if(summaryCard) summaryCard.style.display = 'none';
                 }
             }
@@ -413,7 +416,7 @@
                         const code = this.value.trim();
                         if (code) {
                             if (code.length > 15) {
-                                window.updateTopAlertBar(`❌ ERRO: CÓDIGO COM TAMANHO INCORRETO (${code.length} DÍGITOS). BIPAGEM CANCELADA!`, 'alert-red');
+                                window.updateOperationalAlert(`❌ ERRO: CÓDIGO INVÁLIDO (${code.length} DÍGITOS). BIPAGEM NÃO PERMITIDA!`, 'alert-red');
                                 window.emitVoiceAlert('Código inválido');
                                 this.value = ''; 
                                 e.preventDefault();
@@ -502,14 +505,14 @@
                 voiceMessage = 'Não encontrado, ir para área de tratativa';
             }
 
-            window.updateTopAlertBar(`📢 STATUS: ${statusText.toUpperCase()} | AÇÃO RECOMENDADA: ${actionText}`, alertColor);
+            window.updateOperationalAlert(`📢 ${statusText.toUpperCase()} | ${actionText}`, alertColor);
             window.emitVoiceAlert(voiceMessage);
 
             const newBip = {
                 trackingNumber: barcode,
                 statusOriginal: statusText,
                 destinationHub: destHub,
-                locationType: locType,
+                locationType: locType, 
                 action: actionText,
                 origin: originLabel,
                 encontrado: isFound,
@@ -520,11 +523,11 @@
             window.firebaseActions.updateData('bips_triagem/' + barcode, newBip);
         }
 
-        window.updateTopAlertBar = function(msg, cssClass) {
-            const bar = document.getElementById('top-live-banner');
-            if (bar) {
-                bar.className = `operational-alert-container ${cssClass}`;
-                bar.innerText = msg;
+        window.updateOperationalAlert = function(msg, cssClass) {
+            const container = document.getElementById('live-operational-alert');
+            if (container) {
+                container.className = `operational-alert-container ${cssClass}`;
+                container.innerHTML = msg;
             }
         };
     </script>
@@ -533,58 +536,62 @@
 
     <div id="loading-screen" class="loading-overlay">
         <div class="spinner"></div>
-        <div id="loading-text" style="font-size: 14px; font-weight:600; color:#374151;">Processando dados na nuvem...</div>
-    </div>
-
-    <div id="top-live-banner" class="operational-alert-container alert-idle">
-        SISTEMA ONLINE - AGUARDANDO LEITURA DE PRODUTO
+        <div id="loading-text">Processando e estruturando registros operacionais...</div>
     </div>
 
     <div class="navbar">
         <div class="brand">
-            Pré Tratativa Parcel sweeper
+            Parcel Sweeper Management <span>/</span> <strong>Dashboard Executivo de Controle de Triagem Realtime</strong>
         </div>
         <div class="user-profile">
-            <span>Criador: <span class="creator-name">Helder.Alves</span></span>
+            <span>👤 Operador: helder.alves</span>
         </div>
     </div>
 
     <div class="tab-nav">
         <button class="tab-btn" onclick="switchTab('import')">1. Importação de Bases</button>
-        <button class="tab-btn active" onclick="switchTab('dashboard')">2. Painel Operacional Realtime</button>
-        <button class="tab-btn" onclick="switchTab('report')">3. Relatório de Turno</button>
+        <button class="tab-btn active" onclick="switchTab('dashboard')">2. Monitor de Bipagem Realtime</button>
+        <button class="tab-btn" onclick="switchTab('report')">3. Relatório Executivo Diário</button>
     </div>
 
     <div id="tab-import" class="tab-content">
-        <div class="card" style="margin-bottom: 20px;">
+        <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px;">
+            <div>
+                <h2 style="font-size: 22px; font-weight: 700; color: #0f172a;">Carregamento Massivo de Dados</h2>
+                <p style="font-size: 14px; color: #64748b; margin-top: 4px;">Selecione os arquivos brutos (.csv) exportados ou arquivos compactados (.zip).</p>
+            </div>
+            
             <div class="import-grid">
                 <div>
-                    <div class="import-box" id="box-file-1" onclick="document.getElementById('file-input-1').click()">
-                        <div id="icon-file-1" style="font-size: 32px; margin-bottom: 8px;">📥</div>
-                        <div id="label-file-1" style="font-size: 13px; font-weight: 600; color: #475569;">Selecionar Bases Forward (.csv ou .zip)</div>
-                    </div>
-                    <input type="file" id="file-input-1" accept=".csv,.zip" style="display: none;" onchange="handleFileSelect(1, this)">
-                    <div style="margin-top: 8px; display: flex; gap: 8px;">
-                        <button class="export-btn" style="background: #f9fafb; padding: 4px 8px; font-size: 11px;" onclick="window.clearFirebaseNode('planilha_base1')">Limpar Base 1</button>
+                    <h3 style="font-size: 14px; margin-bottom: 12px; font-weight: 600; color: #475569;">Fluxo Forward (Base 1 - Procurada Primeiro)</h3>
+                    <div id="box-file-1" class="import-box" onclick="document.getElementById('csv-file-1').click()">
+                        <div id="icon-file-1" style="font-size: 36px; margin-bottom: 12px; color: #3b82f6;">📥</div>
+                        <span id="label-file-1" style="font-size: 13px; font-weight: 600; color: #334155;">Selecionar Bases Forward (.csv ou .zip)</span>
+                        <input type="file" id="csv-file-1" accept=".csv,.zip" multiple style="display: none;" onchange="handleFileSelectUnified(event, 1)">
                     </div>
                 </div>
 
                 <div>
-                    <div class="import-box" id="box-file-2" onclick="document.getElementById('file-input-2').click()">
-                        <div id="icon-file-2" style="font-size: 32px; margin-bottom: 8px;">📥</div>
-                        <div id="label-file-2" style="font-size: 13px; font-weight: 600; color: #475569;">Selecionar Bases Receive Task (.csv ou .zip)</div>
-                    </div>
-                    <input type="file" id="file-input-2" accept=".csv,.zip" style="display: none;" onchange="handleFileSelect(2, this)">
-                    <div style="margin-top: 8px; display: flex; gap: 8px;">
-                        <button class="export-btn" style="background: #f9fafb; padding: 4px 8px; font-size: 11px;" onclick="window.clearFirebaseNode('planilha_base2')">Limpar Base 2</button>
+                    <h3 style="font-size: 14px; margin-bottom: 12px; font-weight: 600; color: #475569;">Fluxo Receive Task (Base 2 - Mapeamento)</h3>
+                    <div id="box-file-2" class="import-box" onclick="document.getElementById('csv-file-2').click()">
+                        <div id="icon-file-2" style="font-size: 36px; margin-bottom: 12px; color: #0284c7;">📥</div>
+                        <span id="label-file-2" style="font-size: 13px; font-weight: 600; color: #334155;">Selecionar Bases Receive Task (.csv ou .zip)</span>
+                        <input type="file" id="csv-file-2" accept=".csv,.zip" multiple style="display: none;" onchange="handleFileSelectUnified(event, 2)">
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="card" id="import-summary-card" style="display: none; border-left: 4px solid #10b981;">
-            <h4 style="font-size: 14px; margin-bottom: 6px;">Status de Sincronização Cloud:</h4>
-            <p id="import-summary-text" style="font-size: 13px; color: #475569; line-height: 1.5;"></p>
+            <div class="card" id="import-summary-card" style="display: none; border-left: 4px solid #10b981;">
+                <h4 style="color: #065f46; font-size: 16px;">✔ Sistema Sincronizado e Conectado em Rede</h4>
+                <div style="font-size: 13px; margin-top: 8px; color: #374151; line-height: 1.6;" id="import-summary-text"></div>
+                
+                <div style="margin-top: 20px; display: flex; flex-wrap: wrap; gap: 12px;">
+                    <button style="padding: 12px 24px; background-color: #2563eb; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer;" onclick="switchTab('dashboard')">Iniciar Monitoramento →</button>
+                    <button style="padding: 12px 16px; background-color: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;" onclick="clearDatabaseNode('planilha_base1')">Resetar Apenas Base 1</button>
+                    <button style="padding: 12px 16px; background-color: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;" onclick="clearDatabaseNode('planilha_base2')">Resetar Apenas Base 2</button>
+                    <button style="padding: 12px 16px; background-color: #fef2f2; color: #991b1b; border: 1px solid #fee2e2; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;" onclick="clearOnlyBases()">Limpar Banco de Dados</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -593,84 +600,84 @@
             
             <div class="sidebar">
                 <div class="chart-box">
-                    <svg width="140" height="140">
-                        <circle class="circle-bg" cx="70" cy="70" r="55"/>
-                        <circle id="progress-circle" class="circle-progress" cx="70" cy="70" r="55"/>
+                    <svg width="180" height="180" viewBox="0 0 170 170">
+                        <circle class="circle-bg" cx="85" cy="85" r="70"/>
+                        <circle class="circle-progress" id="progress-circle" cx="85" cy="85" r="70"/>
                     </svg>
                     <div class="chart-text">
-                        <div id="pct-encontrado" class="chart-percentage">0%</div>
-                        <div class="chart-label">Encontrados</div>
+                        <div class="chart-percentage" id="ui-percentage">0.00%</div>
+                        <div class="chart-label">Produtividade</div>
                     </div>
                 </div>
-
                 <div class="stats-list">
-                    <div class="stat-item">
-                        <span>Total Bipados:</span>
-                        <span id="stat-total-bips" class="value">0</span>
-                    </div>
-                    <div class="stat-item">
-                        <span>Encontrados:</span>
-                        <span id="stat-total-achados" class="value" style="color: #059669;">0</span>
-                    </div>
-                    <div class="stat-item">
-                        <span>Não Encontrados:</span>
-                        <span id="stat-total-perdidos" class="value" style="color: #dc2626;">0</span>
-                    </div>
-                </div>
-                
-                <div class="scanner-container" style="width: 100%; margin-top: 12px; padding: 0; background: none; border: none;">
-                    <button class="reset-btn" style="width: 100%; justify-content: center;" onclick="window.clearOnlyScans()">
-                        🗑 Zerar Bips do Turno
-                    </button>
+                    <div class="stat-item"><span>Carga em Rede</span><span class="value" id="ui-total-esperado">0</span></div>
+                    <div class="stat-item"><span>Volumetria Base 1</span><span class="value" id="ui-b1-count">0</span></div>
+                    <div class="stat-item"><span>Volumetria Base 2</span><span class="value" id="ui-b2-count">0</span></div>
+                    <div class="stat-item"><span>Processados (Realtime)</span><span class="value" id="ui-total-bipado">0</span></div>
                 </div>
             </div>
 
-            <div style="flex: 1; display: flex; flex-direction: column; gap: 20px;">
-                <div class="card" style="padding: 12px 20px;">
+            <div class="work-area" style="flex: 1; min-width: 0;">
+                
+                <div id="live-operational-alert" class="operational-alert-container alert-idle">
+                    Aguardando leitura do primeiro pacote para atualizar o status operacional...
+                </div>
+
+                <div class="card" style="padding: 20px;">
                     <div class="scanner-container">
-                        <span class="scanner-label">LEITOR:</span>
-                        <input type="text" id="main-barcode-scanner" class="scanner-input" placeholder="Aguardando bases..." disabled autocomplete="off">
+                        <span class="scanner-label">ENTRADA DO LEITOR (BR):</span>
+                        <input type="text" id="main-barcode-scanner" class="scanner-input" placeholder="Passe o leitor de código de barras corporativo..." disabled>
                     </div>
                 </div>
 
-                <div class="table-container">
+                <div class="table-container" style="margin-top: 24px;">
                     <div class="table-header">
-                        <input type="text" id="table-search" class="table-search-input" placeholder="Filtrar por Código de Barras..." oninput="refreshDashboardUI()">
+                        <strong style="font-size: 16px; font-weight: 700; color: #0f172a;">Malha Operacional de Triagem</strong>
+                        
                         <div class="actions-group">
-                            <button class="export-btn" onclick="window.exportToExcelXLSX()">
-                                Exportar Triagem (.csv)
+                            <input type="text" id="table-search" class="table-search-input" placeholder="🔎 Pesquisar por ID, status ou hub..." oninput="handleSearch()">
+                            <button class="export-btn" onclick="exportToExcelXLSX()">
+                                <span>📥</span> Exportar Dados
+                            </button>
+                            <button class="reset-btn" style="padding: 10px 14px; font-size: 12px;" onclick="clearOnlyScans()">
+                                Zerar Registros
                             </button>
                         </div>
                     </div>
-
+                    
                     <div class="table-scroll">
-                        <table>
+                        <table id="operational-table">
                             <thead>
                                 <tr>
-                                    <th>Código de Barras</th>
-                                    <th>Status Original</th>
-                                    <th>Hub de Destino</th>
-                                    <th style="text-align: center;">Office/Home</th>
-                                    <th style="text-align: center;">Ação Operacional</th>
+                                    <th>Tracking ID</th>
+                                    <th>Status na Base</th>
+                                    <th>Hub Destino</th>
+                                    <th style="text-align: center;">Office / Home</th>
+                                    <th style="text-align: center;">Próxima Ação</th>
                                     <th style="text-align: center;">Origem</th>
                                     <th style="text-align: center;">Validação</th>
                                 </tr>
                             </thead>
-                            <tbody id="dashboard-tbody">
+                            <tbody id="live-table-body">
                                 <tr>
-                                    <td colspan="7" style="text-align: center; color: #9ca3af; padding: 30px;">Nenhum pacote bipado nesta sessão.</td>
+                                    <td colspan="7" style="text-align: center; color: #94a3b8; padding: 48px; font-style: italic;">
+                                        Nenhum registro processado nesta sessão de triagem.
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
 
-                    <div class="pagination-container">
-                        <span id="pagination-info">Mostrando 0-0 de 0 bips</span>
+                    <div class="pagination-container" id="pagination-bar" style="display: none;">
+                        <div id="pagination-info-text">Exibindo 0-0 de 0</div>
                         <div class="pagination-buttons">
-                            <button id="btn-prev-page" class="page-btn" onclick="changePage(-1)" disabled>Anterior</button>
-                            <button id="btn-next-page" class="page-btn" onclick="changePage(1)" disabled>Próximo</button>
+                            <button class="page-btn" id="btn-show-all" onclick="toggleShowAll()">Ver Tudo</button>
+                            <button class="page-btn" id="btn-page-prev" onclick="changePage(-1)">Anterior</button>
+                            <button class="page-btn" id="btn-page-current" disabled>1</button>
+                            <button class="page-btn" id="btn-page-next" onclick="changePage(1)">Próximo</button>
                         </div>
                     </div>
+
                 </div>
             </div>
 
@@ -678,350 +685,376 @@
     </div>
 
     <div id="tab-report" class="tab-content">
-        <div class="report-grid">
-            <div class="report-card report-card-blue">
-                <div class="report-card-title">Volume Total Escaneado</div>
-                <div id="rep-vol-total" class="report-card-value">0</div>
+        <div style="max-width: 1100px; margin: 0 auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px;">
+                <div>
+                    <h2 style="font-size: 26px; color: #0f172a; font-weight: 800; letter-spacing: -0.5px;">Performance Report</h2>
+                    <p style="font-size: 14px; color: #6b7280; margin-top: 4px;">Sumário executivo corporativo para consolidação e volumetria diária</p>
+                </div>
+                <button class="pdf-btn" onclick="window.print()">
+                    <span>🖨️</span> Imprimir Relatório (PDF)
+                </button>
             </div>
-            <div class="report-card report-card-purple">
-                <div class="report-card-title">Manter Fluxo</div>
-                <div id="rep-vol-manter" class="report-card-value">0</div>
-            </div>
-            <div class="report-card" style="border-left: 4px solid #10b981;">
-                <div class="report-card-title">Direcionar Rota Correta</div>
-                <div id="rep-vol-rota" class="report-card-value">0</div>
-            </div>
-            <div class="report-card" style="border-left: 4px solid #f59e0b;">
-                <div class="report-card-title">Direcionar Outra Estação</div>
-                <div id="rep-vol-estacao" class="report-card-value">0</div>
-            </div>
-            <div class="report-card" style="border-left: 4px solid #ec4899;">
-                <div class="report-card-title">Direcionar ao XPT</div>
-                <div id="rep-vol-xpt" class="report-card-value">0</div>
-            </div>
-            <div class="report-card" style="border-left: 4px solid #ef4444;">
-                <div class="report-card-title">Área de Tratativa</div>
-                <div id="rep-vol-tratativa" class="report-card-value">0</div>
-            </div>
-        </div>
 
-        <div class="card" style="padding: 24px; text-align: center;">
-            <p style="font-size: 14px; color: #4b5563; margin-bottom: 16px;">Gere um arquivo resumido das estatísticas consolidadas do turno atual.</p>
-            <button class="pdf-btn" onclick="window.exportFullReportTXT()">
-                Baixar Relatório Consolidado (.txt)
-            </button>
+            <div class="report-grid">
+                <div class="report-card report-card-blue">
+                    <div class="report-card-title">Volume Total Processado</div>
+                    <div class="report-card-value" id="rep-total">0</div>
+                </div>
+                <div class="report-card report-card-purple" style="border-top-color: #10b981;">
+                    <div class="report-card-title">Sucesso (Manter Fluxo)</div>
+                    <div class="report-card-value" style="color: #059669;" id="rep-fluxo">0</div>
+                </div>
+                <div class="report-card report-card-purple" style="border-top-color: #f59e0b;">
+                    <div class="report-card-title">Estação Incorreta</div>
+                    <div class="report-card-value" style="color: #d97706;" id="rep-estacao">0</div>
+                </div>
+                <div class="report-card report-card-purple" style="border-top-color: #ef4444;">
+                    <div class="report-card-title">Área de Tratativa</div>
+                    <div class="report-card-value" style="color: #dc2626;" id="rep-tratativa">0</div>
+                </div>
+            </div>
+
+            <div class="card" style="padding: 32px;">
+                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 20px; color: #0f172a;">Distribuição Detalhada de Ações por Erro de Destino</h3>
+                <div id="report-details-container" style="display: flex; flex-direction: column; gap: 12px; font-size: 14px; color: #4b5563;">
+                    Aguardando processamento de dados realtime para consolidação do relatório...
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
         let currentPage = 1;
-        const rowsPerPage = 10;
+        const rowsPerPage = 50;
+        let showAllRows = false;
+        let filteredList = [];
 
-        window.switchTab = function(tabName) {
+        function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             
-            const targetContent = document.getElementById(`tab-${tabName}`);
-            if(targetContent) targetContent.classList.add('active');
-            
-            const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tabName));
-            if(btn) btn.classList.add('active');
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            const btnIndex = tabId === 'import' ? 0 : (tabId === 'dashboard' ? 1 : 2);
+            document.querySelectorAll('.tab-btn')[btnIndex].classList.add('active');
+        }
 
-            if(tabName === 'dashboard') {
-                setTimeout(() => {
-                    const scanner = document.getElementById('main-barcode-scanner');
-                    if(scanner && !scanner.disabled) scanner.focus();
-                }, 50);
+        window.emitVoiceAlert = function(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'pt-BR';
+                utterance.rate = 1.1;
+                window.speechSynthesis.speak(utterance);
             }
-        };
-
-        window.changePage = function(direction) {
-            currentPage += direction;
-            window.refreshDashboardUI();
         };
 
         window.refreshDashboardUI = function() {
-            const tbody = document.getElementById('dashboard-tbody');
+            document.getElementById('ui-b1-count').innerText = window.totalB1Count.toLocaleString();
+            document.getElementById('ui-b2-count').innerText = window.totalB2Count.toLocaleString();
+            
+            const totalEsperado = window.totalB1Count + window.totalB2Count;
+            document.getElementById('ui-total-esperado').innerText = totalEsperado.toLocaleString();
+
+            const totalBipado = window.scannedItemsList.length;
+            document.getElementById('ui-total-bipado').innerText = totalBipado.toLocaleString();
+
+            let percentage = 0;
+            if (totalEsperado > 0) {
+                percentage = (totalBipado / totalEsperado) * 100;
+            }
+            if(percentage > 100) percentage = 100;
+
+            document.getElementById('ui-percentage').innerText = percentage.toFixed(2) + '%';
+            
+            const offset = 440 - (440 * percentage) / 100;
+            document.getElementById('progress-circle').style.strokeDashoffset = offset;
+
+            applySearchAndPaginationFilter();
+        };
+
+        function applySearchAndPaginationFilter() {
+            const query = document.getElementById('table-search').value.toLowerCase().trim();
+            
+            if (!query) {
+                filteredList = [...window.scannedItemsList];
+            } else {
+                filteredList = window.scannedItemsList.filter(item => {
+                    return (item.trackingNumber && item.trackingNumber.toLowerCase().includes(query)) ||
+                           (item.statusOriginal && item.statusOriginal.toLowerCase().includes(query)) ||
+                           (item.destinationHub && item.destinationHub.toLowerCase().includes(query)) ||
+                           (item.action && item.action.toLowerCase().includes(query));
+                });
+            }
+
+            renderOperationalTable();
+        }
+
+        function handleSearch() {
+            currentPage = 1;
+            applySearchAndPaginationFilter();
+        }
+
+        function toggleShowAll() {
+            showAllRows = !showAllRows;
+            document.getElementById('btn-show-all').innerText = showAllRows ? "Paginar" : "Ver Tudo";
+            renderOperationalTable();
+        }
+
+        function changePage(step) {
+            currentPage += step;
+            renderOperationalTable();
+        }
+
+        function renderOperationalTable() {
+            const tbody = document.getElementById('live-table-body');
+            const pagBar = document.getElementById('pagination-bar');
+            
             if (!tbody) return;
 
-            const filterText = (document.getElementById('table-search')?.value || "").trim().toLowerCase();
-            
-            let listToRender = window.scannedItemsList || [];
-            if (filterText) {
-                listToRender = listToRender.filter(item => 
-                    (item.trackingNumber || "").toLowerCase().includes(filterText)
-                );
-            }
-
-            const totalItems = listToRender.length;
-            
-            let totalAchados = 0;
-            let totalPerdidos = 0;
-            listToRender.forEach(x => {
-                if(x.encontrado === 'SIM') totalAchados++; else totalPerdidos++;
-            });
-
-            const statTotal = document.getElementById('stat-total-bips');
-            const statAchados = document.getElementById('stat-total-achados');
-            const statPerdidos = document.getElementById('stat-total-perdidos');
-            if(statTotal) statTotal.innerText = totalItems;
-            if(statAchados) statAchados.innerText = totalAchados;
-            if(statPerdidos) statPerdidos.innerText = totalPerdidos;
-
-            const pct = totalItems > 0 ? Math.round((totalAchados / totalItems) * 100) : 0;
-            const pctText = document.getElementById('pct-encontrado');
-            if(pctText) pctText.innerText = `${pct}%`;
-            
-            const circle = document.getElementById('progress-circle');
-            if (circle) {
-                const radius = 55;
-                const circumference = 2 * Math.PI * radius; 
-                const offset = circumference - (pct / 100) * circumference;
-                circle.style.strokeDasharray = `${circumference} ${circumference}`;
-                circle.style.strokeDashoffset = offset;
-            }
-
-            if (totalItems === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #9ca3af; padding: 30px;">Nenhum registro encontrado.</td></tr>`;
-                updatePaginationControls(0, 0, 0);
+            if (filteredList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #94a3b8; padding: 48px; font-style: italic;">Nenhum registro correspondente encontrado.</td></tr>`;
+                pagBar.style.display = 'none';
                 return;
             }
 
-            const maxPage = Math.ceil(totalItems / rowsPerPage) || 1;
-            if (currentPage > maxPage) currentPage = maxPage;
-            if (currentPage < 1) currentPage = 1;
+            pagBar.style.display = 'flex';
+            
+            let start = (currentPage - 1) * rowsPerPage;
+            let end = start + rowsPerPage;
+            
+            if (showAllRows) {
+                start = 0;
+                end = filteredList.length;
+            }
 
-            const startIndex = (currentPage - 1) * rowsPerPage;
-            const endIndex = Math.min(startIndex + rowsPerPage, totalItems);
-            const pageItems = listToRender.slice(startIndex, endIndex);
+            if (start >= filteredList.length && filteredList.length > 0) {
+                currentPage = 1;
+                start = 0;
+                end = rowsPerPage;
+            }
+
+            const pageItems = filteredList.slice(start, end);
+            
+            document.getElementById('pagination-info-text').innerText = `Exibindo ${start + 1}-${Math.min(end, filteredList.length)} de ${filteredList.length}`;
+            document.getElementById('btn-page-current').innerText = currentPage;
+            document.getElementById('btn-page-prev').disabled = (currentPage === 1 || showAllRows);
+            document.getElementById('btn-page-next').disabled = (end >= filteredList.length || showAllRows);
 
             let html = '';
             pageItems.forEach(item => {
-                let badgeStyle = "background-color: #fee2e2; color: #dc2626; padding: 2px 6px; border-radius: 4px; font-weight: 600; font-size: 11px;";
-                let actionStyle = "color: #dc2626; font-weight: 600;";
-
-                if (item.encontrado === 'SIM') {
-                    badgeStyle = "background-color: #d1fae5; color: #059669; padding: 2px 6px; border-radius: 4px; font-weight: 600; font-size: 11px;";
-                    if (item.alertClass === 'alert-green') actionStyle = "color: #059669; font-weight: 600;";
-                    else if (item.alertClass === 'alert-blue') actionStyle = "color: #2563eb; font-weight: 600;";
-                    else if (item.alertClass === 'alert-orange') actionStyle = "color: #ea580c; font-weight: 600;";
-                    else if (item.alertClass === 'alert-pink') actionStyle = "color: #db2777; font-weight: 600;";
-                }
+                const validationText = item.encontrado === 'SIM' ? 'OK' : 'FALHA';
+                const originText = item.origin || 'N/A';
+                const locText = item.locationType || '-';
 
                 html += `
                     <tr>
-                        <td style="font-weight: 600;">${item.trackingNumber || ''}</td>
-                        <td>${item.statusOriginal || 'N/A'}</td>
-                        <td>${item.destinationHub || 'N/A'}</td>
-                        <td style="text-align: center;">${item.locationType || '-'}</td>
-                        <td style="text-align: center; ${actionStyle}">${item.action || 'REVISAR'}</td>
-                        <td style="text-align: center; color: #64748b;">${item.origin || '-'}</td>
-                        <td style="text-align: center;">
-                            <span class="${badgeStyle}">
-                                ${item.encontrado || 'NÃO'}
-                            </span>
+                        <td><strong>${item.trackingNumber}</strong></td>
+                        <td><span style="color: #4b5563; font-weight: 500;">${item.statusOriginal || 'N/A'}</span></td>
+                        <td><span style="color: #1f2937; font-weight: 500;">${item.destinationHub || 'N/A'}</span></td>
+                        <td style="text-align: center; color: #4b5563;">${locText}</td>
+                        <td style="text-align: center; font-weight: 500; color: #1f2937;">
+                            ${item.action || 'IR PARA ÁREA DE TRATATIVA'}
                         </td>
+                        <td style="text-align: center; color: #4b5563;">${originText}</td>
+                        <td style="text-align: center; font-weight: 600; color: #1f2937;">${validationText}</td>
                     </tr>
                 `;
             });
 
             tbody.innerHTML = html;
-            updatePaginationControls(startIndex + 1, endIndex, totalItems);
-        };
-
-        function updatePaginationControls(start, end, total) {
-            const info = document.getElementById('pagination-info');
-            if(info) {
-                info.innerText = total > 0 ? `Mostrando ${start}-${end} de ${total} bips` : "Mostrando 0-0 de 0 bips";
-            }
-            const btnPrev = document.getElementById('btn-prev-page');
-            const btnNext = document.getElementById('btn-next-page');
-            if(btnPrev) btnPrev.disabled = (currentPage === 1 || total === 0);
-            if(btnNext) btnNext.disabled = (end >= total || total === 0);
         }
 
         window.calculateAndRenderReport = function() {
-            let total = 0, manter = 0, rota = 0, estacao = 0, xpt = 0, tratativa = 0;
+            let total = window.scannedItemsList.length;
+            let fluxo = 0, estacao = 0, tratativa = 0;
+            let hubCountMap = {};
 
-            if (window.scannedItemsList && window.scannedItemsList.length > 0) {
-                total = window.scannedItemsList.length;
-                window.scannedItemsList.forEach(item => {
-                    if (item.encontrado === 'NÃO') {
-                        tratativa++;
-                    } else {
-                        if (item.alertClass === 'alert-green') manter++;
-                        else if (item.alertClass === 'alert-blue') rota++;
-                        else if (item.alertClass === 'alert-orange') estacao++;
-                        else if (item.alertClass === 'alert-pink') xpt++;
-                        else tratativa++;
-                    }
-                });
-            }
-
-            const rTotal = document.getElementById('rep-vol-total');
-            const rManter = document.getElementById('rep-vol-manter');
-            const rRota = document.getElementById('rep-vol-rota');
-            const rEstacao = document.getElementById('rep-vol-estacao');
-            const rXpt = document.getElementById('rep-vol-xpt');
-            const rTratativa = document.getElementById('rep-vol-tratativa');
-
-            if(rTotal) rTotal.innerText = total;
-            if(rManter) rManter.innerText = manter;
-            if(rRota) rRota.innerText = rota;
-            if(rEstacao) rEstacao.innerText = estacao;
-            if(rXpt) rXpt.innerText = xpt;
-            if(rTratativa) rTratativa.innerText = tratativa;
-        };
-
-        window.exportFullReportTXT = function() {
-            if(!window.scannedItemsList || window.scannedItemsList.length === 0) {
-                alert("Nenhum dado disponível para exportar relatório.");
-                return;
-            }
-            
-            let total = 0, manter = 0, rota = 0, estacao = 0, xpt = 0, tratativa = 0;
-            total = window.scannedItemsList.length;
             window.scannedItemsList.forEach(item => {
-                if (item.encontrado === 'NÃO') { tratativa++; }
-                else {
-                    if (item.alertClass === 'alert-green') manter++;
-                    else if (item.alertClass === 'alert-blue') rota++;
-                    else if (item.alertClass === 'alert-orange') estacao++;
-                    else if (item.alertClass === 'alert-pink') xpt++;
-                    else tratativa++;
-                }
+                const action = item.action || '';
+                if (action.includes('MANTER FLUXO')) fluxo++;
+                else if (action.includes('ESTAÇÃO CORRETA')) estacao++;
+                else tratativa++;
+
+                const hub = item.destinationHub || 'NÃO ENCONTRADO';
+                if (!hubCountMap[hub]) hubCountMap[hub] = { total: 0, tratativa: 0, fluxo: 0, estacao: 0 };
+                hubCountMap[hub].total++;
+                if (action.includes('MANTER FLUXO')) hubCountMap[hub].fluxo++;
+                else if (action.includes('ESTAÇÃO CORRETA')) hubCountMap[hub].estacao++;
+                else hubCountMap[hub].tratativa++;
             });
 
-            let txt = `==================================================\n`;
-            txt += `         RELATÓRIO DE ALTERAÇÃO E TRIAGEM         \n`;
-            txt += `==================================================\n`;
-            txt += `Data: ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR')}\n`;
-            txt += `--------------------------------------------------\n`;
-            txt += `Volume Total Processado: ${total}\n`;
-            txt += `  - Manter Fluxo: ${manter}\n`;
-            txt += `  - Direcionar Rota Correta: ${rota}\n`;
-            txt += `  - Direcionar Outra Estação: ${estacao}\n`;
-            txt += `  - Direcionar ao XPT: ${xpt}\n`;
-            txt += `  - Retidos na Área de Tratativa: ${tratativa}\n`;
-            txt += `--------------------------------------------------\n`;
+            document.getElementById('rep-total').innerText = total;
+            document.getElementById('rep-fluxo').innerText = fluxo;
+            document.getElementById('rep-estacao').innerText = estacao;
+            document.getElementById('rep-tratativa').innerText = tratativa;
 
-            let blob = new Blob([txt], { type: "text/plain;charset=utf-8;" });
-            let link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.setAttribute("download", `Relatorio_Turno_${new Date().toISOString().slice(0,10)}.txt`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            const container = document.getElementById('report-details-container');
+            if (!container) return;
+
+            if (total === 0) {
+                container.innerHTML = 'Aguardando processamento de dados realtime para consolidação do relatório...';
+                return;
+            }
+
+            let html = '';
+            for (let hub in hubCountMap) {
+                const stats = hubCountMap[hub];
+                html += `
+                    <div style="padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px; background-color: #f8fafc;">
+                        <strong style="color: #1f2937; font-size: 15px;">📍 Hub: ${hub}</strong>
+                        <div style="display: flex; gap: 24px; margin-top: 8px; font-size: 13px;">
+                            <span>📦 Total no Hub: <strong>${stats.total}</strong></span>
+                            <span style="color: #059669;">✔ Fluxo Correto: <strong>${stats.fluxo}</strong></span>
+                            <span style="color: #d97706;">⚠ Estação Errada: <strong>${stats.estacao}</strong></span>
+                            <span style="color: #dc2626;">❌ Tratativa: <strong>${stats.tratativa}</strong></span>
+                        </div>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
         };
 
-        window.clearFirebaseNode = function(node) {
+        function parseRFC4180CSV(text) {
+            let lines = [];
+            let row = [""];
+            let inQuotes = false;
+
+            for (let i = 0; i < text.length; i++) {
+                let c = text[i];
+                let next = text[i+1];
+
+                if (c === '"') {
+                    if (inQuotes && next === '"') {
+                        row[row.length - 1] += '"';
+                        i++;
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (c === ',' && !inQuotes) {
+                    row.push("");
+                } else if ((c === '\r' || c === '\n') && !inQuotes) {
+                    if (c === '\r' && next === '\n') { i++; }
+                    lines.push(row);
+                    row = [""];
+                } else {
+                    row[row.length - 1] += c;
+                }
+            }
+            if (row.length > 1 || row[0] !== "") {
+                lines.push(row);
+            }
+            return lines;
+        }
+
+        window.handleFileSelectUnified = function(event, baseNum) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
+            showLoading(true, "Lendo e interpretando pacotes de dados de triagem...");
+
+            let filePromises = [];
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (file.name.toLowerCase().endsWith('.zip')) {
+                    const p = file.arrayBuffer().then(buf => {
+                        return JSZip.loadAsync(buf).then(zip => {
+                            let zipPromises = [];
+                            zip.forEach((relativePath, zipEntry) => {
+                                if (!zipEntry.dir && relativePath.toLowerCase().endsWith('.csv')) {
+                                    const zp = zipEntry.async("string").then(csvText => {
+                                        processCsvContentText(csvText, baseNum);
+                                    });
+                                    zipPromises.push(zp);
+                                }
+                            });
+                            return Promise.all(zipPromises);
+                        });
+                    });
+                    filePromises.push(p);
+                } else {
+                    const p = new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            processCsvContentText(e.target.result, baseNum);
+                            resolve();
+                        };
+                        reader.readAsText(file, "UTF-8");
+                    });
+                    filePromises.push(p);
+                }
+            }
+
+            Promise.all(filePromises).then(() => {
+                showLoading(false);
+                event.target.value = ''; 
+            }).catch(err => {
+                showLoading(false);
+                alert("Erro crítico no processamento das bases: " + err);
+                event.target.value = '';
+            });
+        };
+
+        function processCsvContentText(text, baseNum) {
+            const rows = parseRFC4180CSV(text);
+            if (rows.length < 2) return;
+
+            const headerRow = rows[0].map(h => h.trim().replace(/^\uFEFF/, '').replace(/^"|"$/g, ''));
+            
+            let trackingIdx = headerRow.indexOf('SLS Tracking Number');
+            if (trackingIdx === -1) trackingIdx = headerRow.indexOf('Tracking Number');
+            if (trackingIdx === -1) trackingIdx = 1; 
+
+            let statusIdx = headerRow.indexOf('Status');
+            if (statusIdx === -1) statusIdx = 22; 
+
+            let hubIdx = headerRow.indexOf('Destination Hub');
+            if (hubIdx === -1) hubIdx = 44; 
+
+            let locTypeIdx = headerRow.indexOf('Location Type');
+            if (locTypeIdx === -1) locTypeIdx = 10; 
+
+            let chunkUpdates = {};
+            let countCount = 0;
+
+            for (let i = 1; i < rows.length; i++) {
+                const columns = rows[i];
+                if (columns.length <= Math.max(trackingIdx, statusIdx, hubIdx)) continue;
+
+                const trackingNumber = columns[trackingIdx] ? columns[trackingIdx].trim() : '';
+                if (!trackingNumber || trackingNumber === 'SLS Tracking Number' || trackingNumber === 'Tracking Number') continue;
+
+                const statusVal = columns[statusIdx] ? columns[statusIdx].trim() : 'N/A';
+                const destinationHub = columns[hubIdx] ? columns[hubIdx].trim() : 'N/A';
+                const locationType = columns[locTypeIdx] ? columns[locTypeIdx].trim() : '-';
+
+                chunkUpdates[trackingNumber] = {
+                    status: statusVal,
+                    destinationHub: destinationHub,
+                    locationType: locationType
+                };
+                countCount++;
+            }
+
+            if (countCount > 0) {
+                const nodeName = baseNum === 1 ? 'planilha_base1' : 'planilha_base2';
+                window.firebaseActions.updateData(nodeName, chunkUpdates);
+            }
+        }
+
+        function showLoading(show, message = "") {
+            const screen = document.getElementById('loading-screen');
+            const txt = document.getElementById('loading-text');
+            if(screen) screen.style.display = show ? 'flex' : 'none';
+            if(txt && message) txt.innerText = message;
+        }
+
+        window.clearDatabaseNode = function(node) {
             if(confirm(`Deseja limpar todos os registros de ${node}?`)) {
                 window.firebaseActions.removeNode(node);
             }
         };
-
-        window.emitVoiceAlert = function(text) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel(); 
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'pt-BR';
-                utterance.rate = 1.1; 
-                window.speechSynthesis.speak(utterance);
-            }
-        };
-
-        function handleFileSelect(baseNum, input) {
-            const file = input.files[0];
-            if (!file) return;
-
-            const loadingScreen = document.getElementById('loading-screen');
-            if (loadingScreen) loadingScreen.style.display = 'flex';
-
-            if (file.name.endsWith('.zip')) {
-                JSZip.loadAsync(file).then(zip => {
-                    const csvFile = Object.keys(zip.files).find(name => name.endsWith('.csv'));
-                    if (!csvFile) {
-                        alert('Nenhum arquivo .csv encontrado dentro do arquivo compactado.');
-                        if (loadingScreen) loadingScreen.style.display = 'none';
-                        return;
-                    }
-                    zip.files[csvFile].async('string').then(content => {
-                        parseAndUploadCSV(content, baseNum);
-                    });
-                }).catch(err => {
-                    alert('Falha ao ler pacote ZIP: ' + err.message);
-                    if (loadingScreen) loadingScreen.style.display = 'none';
-                });
-            } else {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    parseAndUploadCSV(e.target.result, baseNum);
-                };
-                reader.readAsText(file, 'UTF-8');
-            }
-        }
-
-        function parseAndUploadCSV(text, baseNum) {
-            const lines = text.split(/\r?\n/);
-            if (lines.length < 2) {
-                if (document.getElementById('loading-screen')) document.getElementById('loading-screen').style.display = 'none';
-                return;
-            }
-
-            const header = lines[0].split(',');
-            const idxTracking = header.findIndex(h => h.trim().replace(/^"|"$/g, '') === 'SLS Tracking Number');
-            const idxStatus = header.findIndex(h => h.trim().replace(/^"|"$/g, '') === 'Status');
-            const idxHub = header.findIndex(h => h.trim().replace(/^"|"$/g, '') === 'Destination Hub');
-            const idxLocType = header.findIndex(h => h.trim().replace(/^"|"$/g, '') === 'Location Type');
-
-            if (idxTracking === -1 || idxStatus === -1 || idxHub === -1) {
-                alert('Erro de Cabeçalho: Verifique as colunas obrigatórias.');
-                if (document.getElementById('loading-screen')) document.getElementById('loading-screen').style.display = 'none';
-                return;
-            }
-
-            let batch = {};
-            let count = 0;
-
-            for (let i = 1; i < lines.length; i++) {
-                if (!lines[i].trim()) continue;
-                
-                let cols = [];
-                let current = '';
-                let inQuotes = false;
-                
-                for (let char of lines[i]) {
-                    if (char === '"') {
-                        inQuotes = !inQuotes;
-                    } else if (char === ',' && !inQuotes) {
-                        cols.push(current.trim().replace(/^"|"$/g, ''));
-                        current = '';
-                    } else {
-                        current += char;
-                    }
-                }
-                cols.push(current.trim().replace(/^"|"$/g, ''));
-
-                const tracking = cols[idxTracking];
-                if (tracking && tracking.trim()) {
-                    batch[tracking.trim()] = {
-                        status: cols[idxStatus] || 'N/A',
-                        destinationHub: cols[idxHub] || 'N/A',
-                        locationType: idxLocType !== -1 ? (cols[idxLocType] || '-') : '-'
-                    };
-                    count++;
-                }
-            }
-
-            const nodePath = baseNum === 1 ? 'planilha_base1' : 'planilha_base2';
-            window.firebaseActions.updateData(nodePath, batch).then(() => {
-                if (document.getElementById('loading-screen')) document.getElementById('loading-screen').style.display = 'none';
-                alert(`Sucesso! Base ${baseNum} sincronizada.`);
-            }).catch(err => {
-                if (document.getElementById('loading-screen')) document.getElementById('loading-screen').style.display = 'none';
-                alert('Falha no upload para nuvem: ' + err.message);
-            });
-        }
 
         window.exportToExcelXLSX = function() {
             if (!window.scannedItemsList || window.scannedItemsList.length === 0) return;
@@ -1041,6 +1074,5 @@
         window.clearOnlyScans = function() { if(confirm("Zerar histórico de bips realtime?")) window.firebaseActions.removeNode('bips_triagem'); };
         window.clearOnlyBases = function() { if(confirm("Limpar dados das duas planilhas na nuvem?")) { window.firebaseActions.removeNode('planilha_base1'); window.firebaseActions.removeNode('planilha_base2'); } };
     </script>
-
 </body>
 </html>

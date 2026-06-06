@@ -38,7 +38,7 @@
             text-transform: uppercase;
         }
         
-        /* Definição de Cores das Tarjas */
+        /* Definição de Cores das Tarjas superiores */
         .alert-idle { background: linear-gradient(135deg, #64748b, #475569) !important; color: #f8fafc; }
         .alert-green { background: linear-gradient(135deg, #10b981, #059669) !important; }
         .alert-red { background: linear-gradient(135deg, #ef4444, #dc2626) !important; }
@@ -205,23 +205,6 @@
         th:nth-child(7), td:nth-child(7) { width: 11%; text-align: center; }
 
         tr:hover td { background-color: #f8fafc; }
-
-        .badge { 
-            display: inline-flex; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 6px 10px; 
-            border-radius: 6px; 
-            font-weight: 600; 
-            font-size: 11px; 
-            width: 100%; 
-            text-align: center; 
-            text-transform: uppercase; 
-            letter-spacing: 0.3px;
-            background-color: #f1f5f9; 
-            color: #334155; 
-            border: 1px solid #cbd5e1;
-        }
 
         /* Report Grid */
         .report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 32px; }
@@ -860,24 +843,21 @@
 
             let html = '';
             pageItems.forEach(item => {
-                const validationBadge = item.encontrado === 'SIM' 
-                    ? `<span class="badge" style="background-color: #e0f2fe; color: #0369a1; border-color: #bae6fd;">OK</span>`
-                    : `<span class="badge" style="background-color: #fef2f2; color: #991b1b; border-color: #fee2e2;">FALHA</span>`;
-
-                const originBadge = `<span class="badge">${item.origin || 'N/A'}</span>`;
-                const locBadge = `<span class="badge" style="background-color: #f8fafc;">${item.locationType || '-'}</span>`;
+                const validationText = item.encontrado === 'SIM' ? 'OK' : 'FALHA';
+                const originText = item.origin || 'N/A';
+                const locText = item.locationType || '-';
 
                 html += `
                     <tr>
                         <td><strong>${item.trackingNumber}</strong></td>
-                        <td><span style="color: #64748b; font-weight: 500;">${item.statusOriginal || 'N/A'}</span></td>
-                        <td>${item.destinationHub || 'N/A'}</td>
-                        <td style="text-align: center;">${locBadge}</td>
-                        <td style="text-align: center; font-weight: 700;">
+                        <td><span style="color: #4b5563; font-weight: 500;">${item.statusOriginal || 'N/A'}</span></td>
+                        <td><span style="color: #1f2937; font-weight: 500;">${item.destinationHub || 'N/A'}</span></td>
+                        <td style="text-align: center; color: #4b5563;">${locText}</td>
+                        <td style="text-align: center; font-weight: 500; color: #1f2937;">
                             ${item.action || 'IR PARA ÁREA DE TRATATIVA'}
                         </td>
-                        <td style="text-align: center;">${originBadge}</td>
-                        <td style="text-align: center;">${validationBadge}</td>
+                        <td style="text-align: center; color: #4b5563;">${originText}</td>
+                        <td style="text-align: center; font-weight: 600; color: #1f2937;">${validationText}</td>
                     </tr>
                 `;
             });

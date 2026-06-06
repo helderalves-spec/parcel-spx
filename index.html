@@ -418,12 +418,12 @@
                             if (code.length > 15) {
                                 window.updateOperationalAlert(`❌ ERRO: CÓDIGO INVÁLIDO (${code.length} DÍGITOS). BIPAGEM NÃO PERMITIDA!`, 'alert-red');
                                 window.emitVoiceAlert('Código inválido');
-                                this.value = ''; 
+                                this.value = '';
                                 e.preventDefault();
                                 return;
                             }
                             processBarcodeBip(code);
-                            this.value = ''; 
+                            this.value = '';
                         }
                     }
                 });
@@ -438,7 +438,7 @@
             let isFound = 'NÃO';
             let statusText = 'NÃO ENCONTRADO';
             let destHub = 'N/A';
-            let locType = '-'; 
+            let locType = '-';
             let actionText = 'IR PARA ÁREA DE TRATATIVA';
             let alertColor = 'alert-red';
             let voiceMessage = 'Não encontrado, ir para área de tratativa';
@@ -488,7 +488,7 @@
                     actionText = 'MANTER FLUXO';
                     alertColor = 'alert-green';
                     voiceMessage = 'Manter fluxo';
-                }
+                } 
                 else if (statusLower.includes('delivering') || statusLower.includes('delivered')) {
                     actionText = 'IR PARA ÁREA DE TRATATIVA';
                     alertColor = 'alert-red';
@@ -512,7 +512,7 @@
                 trackingNumber: barcode,
                 statusOriginal: statusText,
                 destinationHub: destHub,
-                locationType: locType, 
+                locationType: locType,
                 action: actionText,
                 origin: originLabel,
                 encontrado: isFound,
@@ -523,534 +523,120 @@
             window.firebaseActions.updateData('bips_triagem/' + barcode, newBip);
         }
 
-        window.updateOperationalAlert = function(msg, cssClass) {
-            const container = document.getElementById('live-operational-alert');
-            if (container) {
-                container.className = `operational-alert-container ${cssClass}`;
-                container.innerHTML = msg;
-            }
-        };
-    </script>
-</head>
-<body>
-
-    <div id="loading-screen" class="loading-overlay">
-        <div class="spinner"></div>
-        <div id="loading-text">Processando e estruturando registros operacionais...</div>
-    </div>
-
-    <div class="navbar">
-        <div class="brand">
-            Parcel Sweeper Management <span>/</span> <strong>Dashboard Executivo de Controle de Triagem Realtime</strong>
-        </div>
-        <div class="user-profile">
-            <span>👤 Operador: helder.alves</span>
-        </div>
-    </div>
-
-    <div class="tab-nav">
-        <button class="tab-btn" onclick="switchTab('import')">1. Importação de Bases</button>
-        <button class="tab-btn active" onclick="switchTab('dashboard')">2. Monitor de Bipagem Realtime</button>
-        <button class="tab-btn" onclick="switchTab('report')">3. Relatório Executivo Diário</button>
-    </div>
-
-    <div id="tab-import" class="tab-content">
-        <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px;">
-            <div>
-                <h2 style="font-size: 22px; font-weight: 700; color: #0f172a;">Carregamento Massivo de Dados</h2>
-                <p style="font-size: 14px; color: #64748b; margin-top: 4px;">Selecione os arquivos brutos (.csv) exportados ou arquivos compactados (.zip).</p>
-            </div>
-            
-            <div class="import-grid">
-                <div>
-                    <h3 style="font-size: 14px; margin-bottom: 12px; font-weight: 600; color: #475569;">Fluxo Forward (Base 1 - Procurada Primeiro)</h3>
-                    <div id="box-file-1" class="import-box" onclick="document.getElementById('csv-file-1').click()">
-                        <div id="icon-file-1" style="font-size: 36px; margin-bottom: 12px; color: #3b82f6;">📥</div>
-                        <span id="label-file-1" style="font-size: 13px; font-weight: 600; color: #334155;">Selecionar Bases Forward (.csv ou .zip)</span>
-                        <input type="file" id="csv-file-1" accept=".csv,.zip" multiple style="display: none;" onchange="handleFileSelectUnified(event, 1)">
-                    </div>
-                </div>
-
-                <div>
-                    <h3 style="font-size: 14px; margin-bottom: 12px; font-weight: 600; color: #475569;">Fluxo Receive Task (Base 2 - Mapeamento)</h3>
-                    <div id="box-file-2" class="import-box" onclick="document.getElementById('csv-file-2').click()">
-                        <div id="icon-file-2" style="font-size: 36px; margin-bottom: 12px; color: #0284c7;">📥</div>
-                        <span id="label-file-2" style="font-size: 13px; font-weight: 600; color: #334155;">Selecionar Bases Receive Task (.csv ou .zip)</span>
-                        <input type="file" id="csv-file-2" accept=".csv,.zip" multiple style="display: none;" onchange="handleFileSelectUnified(event, 2)">
-                    </div>
-                </div>
-            </div>
-
-            <div class="card" id="import-summary-card" style="display: none; border-left: 4px solid #10b981;">
-                <h4 style="color: #065f46; font-size: 16px;">✔ Sistema Sincronizado e Conectado em Rede</h4>
-                <div style="font-size: 13px; margin-top: 8px; color: #374151; line-height: 1.6;" id="import-summary-text"></div>
-                
-                <div style="margin-top: 20px; display: flex; flex-wrap: wrap; gap: 12px;">
-                    <button style="padding: 12px 24px; background-color: #2563eb; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer;" onclick="switchTab('dashboard')">Iniciar Monitoramento →</button>
-                    <button style="padding: 12px 16px; background-color: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;" onclick="clearDatabaseNode('planilha_base1')">Resetar Apenas Base 1</button>
-                    <button style="padding: 12px 16px; background-color: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;" onclick="clearDatabaseNode('planilha_base2')">Resetar Apenas Base 2</button>
-                    <button style="padding: 12px 16px; background-color: #fef2f2; color: #991b1b; border: 1px solid #fee2e2; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;" onclick="clearOnlyBases()">Limpar Banco de Dados</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="tab-dashboard" class="tab-content active">
-        <div class="dashboard-layout">
-            
-            <div class="sidebar">
-                <div class="chart-box">
-                    <svg width="180" height="180" viewBox="0 0 170 170">
-                        <circle class="circle-bg" cx="85" cy="85" r="70"/>
-                        <circle class="circle-progress" id="progress-circle" cx="85" cy="85" r="70"/>
-                    </svg>
-                    <div class="chart-text">
-                        <div class="chart-percentage" id="ui-percentage">0.00%</div>
-                        <div class="chart-label">Produtividade</div>
-                    </div>
-                </div>
-                <div class="stats-list">
-                    <div class="stat-item"><span>Carga em Rede</span><span class="value" id="ui-total-esperado">0</span></div>
-                    <div class="stat-item"><span>Volumetria Base 1</span><span class="value" id="ui-b1-count">0</span></div>
-                    <div class="stat-item"><span>Volumetria Base 2</span><span class="value" id="ui-b2-count">0</span></div>
-                    <div class="stat-item"><span>Processados (Realtime)</span><span class="value" id="ui-total-bipado">0</span></div>
-                </div>
-            </div>
-
-            <div class="work-area" style="flex: 1; min-width: 0;">
-                
-                <div id="live-operational-alert" class="operational-alert-container alert-idle">
-                    Aguardando leitura do primeiro pacote para atualizar o status operacional...
-                </div>
-
-                <div class="card" style="padding: 20px;">
-                    <div class="scanner-container">
-                        <span class="scanner-label">ENTRADA DO LEITOR (BR):</span>
-                        <input type="text" id="main-barcode-scanner" class="scanner-input" placeholder="Passe o leitor de código de barras corporativo..." disabled>
-                    </div>
-                </div>
-
-                <div class="table-container" style="margin-top: 24px;">
-                    <div class="table-header">
-                        <strong style="font-size: 16px; font-weight: 700; color: #0f172a;">Malha Operacional de Triagem</strong>
-                        
-                        <div class="actions-group">
-                            <input type="text" id="table-search" class="table-search-input" placeholder="🔎 Pesquisar por ID, status ou hub..." oninput="handleSearch()">
-                            <button class="export-btn" onclick="exportToExcelXLSX()">
-                                <span>📥</span> Exportar Dados
-                            </button>
-                            <button class="reset-btn" style="padding: 10px 14px; font-size: 12px;" onclick="clearOnlyScans()">
-                                Zerar Registros
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="table-scroll">
-                        <table id="operational-table">
-                            <thead>
-                                <tr>
-                                    <th>Tracking ID</th>
-                                    <th>Status na Base</th>
-                                    <th>Hub Destino</th>
-                                    <th style="text-align: center;">Office / Home</th>
-                                    <th style="text-align: center;">Próxima Ação</th>
-                                    <th style="text-align: center;">Origem</th>
-                                    <th style="text-align: center;">Validação</th>
-                                </tr>
-                            </thead>
-                            <tbody id="live-table-body">
-                                <tr>
-                                    <td colspan="7" style="text-align: center; color: #94a3b8; padding: 48px; font-style: italic;">
-                                        Nenhum registro processado nesta sessão de triagem.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="pagination-container" id="pagination-bar" style="display: none;">
-                        <div id="pagination-info-text">Exibindo 0-0 de 0</div>
-                        <div class="pagination-buttons">
-                            <button class="page-btn" id="btn-show-all" onclick="toggleShowAll()">Ver Tudo</button>
-                            <button class="page-btn" id="btn-page-prev" onclick="changePage(-1)">Anterior</button>
-                            <button class="page-btn" id="btn-page-current" disabled>1</button>
-                            <button class="page-btn" id="btn-page-next" onclick="changePage(1)">Próximo</button>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <div id="tab-report" class="tab-content">
-        <div style="max-width: 1100px; margin: 0 auto;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px;">
-                <div>
-                    <h2 style="font-size: 26px; color: #0f172a; font-weight: 800; letter-spacing: -0.5px;">Performance Report</h2>
-                    <p style="font-size: 14px; color: #6b7280; margin-top: 4px;">Sumário executivo corporativo para consolidação e volumetria diária</p>
-                </div>
-                <button class="pdf-btn" onclick="window.print()">
-                    <span>🖨️</span> Imprimir Relatório (PDF)
-                </button>
-            </div>
-
-            <div class="report-grid">
-                <div class="report-card report-card-blue">
-                    <div class="report-card-title">Volume Total Processado</div>
-                    <div class="report-card-value" id="rep-total">0</div>
-                </div>
-                <div class="report-card report-card-purple" style="border-top-color: #10b981;">
-                    <div class="report-card-title">Sucesso (Manter Fluxo)</div>
-                    <div class="report-card-value" style="color: #059669;" id="rep-fluxo">0</div>
-                </div>
-                <div class="report-card report-card-purple" style="border-top-color: #f59e0b;">
-                    <div class="report-card-title">Estação Incorreta</div>
-                    <div class="report-card-value" style="color: #d97706;" id="rep-estacao">0</div>
-                </div>
-                <div class="report-card report-card-purple" style="border-top-color: #ef4444;">
-                    <div class="report-card-title">Área de Tratativa</div>
-                    <div class="report-card-value" style="color: #dc2626;" id="rep-tratativa">0</div>
-                </div>
-            </div>
-
-            <div class="card" style="padding: 32px;">
-                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 20px; color: #0f172a;">Distribuição Detalhada de Ações por Erro de Destino</h3>
-                <div id="report-details-container" style="display: flex; flex-direction: column; gap: 12px; font-size: 14px; color: #4b5563;">
-                    Aguardando processamento de dados realtime para consolidação do relatório...
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        let currentPage = 1;
-        const rowsPerPage = 50;
-        let showAllRows = false;
-        let filteredList = [];
-
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            
-            document.getElementById(`tab-${tabId}`).classList.add('active');
-            const btnIndex = tabId === 'import' ? 0 : (tabId === 'dashboard' ? 1 : 2);
-            document.querySelectorAll('.tab-btn')[btnIndex].classList.add('active');
-        }
-
-        window.emitVoiceAlert = function(text) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'pt-BR';
-                utterance.rate = 1.1;
-                window.speechSynthesis.speak(utterance);
-            }
-        };
-
-        window.refreshDashboardUI = function() {
-            document.getElementById('ui-b1-count').innerText = window.totalB1Count.toLocaleString();
-            document.getElementById('ui-b2-count').innerText = window.totalB2Count.toLocaleString();
-            
-            const totalEsperado = window.totalB1Count + window.totalB2Count;
-            document.getElementById('ui-total-esperado').innerText = totalEsperado.toLocaleString();
-
-            const totalBipado = window.scannedItemsList.length;
-            document.getElementById('ui-total-bipado').innerText = totalBipado.toLocaleString();
-
-            let percentage = 0;
-            if (totalEsperado > 0) {
-                percentage = (totalBipado / totalEsperado) * 100;
-            }
-            if(percentage > 100) percentage = 100;
-
-            document.getElementById('ui-percentage').innerText = percentage.toFixed(2) + '%';
-            
-            const offset = 440 - (440 * percentage) / 100;
-            document.getElementById('progress-circle').style.strokeDashoffset = offset;
-
-            applySearchAndPaginationFilter();
-        };
-
-        function applySearchAndPaginationFilter() {
-            const query = document.getElementById('table-search').value.toLowerCase().trim();
-            
-            if (!query) {
-                filteredList = [...window.scannedItemsList];
-            } else {
-                filteredList = window.scannedItemsList.filter(item => {
-                    return (item.trackingNumber && item.trackingNumber.toLowerCase().includes(query)) ||
-                           (item.statusOriginal && item.statusOriginal.toLowerCase().includes(query)) ||
-                           (item.destinationHub && item.destinationHub.toLowerCase().includes(query)) ||
-                           (item.action && item.action.toLowerCase().includes(query));
-                });
-            }
-
-            renderOperationalTable();
-        }
-
-        function handleSearch() {
-            currentPage = 1;
-            applySearchAndPaginationFilter();
-        }
-
-        function toggleShowAll() {
-            showAllRows = !showAllRows;
-            document.getElementById('btn-show-all').innerText = showAllRows ? "Paginar" : "Ver Tudo";
-            renderOperationalTable();
-        }
-
-        function changePage(step) {
-            currentPage += step;
-            renderOperationalTable();
-        }
-
-        function renderOperationalTable() {
-            const tbody = document.getElementById('live-table-body');
-            const pagBar = document.getElementById('pagination-bar');
-            
-            if (!tbody) return;
-
-            if (filteredList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #94a3b8; padding: 48px; font-style: italic;">Nenhum registro correspondente encontrado.</td></tr>`;
-                pagBar.style.display = 'none';
-                return;
-            }
-
-            pagBar.style.display = 'flex';
-            
-            let start = (currentPage - 1) * rowsPerPage;
-            let end = start + rowsPerPage;
-            
-            if (showAllRows) {
-                start = 0;
-                end = filteredList.length;
-            }
-
-            if (start >= filteredList.length && filteredList.length > 0) {
-                currentPage = 1;
-                start = 0;
-                end = rowsPerPage;
-            }
-
-            const pageItems = filteredList.slice(start, end);
-            
-            document.getElementById('pagination-info-text').innerText = `Exibindo ${start + 1}-${Math.min(end, filteredList.length)} de ${filteredList.length}`;
-            document.getElementById('btn-page-current').innerText = currentPage;
-            document.getElementById('btn-page-prev').disabled = (currentPage === 1 || showAllRows);
-            document.getElementById('btn-page-next').disabled = (end >= filteredList.length || showAllRows);
-
-            let html = '';
-            pageItems.forEach(item => {
-                const validationText = item.encontrado === 'SIM' ? 'OK' : 'FALHA';
-                const originText = item.origin || 'N/A';
-                const locText = item.locationType || '-';
-
-                html += `
-                    <tr>
-                        <td><strong>${item.trackingNumber}</strong></td>
-                        <td><span style="color: #4b5563; font-weight: 500;">${item.statusOriginal || 'N/A'}</span></td>
-                        <td><span style="color: #1f2937; font-weight: 500;">${item.destinationHub || 'N/A'}</span></td>
-                        <td style="text-align: center; color: #4b5563;">${locText}</td>
-                        <td style="text-align: center; font-weight: 500; color: #1f2937;">
-                            ${item.action || 'IR PARA ÁREA DE TRATATIVA'}
-                        </td>
-                        <td style="text-align: center; color: #4b5563;">${originText}</td>
-                        <td style="text-align: center; font-weight: 600; color: #1f2937;">${validationText}</td>
-                    </tr>
-                `;
-            });
-
-            tbody.innerHTML = html;
-        }
-
-        window.calculateAndRenderReport = function() {
-            let total = window.scannedItemsList.length;
-            let fluxo = 0, estacao = 0, tratativa = 0;
-            let hubCountMap = {};
-
-            window.scannedItemsList.forEach(item => {
-                const action = item.action || '';
-                if (action.includes('MANTER FLUXO')) fluxo++;
-                else if (action.includes('ESTAÇÃO CORRETA')) estacao++;
-                else tratativa++;
-
-                const hub = item.destinationHub || 'NÃO ENCONTRADO';
-                if (!hubCountMap[hub]) hubCountMap[hub] = { total: 0, tratativa: 0, fluxo: 0, estacao: 0 };
-                hubCountMap[hub].total++;
-                if (action.includes('MANTER FLUXO')) hubCountMap[hub].fluxo++;
-                else if (action.includes('ESTAÇÃO CORRETA')) hubCountMap[hub].estacao++;
-                else hubCountMap[hub].tratativa++;
-            });
-
-            document.getElementById('rep-total').innerText = total;
-            document.getElementById('rep-fluxo').innerText = fluxo;
-            document.getElementById('rep-estacao').innerText = estacao;
-            document.getElementById('rep-tratativa').innerText = tratativa;
-
-            const container = document.getElementById('report-details-container');
-            if (!container) return;
-
-            if (total === 0) {
-                container.innerHTML = 'Aguardando processamento de dados realtime para consolidação do relatório...';
-                return;
-            }
-
-            let html = '';
-            for (let hub in hubCountMap) {
-                const stats = hubCountMap[hub];
-                html += `
-                    <div style="padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px; background-color: #f8fafc;">
-                        <strong style="color: #1f2937; font-size: 15px;">📍 Hub: ${hub}</strong>
-                        <div style="display: flex; gap: 24px; margin-top: 8px; font-size: 13px;">
-                            <span>📦 Total no Hub: <strong>${stats.total}</strong></span>
-                            <span style="color: #059669;">✔ Fluxo Correto: <strong>${stats.fluxo}</strong></span>
-                            <span style="color: #d97706;">⚠ Estação Errada: <strong>${stats.estacao}</strong></span>
-                            <span style="color: #dc2626;">❌ Tratativa: <strong>${stats.tratativa}</strong></span>
-                        </div>
-                    </div>
-                `;
-            }
-            container.innerHTML = html;
-        };
-
-        function parseRFC4180CSV(text) {
-            let lines = [];
-            let row = [""];
-            let inQuotes = false;
-
-            for (let i = 0; i < text.length; i++) {
-                let c = text[i];
-                let next = text[i+1];
-
-                if (c === '"') {
-                    if (inQuotes && next === '"') {
-                        row[row.length - 1] += '"';
-                        i++;
-                    } else {
-                        inQuotes = !inQuotes;
-                    }
-                } else if (c === ',' && !inQuotes) {
-                    row.push("");
-                } else if ((c === '\r' || c === '\n') && !inQuotes) {
-                    if (c === '\r' && next === '\n') { i++; }
-                    lines.push(row);
-                    row = [""];
-                } else {
-                    row[row.length - 1] += c;
-                }
-            }
-            if (row.length > 1 || row[0] !== "") {
-                lines.push(row);
-            }
-            return lines;
-        }
-
-        window.handleFileSelectUnified = function(event, baseNum) {
+        // --- APENAS O MOTOR DE IMPORTAÇÃO ATUALIZADO (SUPORTE A ZIP, MULTI-ARQUIVOS, INCREMENTAL E LOTE PESADO +20K) ---
+        window.handleFileImport = async function(event, baseNumber) {
             const files = event.target.files;
             if (!files || files.length === 0) return;
 
-            showLoading(true, "Lendo e interpretando pacotes de dados de triagem...");
+            const overlay = document.getElementById('loading-overlay');
+            const progressTxt = document.getElementById('loading-text');
+            if (overlay) overlay.style.display = 'flex';
 
-            let filePromises = [];
+            let combinedTextData = "";
 
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                if (file.name.toLowerCase().endsWith('.zip')) {
-                    const p = file.arrayBuffer().then(buf => {
-                        return JSZip.loadAsync(buf).then(zip => {
-                            let zipPromises = [];
-                            zip.forEach((relativePath, zipEntry) => {
-                                if (!zipEntry.dir && relativePath.toLowerCase().endsWith('.csv')) {
-                                    const zp = zipEntry.async("string").then(csvText => {
-                                        processCsvContentText(csvText, baseNum);
-                                    });
-                                    zipPromises.push(zp);
-                                }
-                            });
-                            return Promise.all(zipPromises);
+            try {
+                // 1. Loop para ler múltiplos arquivos de uma só vez ou arquivos .zip descompactados
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    if (progressTxt) progressTxt.innerText = `Lendo arquivo ${i+1} de ${files.length}: ${file.name}...`;
+
+                    if (file.name.endsWith('.zip')) {
+                        const zip = await JSZip.loadAsync(file);
+                        for (const filename of Object.keys(zip.files)) {
+                            if (filename.endsWith('.csv')) {
+                                const unzippedContent = await zip.files[filename].async("text");
+                                combinedTextData += "\n" + unzippedContent;
+                            }
+                        }
+                    } else {
+                        const content = await new Promise((resolve) => {
+                            const reader = new FileReader();
+                            reader.onload = (e) => resolve(e.target.result);
+                            reader.readAsText(file);
                         });
-                    });
-                    filePromises.push(p);
-                } else {
-                    const p = new Promise((resolve) => {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            processCsvContentText(e.target.result, baseNum);
-                            resolve();
-                        };
-                        reader.readAsText(file, "UTF-8");
-                    });
-                    filePromises.push(p);
+                        combinedTextData += "\n" + content;
+                    }
                 }
-            }
 
-            Promise.all(filePromises).then(() => {
-                showLoading(false);
-                event.target.value = ''; 
-            }).catch(err => {
-                showLoading(false);
-                alert("Erro crítico no processamento das bases: " + err);
-                event.target.value = '';
-            });
+                if (progressTxt) progressTxt.innerText = "Processando matriz de colunas...";
+                const lines = combinedTextData.split(/\r?\n/);
+                let parsedMap = {};
+                let headers = [];
+                let trackingIdx = -1, statusIdx = -1, hubIdx = -1, typeIdx = -1;
+
+                // 2. Mapeamento das colunas do CSV
+                for (let i = 0; i < lines.length; i++) {
+                    let cleanLine = lines[i].trim();
+                    if (!cleanLine) continue;
+
+                    let cols = cleanLine.split(/[;,]/).map(c => c.replace(/^["']|["']$/g, '').trim());
+
+                    if (headers.length === 0) {
+                        if (cols.some(c => c.toLowerCase().includes('tracking') || c.toLowerCase().includes('status') || c.toLowerCase().includes('hub') || c.toLowerCase().includes('task'))) {
+                            headers = cols;
+                            trackingIdx = cols.findIndex(c => c.toLowerCase().includes('tracking_number') || c.toLowerCase().includes('tracking_id') || c.toLowerCase().includes('trackingnumber') || c.toLowerCase().includes('id') || c.toLowerCase().includes('code'));
+                            statusIdx = cols.findIndex(c => c.toLowerCase().includes('status') || c.toLowerCase().includes('state'));
+                            hubIdx = cols.findIndex(c => c.toLowerCase().includes('destination_hub') || c.toLowerCase().includes('hub') || c.toLowerCase().includes('destin'));
+                            typeIdx = cols.findIndex(c => c.toLowerCase().includes('location_type') || c.toLowerCase().includes('type') || c.toLowerCase().includes('office'));
+                            
+                            if (trackingIdx === -1) trackingIdx = 0;
+                        }
+                        continue;
+                    }
+
+                    if (cols.length <= 1) continue;
+                    let tracking = cols[trackingIdx] || '';
+                    if (!tracking || tracking.toLowerCase() === 'tracking_number' || tracking.toLowerCase() === 'tracking number') continue;
+
+                    let status = statusIdx !== -1 ? cols[statusIdx] : 'N/A';
+                    let hub = hubIdx !== -1 ? cols[hubIdx] : 'N/A';
+                    let type = typeIdx !== -1 ? cols[typeIdx] : '-';
+
+                    parsedMap[tracking] = {
+                        trackingNumber: tracking,
+                        status: status,
+                        destinationHub: hub,
+                        locationType: type
+                    };
+                }
+
+                const totalKeys = Object.keys(parsedMap).length;
+                if (totalKeys === 0) {
+                    alert("Aviso: Nenhum dado válido foi extraído dos arquivos anexados.");
+                    if (overlay) overlay.style.display = 'none';
+                    return;
+                }
+
+                // 3. Salvamento fatiado em Chunks de 2.500 usando update() para não apagar o histórico existente
+                const keys = Object.keys(parsedMap);
+                const chunkSize = 2500;
+                const totalChunks = Math.ceil(keys.length / chunkSize);
+                const targetNode = baseNumber === 1 ? 'planilha_base1' : 'planilha_base2';
+
+                for (let chunkIdx = 0; chunkIdx < totalChunks; chunkIdx++) {
+                    let currentChunkSlice = {};
+                    let start = chunkIdx * chunkSize;
+                    let end = Math.min(start + chunkSize, keys.length);
+
+                    for (let k = start; k < end; k++) {
+                        currentChunkSlice[keys[k]] = parsedMap[keys[k]];
+                    }
+
+                    if (progressTxt) progressTxt.innerText = `Sincronizando lote pesado: ${end} de ${totalKeys}...`;
+                    await window.firebaseActions.updateData(targetNode, currentChunkSlice);
+                }
+
+                if (progressTxt) progressTxt.innerText = "Sincronização realizada com sucesso!";
+                setTimeout(() => { if (overlay) overlay.style.display = 'none'; }, 800);
+
+            } catch (err) {
+                console.error(err);
+                alert("Erro ao realizar a importação pesada: " + err.message);
+                if (overlay) overlay.style.display = 'none';
+            }
         };
 
-        function processCsvContentText(text, baseNum) {
-            const rows = parseRFC4180CSV(text);
-            if (rows.length < 2) return;
-
-            const headerRow = rows[0].map(h => h.trim().replace(/^\uFEFF/, '').replace(/^"|"$/g, ''));
-            
-            let trackingIdx = headerRow.indexOf('SLS Tracking Number');
-            if (trackingIdx === -1) trackingIdx = headerRow.indexOf('Tracking Number');
-            if (trackingIdx === -1) trackingIdx = 1; 
-
-            let statusIdx = headerRow.indexOf('Status');
-            if (statusIdx === -1) statusIdx = 22; 
-
-            let hubIdx = headerRow.indexOf('Destination Hub');
-            if (hubIdx === -1) hubIdx = 44; 
-
-            let locTypeIdx = headerRow.indexOf('Location Type');
-            if (locTypeIdx === -1) locTypeIdx = 10; 
-
-            let chunkUpdates = {};
-            let countCount = 0;
-
-            for (let i = 1; i < rows.length; i++) {
-                const columns = rows[i];
-                if (columns.length <= Math.max(trackingIdx, statusIdx, hubIdx)) continue;
-
-                const trackingNumber = columns[trackingIdx] ? columns[trackingIdx].trim() : '';
-                if (!trackingNumber || trackingNumber === 'SLS Tracking Number' || trackingNumber === 'Tracking Number') continue;
-
-                const statusVal = columns[statusIdx] ? columns[statusIdx].trim() : 'N/A';
-                const destinationHub = columns[hubIdx] ? columns[hubIdx].trim() : 'N/A';
-                const locationType = columns[locTypeIdx] ? columns[locTypeIdx].trim() : '-';
-
-                chunkUpdates[trackingNumber] = {
-                    status: statusVal,
-                    destinationHub: destinationHub,
-                    locationType: locationType
-                };
-                countCount++;
-            }
-
-            if (countCount > 0) {
-                const nodeName = baseNum === 1 ? 'planilha_base1' : 'planilha_base2';
-                window.firebaseActions.updateData(nodeName, chunkUpdates);
-            }
-        }
-
-        function showLoading(show, message = "") {
-            const screen = document.getElementById('loading-screen');
-            const txt = document.getElementById('loading-text');
-            if(screen) screen.style.display = show ? 'flex' : 'none';
-            if(txt && message) txt.innerText = message;
-        }
-
-        window.clearDatabaseNode = function(node) {
+        window.clearCloudNode = function(node) {
             if(confirm(`Deseja limpar todos os registros de ${node}?`)) {
                 window.firebaseActions.removeNode(node);
             }
@@ -1072,7 +658,263 @@
         };
 
         window.clearOnlyScans = function() { if(confirm("Zerar histórico de bips realtime?")) window.firebaseActions.removeNode('bips_triagem'); };
-        window.clearOnlyBases = function() { if(confirm("Limpar dados das duas planilhas na nuvem?")) { window.firebaseActions.removeNode('planilha_base1'); window.firebaseActions.removeNode('planilha_base2'); } };
+        window.clearOnlyBases = function() { if(confirm("Limpar dados das duas bases de triagem salvas na nuvem?")) { window.firebaseActions.removeNode('planilha_base1'); window.firebaseActions.removeNode('planilha_base2'); } };
+    </script>
+</head>
+<body>
+
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <div id="loading-text">Processando bases pesadas de triagem...</div>
+    </div>
+
+    <div class="navbar">
+        <div class="brand">
+            <strong>Parcel Sweeper Hub</strong><span>|</span>Executive Suite Smart Crossdocking
+        </div>
+        <div class="user-profile">
+            <span>Operador Conectado</span>
+            <div style="width:8px; height:8px; background-color:#10b981; border-radius:50%"></div>
+        </div>
+    </div>
+
+    <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('tab-scan')">Painel de Triagem Realtime</button>
+        <button class="tab-btn" onclick="switchTab('tab-import')">Importação das Bases Logísticas</button>
+    </div>
+
+    <div id="tab-scan" class="tab-content active">
+        <div class="operational-alert-container alert-idle" id="live-operational-alert">
+            PAINEL OPERACIONAL AGUARDANDO LEITURA DO PRIMEIRO PACOTE
+        </div>
+
+        <div class="dashboard-layout">
+            <div class="sidebar">
+                <div class="chart-box">
+                    <svg width="180" height="180">
+                        <circle class="circle-bg" cx="90" cy="90" r="70"/>
+                        <circle id="live-progress-circle" class="circle-progress" cx="90" cy="90" r="70"/>
+                    </svg>
+                    <div class="chart-text">
+                        <div class="chart-percentage" id="live-p-text">0%</div>
+                        <div class="chart-label">Sucesso</div>
+                    </div>
+                </div>
+                <div class="stats-list">
+                    <div class="stat-item"><span>Total Bipados</span><span class="value" id="s-total">0</span></div>
+                    <div class="stat-item"><span>Manter Fluxo</span><span class="value" style="color:#059669; background-color:#ecfdf5" id="s-fluxo">0</span></div>
+                    <div class="stat-item"><span>Alteração Rota</span><span class="value" style="color:#1d4ed8; background-color:#eff6ff" id="s-rota">0</span></div>
+                    <div class="stat-item"><span>Estação Incorreta</span><span class="value" style="color:#b45309; background-color:#fffbeb" id="s-estacao">0</span></div>
+                    <div class="stat-item"><span>Tratativa Urgente</span><span class="value" style="color:#b91c1c; background-color:#fef2f2" id="s-tratativa">0</span></div>
+                    <div class="stat-item"><span>Direcionar XPT</span><span class="value" style="color:#db2777; background-color:#fdf2f8" id="s-xpt">0</span></div>
+                </div>
+            </div>
+
+            <div style="flex:1; display:flex; flex-direction:column; gap:24px;">
+                <div class="scanner-container">
+                    <div class="scanner-label">ENTRADA DO SCANNER:</div>
+                    <input type="text" id="main-barcode-scanner" class="scanner-input" placeholder="Aguardando sincronização segura das bases com a nuvem..." disabled>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <input type="text" class="table-search-input" placeholder="Buscar por código de barras..." id="search-scan-input" oninput="window.refreshDashboardUI()">
+                        <div class="actions-group">
+                            <button class="export-btn" onclick="window.exportToExcelXLSX()">Exportar CSV Consolidado</button>
+                            <button class="reset-btn" onclick="window.clearOnlyScans()">Zerar Bips</button>
+                        </div>
+                    </div>
+                    <div class="table-scroll">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tracking ID / Barcode</th>
+                                    <th>Status Original</th>
+                                    <th>Hub Destino</th>
+                                    <th style="text-align:center">Tipo</th>
+                                    <th style="text-align:center">Ação Operacional</th>
+                                    <th style="text-align:center">Origem</th>
+                                    <th style="text-align:center">Match</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scan-tbody">
+                                <tr><td colspan="7" style="text-align:center; color:#9ca3af; padding:40px 0;">Nenhum pacote bipado nesta sessão.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination-container">
+                        <span id="pagination-info">Exibindo 0 registros</span>
+                        <div class="pagination-buttons">
+                            <button class="page-btn" id="btn-prev-page" onclick="changePage(-1)" disabled>Anterior</button>
+                            <button class="page-btn" id="btn-next-page" onclick="changePage(1)" disabled>Próxima</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-import" class="tab-content">
+        <div class="report-grid">
+            <div class="report-card report-card-blue">
+                <div class="report-card-title">Base Forward (Planilha 1)</div>
+                <div class="report-card-value" id="card-b1-total">0</div>
+            </div>
+            <div class="report-card report-card-purple">
+                <div class="report-card-title">Base Receive Task (Planilha 2)</div>
+                <div class="report-card-value" id="card-b2-total">0</div>
+            </div>
+        </div>
+
+        <div class="card" id="import-summary-card" style="display:none; margin-bottom:32px; border-left:4px solid #10b981; background-color:#f0fdf4">
+            <div style="font-size:14px; color:#14532d; line-height:1.6;" id="import-summary-text"></div>
+        </div>
+
+        <div class="import-grid">
+            <div>
+                <h3 style="font-size:14px; font-weight:700; color:#334155; margin-bottom:12px; text-transform:uppercase; letter-spacing:0.5px;">Bases Forward (Base 1)</h3>
+                <div class="import-box" id="box-file-1" onclick="document.getElementById('file-input-1').click()">
+                    <div style="font-size:32px; margin-bottom:12px;" id="icon-file-1">📥</div>
+                    <div style="font-size:14px; font-weight:600; color:#475569;" id="label-file-1">Selecionar Bases Forward (.csv ou .zip)</div>
+                    <div style="font-size:11px; color:#94a3b8; margin-top:6px;">Aceita múltiplos arquivos ou pacotes comprimidos (.zip)</div>
+                </div>
+                <input type="file" id="file-input-1" style="display:none;" multiple accept=".csv,.zip" onchange="window.handleFileImport(event, 1)">
+                <button class="reset-btn" style="width:100%; margin-top:12px; justify-content:center;" onclick="window.clearCloudNode('planilha_base1')">Apagar Registros da Base 1</button>
+            </div>
+
+            <div>
+                <h3 style="font-size:14px; font-weight:700; color:#334155; margin-bottom:12px; text-transform:uppercase; letter-spacing:0.5px;">Bases Receive Task (Base 2)</h3>
+                <div class="import-box" id="box-file-2" onclick="document.getElementById('file-input-2').click()">
+                    <div style="font-size:32px; margin-bottom:12px;" id="icon-file-2">📥</div>
+                    <div style="font-size:14px; font-weight:600; color:#475569;" id="label-file-2">Selecionar Bases Receive Task (.csv ou .zip)</div>
+                    <div style="font-size:11px; color:#94a3b8; margin-top:6px;">Aceita múltiplos arquivos ou pacotes comprimidos (.zip)</div>
+                </div>
+                <input type="file" id="file-input-2" style="display:none;" multiple accept=".csv,.zip" onchange="window.handleFileImport(event, 2)">
+                <button class="reset-btn" style="width:100%; margin-top:12px; justify-content:center;" onclick="window.clearCloudNode('planilha_base2')">Apagar Registros da Base 2</button>
+            </div>
+        </div>
+
+        <div style="margin-top:32px; text-align:right">
+            <button class="export-btn" style="background-color:#fee2e2; color:#991b1b; border-color:#fca5a5" onclick="window.clearOnlyBases()">Limpar Ambas as Bases Completamente</button>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        const rowsPerPage = 50;
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        window.emitVoiceAlert = function(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'pt-BR';
+                utterance.rate = 1.1;
+                window.speechSynthesis.speak(utterance);
+            }
+        };
+
+        window.refreshDashboardUI = function() {
+            const query = document.getElementById('search-scan-input') ? document.getElementById('search-scan-input').value.trim().toLowerCase() : '';
+            const tbody = document.getElementById('scan-tbody');
+            if (!tbody) return;
+
+            let filtered = window.scannedItemsList || [];
+            if (query) {
+                filtered = filtered.filter(item => item.trackingNumber && item.trackingNumber.toLowerCase().includes(query));
+            }
+
+            const totalRecords = filtered.length;
+            document.getElementById('s-total').innerText = window.scannedItemsList.length;
+
+            if (totalRecords === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#9ca3af; padding:40px 0;">Nenhum registro correspondente encontrado.</td></tr>`;
+                document.getElementById('pagination-info').innerText = "Exibindo 0 registros";
+                document.getElementById('btn-prev-page').disabled = true;
+                document.getElementById('btn-next-page').disabled = true;
+                return;
+            }
+
+            const totalPages = Math.ceil(totalRecords / rowsPerPage);
+            if (currentPage > totalPages) currentPage = totalPages || 1;
+
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = Math.min(startIndex + rowsPerPage, totalRecords);
+            const pageItems = filtered.slice(startIndex, endIndex);
+
+            let html = '';
+            pageItems.forEach(item => {
+                let badgeStyle = '';
+                if (item.alertClass === 'alert-green') badgeStyle = 'background-color:#e0f2fe; color:#0369a1; padding:4px 8px; border-radius:4px; font-weight:700;';
+                else if (item.alertClass === 'alert-blue') badgeStyle = 'background-color:#eff6ff; color:#1d4ed8; padding:4px 8px; border-radius:4px; font-weight:700;';
+                else if (item.alertClass === 'alert-orange') badgeStyle = 'background-color:#fffbeb; color:#b45309; padding:4px 8px; border-radius:4px; font-weight:700;';
+                else if (item.alertClass === 'alert-pink') badgeStyle = 'background-color:#fdf2f8; color:#db2777; padding:4px 8px; border-radius:4px; font-weight:700;';
+                else badgeStyle = 'background-color:#fef2f2; color:#b91c1c; padding:4px 8px; border-radius:4px; font-weight:700;';
+
+                let matchBadge = item.encontrado === 'SIM' 
+                    ? `<span style="background-color:#dcfce7; color:#15803d; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:11px;">MATCH</span>`
+                    : `<span style="background-color:#ffeeef; color:#e11d48; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:11px;">MISMATCH</span>`;
+
+                html += `
+                    <tr>
+                        <td style="font-weight:700; color:#0f172a;">${item.trackingNumber}</td>
+                        <td style="color:#475569; font-weight:500;">${item.statusOriginal || 'N/A'}</td>
+                        <td style="font-weight:600; color:#1e293b;">${item.destinationHub || 'N/A'}</td>
+                        <td style="text-align:center; font-weight:600; color:#64748b;">${item.locationType || '-'}</td>
+                        <td style="text-align:center;"><span style="${badgeStyle}">${item.action || 'TRATATIVA'}</span></td>
+                        <td style="text-align:center; font-weight:500; color:#475569;">${item.origin || 'N/A'}</td>
+                        <td style="text-align:center;">${matchBadge}</td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+            document.getElementById('pagination-info').innerText = `Exibindo ${startIndex + 1}-${endIndex} de ${totalRecords} bips`;
+            document.getElementById('btn-prev-page').disabled = currentPage === 1;
+            document.getElementById('btn-next-page').disabled = currentPage === totalPages;
+        };
+
+        function changePage(direction) {
+            currentPage += direction;
+            window.refreshDashboardUI();
+        }
+
+        window.calculateAndRenderReport = function() {
+            let total = window.scannedItemsList.length;
+            let fluxo = 0, rota = 0, estacao = 0, tratativa = 0, xpt = 0;
+
+            window.scannedItemsList.forEach(item => {
+                if (item.alertClass === 'alert-green') fluxo++;
+                else if (item.alertClass === 'alert-blue') rota++;
+                else if (item.alertClass === 'alert-orange') estacao++;
+                else if (item.alertClass === 'alert-pink') xpt++;
+                else tratativa++;
+            });
+
+            if(document.getElementById('s-fluxo')) document.getElementById('s-fluxo').innerText = fluxo;
+            if(document.getElementById('s-rota')) document.getElementById('s-rota').innerText = rota;
+            if(document.getElementById('s-estacao')) document.getElementById('s-estacao').innerText = estacao;
+            if(document.getElementById('s-tratativa')) document.getElementById('s-tratativa').innerText = tratativa;
+            if(document.getElementById('s-xpt')) document.getElementById('s-xpt').innerText = xpt;
+
+            let pct = total > 0 ? Math.round((fluxo / total) * 100) : 0;
+            if(document.getElementById('live-p-text')) document.getElementById('live-p-text').innerText = pct + '%';
+            
+            const circle = document.getElementById('live-progress-circle');
+            if (circle) {
+                let offset = 440 - (440 * pct) / 100;
+                circle.style.strokeDashoffset = offset;
+            }
+
+            if(document.getElementById('card-b1-total')) document.getElementById('card-b1-total').innerText = window.totalB1Count;
+            if(document.getElementById('card-b2-total')) document.getElementById('card-b2-total').innerText = window.totalB2Count;
+        };
     </script>
 </body>
 </html>

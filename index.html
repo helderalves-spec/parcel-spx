@@ -12,7 +12,1122 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helveti<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parcel Sweeper Hub - Executive Suite</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f3f4f6;
+            color: #1f2937;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* CONTAINER DE ALERTA OPERACIONAL LOCALIZADO (SUBSTITUTO DO VOICE BANNER) */
+        .operational-alert-container {
+            padding: 24px;
+            font-size: 24px;
+            font-weight: 800;
+            text-align: center;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+            border-radius: 12px;
+            margin-bottom: 24px;
+            transition: all 0.25s ease;
+            text-transform: uppercase;
+        }
+        
+        /* Definição de Cores das Tarjas */
+        .alert-idle { background: linear-gradient(135deg, #64748b, #475569) !important; color: #f8fafc; }
+        .alert-green { background: linear-gradient(135deg, #10b981, #059669) !important; }
+        .alert-red { background: linear-gradient(135deg, #ef4444, #dc2626) !important; }
+        .alert-orange { background: linear-gradient(135deg, #f59e0b, #d97706) !important; }
+        .alert-purple { background: linear-gradient(135deg, #7c3aed, #6d28d9) !important; }
+        .alert-blue { background: linear-gradient(135deg, #2563eb, #1d4ed8) !important; }
+        .alert-pink { background: linear-gradient(135deg, #ec4899, #db2777) !important; }
+
+        /* Top Navbar */
+        .navbar {
+            background-color: #0f172a;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .brand {
+            font-size: 16px;
+            color: #94a3b8;
+            font-weight: 500;
+            letter-spacing: -0.2px;
+        }
+
+        .brand span { color: #475569; margin: 0 8px; }
+        .brand strong { color: #f8fafc; font-weight: 700; }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+            color: #cbd5e1;
+            background-color: #1e293b;
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid #334155;
+        }
+
+        /* Navigation Tabs */
+        .tab-nav {
+            background-color: #0f172a;
+            padding: 0 32px;
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .tab-btn {
+            padding: 14px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover { color: #f8fafc; }
+        .tab-btn.active { color: #38bdf8; border-bottom-color: #38bdf8; }
+
+        /* Main Content Container */
+        .tab-content { display: none; padding: 32px; flex: 1; }
+        .tab-content.active { display: block; }
+
+        .dashboard-layout { display: flex; gap: 32px; max-width: 100%; margin: 0 auto; width: 100%; }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 32px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
+            height: fit-content;
+            flex-shrink: 0;
+        }
+
+        .chart-box {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 32px;
+        }
+
+        .circle-bg { fill: none; stroke: #f3f4f6; stroke-width: 10; }
+        .circle-progress {
+            fill: none;
+            stroke: #2563eb;
+            stroke-width: 10;
+            stroke-dasharray: 440;
+            stroke-dashoffset: 440;
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+            transition: stroke-dashoffset 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .chart-text { position: absolute; text-align: center; width: 100%; }
+        .chart-percentage { font-size: 28px; font-weight: 800; color: #111827; letter-spacing: -0.5px; }
+        .chart-label { font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px; }
+
+        .stats-list { width: 100%; border-top: 1px solid #f3f4f6; padding-top: 24px; }
+        .stat-item { display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-bottom: 16px; color: #4b5563; }
+        .stat-item .value { font-weight: 700; color: #111827; background-color: #f3f4f6; padding: 4px 10px; border-radius: 6px; }
+
+        /* Cards Gerais */
+        .card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03); }
+        .import-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+
+        /* Área do Scanner */
+        .scanner-container { background: #f8fafc; border: 1px solid #cbd5e1; padding: 20px; border-radius: 8px; display: flex; gap: 16px; align-items: center; }
+        .scanner-label { font-size: 13px; font-weight: 800; color: #334155; letter-spacing: 0.5px; }
+        .scanner-input { flex: 1; padding: 14px 18px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 16px; font-weight: 600; background-color: #ffffff; letter-spacing: 0.5px; transition: all 0.2s; }
+        .scanner-input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15); }
+
+        /* Import Box */
+        .import-box { border: 2px dashed #cbd5e1; border-radius: 12px; background-color: #ffffff; padding: 48px 24px; text-align: center; cursor: pointer; transition: all 0.2s ease; }
+        .import-box:hover { border-color: #2563eb; background-color: #f8fafc; }
+        .import-box.loaded { border-color: #10b981; background-color: #f0fdf4; border-style: solid; }
+
+        /* Tabelas */
+        .table-container { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.02), 0 4px 6px -2px rgba(0,0,0,0.01); width: 100%; }
+        .table-header { padding: 20px 24px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; background-color: #ffffff; flex-wrap: wrap; gap: 16px; }
+        .table-search-input { padding: 10px 16px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 13px; width: 280px; background-color: #f9fafb; transition: all 0.2s; }
+        .actions-group { display: flex; gap: 12px; align-items: center; }
+
+        .export-btn, .pdf-btn, .reset-btn { padding: 10px 18px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; border: none; transition: all 0.2s ease; }
+        .export-btn { background-color: #ffffff; color: #374151; border: 1px solid #e5e7eb; }
+        .export-btn:hover { background-color: #f9fafb; border-color: #d1d5db; }
+        .pdf-btn { background-color: #2563eb; color: white; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.15); }
+        .pdf-btn:hover { background-color: #1d4ed8; }
+        .reset-btn { background-color: #ef4444; color: white; }
+        .reset-btn:hover { background-color: #dc2626; }
+
+        /* Paginação */
+        .pagination-container { padding: 16px 24px; background: #ffffff; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #4b5563; }
+        .pagination-buttons { display: flex; gap: 6px; }
+        .page-btn { background: #ffffff; border: 1px solid #e5e7eb; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; border-radius: 6px; color: #374151; transition: all 0.15s; }
+        .page-btn:hover:not(:disabled) { border-color: #2563eb; color: #2563eb; }
+        .page-btn:disabled { background: #f3f4f6; color: #9ca3af; cursor: not-allowed; }
+
+        .table-scroll { overflow-x: auto; max-height: 550px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; table-layout: fixed; }
+        th, td { padding: 16px 20px; border-bottom: 1px solid #f3f4f6; color: #374151; overflow: hidden; text-overflow: ellipsis; }
+        th { background-color: #f8fafc; color: #475569; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+
+        th:nth-child(1), td:nth-child(1) { width: 22%; white-space: normal; word-break: break-all; }
+        th:nth-child(2), td:nth-child(2) { width: 18%; }
+        th:nth-child(3), td:nth-child(3) { width: 22%; background-color: #ffffff; color: #374151; }
+        th:nth-child(4), td:nth-child(4) { width: 10%; text-align: center; }
+        th:nth-child(5), td:nth-child(5) { width: 14%; text-align: center; }
+        th:nth-child(6), td:nth-child(6) { width: 11%; text-align: center; }
+        th:nth-child(7), td:nth-child(7) { width: 11%; text-align: center; }
+
+        tr:hover td { background-color: #f8fafc; }
+
+        .badge { 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 6px 10px; 
+            border-radius: 6px; 
+            font-weight: 600; 
+            font-size: 11px; 
+            width: 100%; 
+            text-align: center; 
+            text-transform: uppercase; 
+            letter-spacing: 0.3px;
+            background-color: #f1f5f9; 
+            color: #334155; 
+            border: 1px solid #cbd5e1;
+        }
+
+        .action-tarja {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 12px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.2px;
+            width: 100%;
+            color: white !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* Report Grid */
+        .report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 32px; }
+        .report-card { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 28px 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); position: relative; }
+        .report-card-blue { border-top: 4px solid #2563eb; }
+        .report-card-purple { border-top: 4px solid #7c3aed; }
+        .report-card-title { font-size: 12px; color: #6b7280; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
+        .report-card-value { font-size: 36px; font-weight: 800; color: #111827; line-height: 1; letter-spacing: -1px; }
+
+        /* Loading Overlay */
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); color: white; font-size: 18px; font-weight: bold; display: none; align-items: center; justify-content: center; flex-direction: column; z-index: 9999; text-align: center; padding: 20px; }
+        .spinner { border: 4px solid rgba(255, 255, 255, 0.1); width: 55px; height: 55px; border-radius: 50%; border-left-color: #38bdf8; animation: spin 1s linear infinite; margin-bottom: 18px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+        import { getDatabase, ref, update, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC-98bTSJZekzIcbpWqvVPKzhsLPRSZbIA",
+            authDomain: "parcel-4854c.firebaseapp.com",
+            projectId: "parcel-4854c",
+            storageBucket: "parcel-4854c.firebasestorage.app",
+            messagingSenderId: "136698755428",
+            appId: "1:136698755428:web:710d834b548d91990b6271",
+            measurementId: "G-71NMSWMX4B"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const database = getDatabase(app);
+
+        window.firebaseActions = {
+            updateData: (path, data) => update(ref(database, path), data),
+            removeNode: (path) => remove(ref(database, path))
+        };
+
+        window.base1Map = {};
+        window.base2Map = {};
+        window.totalB1Count = 0;
+        window.totalB2Count = 0;
+        window.scannedItemsList = [];
+
+        onValue(ref(database, 'planilha_base1'), (snapshot) => {
+            window.base1Map = snapshot.val() || {};
+            window.totalB1Count = Object.keys(window.base1Map).length;
+            updateImportVisuals(1, window.totalB1Count);
+            checkAndUnlockScanner();
+            triggerRetroactiveRecalculate();
+        });
+
+        onValue(ref(database, 'planilha_base2'), (snapshot) => {
+            window.base2Map = snapshot.val() || {};
+            window.totalB2Count = Object.keys(window.base2Map).length;
+            updateImportVisuals(2, window.totalB2Count);
+            checkAndUnlockScanner();
+            triggerRetroactiveRecalculate();
+        });
+
+        onValue(ref(database, 'bips_triagem'), (snapshot) => {
+            const data = snapshot.val() || {};
+            const items = Object.keys(data).map(key => data[key]);
+            items.sort((a, b) => new Date(b.timestampBip) - new Date(a.timestampBip));
+            window.scannedItemsList = items;
+            window.refreshDashboardUI();
+            window.calculateAndRenderReport(); 
+        });
+
+        function updateImportVisuals(baseNum, count) {
+            const box = document.getElementById(`box-file-${baseNum}`);
+            const icon = document.getElementById(`icon-file-${baseNum}`);
+            const label = document.getElementById(`label-file-${baseNum}`);
+            if(!box || !icon || !label) return;
+
+            if (count > 0) {
+                box.classList.add('loaded');
+                icon.innerText = '✔';
+                label.innerText = `Base ${baseNum}: ${count} ordens salvas na nuvem`;
+            } else {
+                box.classList.remove('loaded');
+                icon.innerText = '📥';
+                label.innerText = baseNum === 1 ? "Selecionar Bases Forward (.csv ou .zip)" : "Selecionar Bases Receive Task (.csv ou .zip)";
+            }
+        }
+
+        function checkAndUnlockScanner() {
+            const totalRecords = window.totalB1Count + window.totalB2Count;
+            const scannerInput = document.getElementById('main-barcode-scanner');
+            const summaryCard = document.getElementById('import-summary-card');
+            const summaryText = document.getElementById('import-summary-text');
+
+            if (scannerInput) {
+                if (totalRecords > 0) {
+                    scannerInput.disabled = false;
+                    scannerInput.placeholder = "Passe o leitor de código de barras corporativo...";
+                    if(summaryCard) summaryCard.style.display = 'block';
+                    if(summaryText) {
+                        summaryText.innerHTML = `
+                            <strong>Base 1 (Forward):</strong> ${window.totalB1Count} registros na nuvem.<br>
+                            <strong>Base 2 (Receive Task):</strong> ${window.totalB2Count} registros na nuvem.<br>
+                            <strong>Total Consolidado:</strong> ${totalRecords} ordens ativas para cruzamento prioritário.
+                        `;
+                    }
+                } else {
+                    scannerInput.disabled = true;
+                    scannerInput.placeholder = "Aguardando sincronização segura das bases com a nuvem...";
+                    if(summaryCard) summaryCard.style.display = 'none';
+                }
+            }
+            window.refreshDashboardUI();
+        }
+
+        function triggerRetroactiveRecalculate() {
+            if (!window.scannedItemsList || window.scannedItemsList.length === 0) return;
+            
+            let updates = {};
+            let mudouAlgo = false;
+
+            window.scannedItemsList.forEach(item => {
+                const barcode = item.trackingNumber;
+                if(!barcode) return;
+
+                let b1Data = window.base1Map ? window.base1Map[barcode] : null;
+                let b2Data = window.base2Map ? window.base2Map[barcode] : null;
+
+                let originLabel = 'NÃO ENCONTRADO';
+                let isFound = 'NÃO';
+                let statusText = 'NÃO ENCONTRADO';
+                let destHub = 'N/A';
+                let locType = '-'; 
+                let actionText = 'IR PARA ÁREA DE TRATATIVA';
+                let currentClass = 'alert-red'; 
+
+                if (b1Data) {
+                    isFound = 'SIM';
+                    originLabel = b2Data ? 'Ambas' : 'Base 1';
+                    statusText = b2Data ? (b2Data.status || b1Data.status || 'N/A') : (b1Data.status || 'N/A');
+                    destHub = b1Data.destinationHub || 'N/A';
+                    locType = b1Data.locationType || (b2Data ? b2Data.locationType : '-');
+                } 
+                else if (b2Data) {
+                    isFound = 'SIM';
+                    originLabel = 'Base 2';
+                    statusText = b2Data.status || 'N/A';
+                    destHub = b2Data.destinationHub || 'N/A';
+                    locType = b2Data.locationType || '-';
+                }
+
+                if (isFound === 'SIM') {
+                    const hubLower = destHub.toLowerCase();
+                    const statusLower = statusText.toLowerCase();
+                    
+                    const isUberaba = hubLower.includes('uberaba');
+                    const isXPT = hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
+
+                    if (isUberaba && (statusText === 'LMHub_Received' || statusLower === 'lmhub_received' || statusLower.includes('received'))) {
+                        statusText = `LMHub_Received_${locType}`;
+                    }
+
+                    if (statusText.startsWith('LMHub_Assigning') || statusLower.includes('assigning')) {
+                        actionText = 'DIRECIONAR A ROTA CORRETA';
+                        currentClass = 'alert-blue';
+                    }
+                    else if (isXPT) {
+                        actionText = 'DIRECIONAR AO XPT';
+                        currentClass = 'alert-pink';
+                    }
+                    else if (!isUberaba) {
+                        actionText = 'DIRECIONAR A ESTAÇÃO CORRETA';
+                        currentClass = 'alert-orange';
+                    }
+                    else if (statusText.startsWith('LMHub_Received')) {
+                        actionText = 'MANTER FLUXO';
+                        currentClass = 'alert-green';
+                    } 
+                    else {
+                        actionText = 'IR PARA ÁREA DE TRATATIVA';
+                        currentClass = 'alert-red';
+                    }
+                }
+
+                if (item.statusOriginal !== statusText || item.destinationHub !== destHub || item.action !== actionText || item.encontrado !== isFound || item.alertClass !== currentClass) {
+                    updates[barcode] = {
+                        ...item,
+                        statusOriginal: statusText,
+                        destinationHub: destHub,
+                        locationType: locType,
+                        action: actionText,
+                        origin: originLabel,
+                        encontrado: isFound,
+                        alertClass: currentClass
+                    };
+                    mudouAlgo = true;
+                }
+            });
+
+            if (mudouAlgo) {
+                window.firebaseActions.updateData('bips_triagem', updates);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const scannerInput = document.getElementById('main-barcode-scanner');
+            if (scannerInput) {
+                scannerInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        const code = this.value.trim();
+                        if (code) {
+                            if (code.length > 15) {
+                                window.updateOperationalAlert(`❌ ERRO: CÓDIGO INVÁLIDO (${code.length} DÍGITOS). BIPAGEM NÃO PERMITIDA!`, 'alert-red');
+                                window.emitVoiceAlert('Código inválido');
+                                this.value = ''; 
+                                e.preventDefault();
+                                return;
+                            }
+                            processBarcodeBip(code);
+                            this.value = ''; 
+                        }
+                    }
+                });
+            }
+        });
+
+        function processBarcodeBip(barcode) {
+            let b1Data = window.base1Map ? window.base1Map[barcode] : null;
+            let b2Data = window.base2Map ? window.base2Map[barcode] : null;
+
+            let originLabel = 'NÃO ENCONTRADO';
+            let isFound = 'NÃO';
+            let statusText = 'NÃO ENCONTRADO';
+            let destHub = 'N/A';
+            let locType = '-'; 
+            let actionText = 'IR PARA ÁREA DE TRATATIVA';
+            let alertColor = 'alert-red';
+            let voiceMessage = 'Não encontrado, ir para área de tratativa';
+
+            if (b1Data) {
+                isFound = 'SIM';
+                originLabel = b2Data ? 'Ambas' : 'Base 1';
+                statusText = b2Data ? (b2Data.status || b1Data.status || 'N/A') : (b1Data.status || 'N/A');
+                destHub = b1Data.destinationHub || 'N/A';
+                locType = b1Data.locationType || (b2Data ? b2Data.locationType : '-');
+            } 
+            else if (b2Data) {
+                isFound = 'SIM';
+                originLabel = 'Base 2';
+                statusText = b2Data.status || 'N/A';
+                destHub = b2Data.destinationHub || 'N/A';
+                locType = b2Data.locationType || '-';
+            }
+
+            if (isFound === 'SIM') {
+                const hubLower = destHub.toLowerCase();
+                const statusLower = statusText.toLowerCase();
+                
+                const isUberaba = hubLower.includes('uberaba');
+                const isXPT = hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
+
+                if (isUberaba && (statusText === 'LMHub_Received' || statusLower === 'lmhub_received' || statusLower.includes('received'))) {
+                    statusText = `LMHub_Received_${locType}`;
+                }
+
+                if (statusText.startsWith('LMHub_Assigning') || statusLower.includes('assigning')) {
+                    actionText = 'DIRECIONAR A ROTA CORRETA';
+                    alertColor = 'alert-blue';
+                    voiceMessage = 'Direcionar a rota correta';
+                }
+                else if (isXPT) {
+                    actionText = 'DIRECIONAR AO XPT';
+                    alertColor = 'alert-pink';
+                    voiceMessage = 'Direcionar ao xis pê tê';
+                }
+                else if (!isUberaba) {
+                    actionText = 'DIRECIONAR A ESTAÇÃO CORRETA';
+                    alertColor = 'alert-orange';
+                    voiceMessage = 'Direcionar a estação correta';
+                }
+                else if (statusText.startsWith('LMHub_Received')) {
+                    actionText = 'MANTER FLUXO';
+                    alertColor = 'alert-green';
+                    voiceMessage = 'Manter fluxo';
+                }
+                else if (statusLower.includes('delivering') || statusLower.includes('delivered')) {
+                    actionText = 'IR PARA ÁREA DE TRATATIVA';
+                    alertColor = 'alert-red';
+                    voiceMessage = 'Pacote já em rota ou entregue, ir para área de tratativa';
+                }
+                else {
+                    actionText = 'IR PARA ÁREA DE TRATATIVA';
+                    alertColor = 'alert-red';
+                    voiceMessage = 'Verificar status na tratativa';
+                }
+            } else {
+                actionText = 'IR PARA ÁREA DE TRATATIVA';
+                alertColor = 'alert-red';
+                voiceMessage = 'Não encontrado, ir para área de tratativa';
+            }
+
+            window.updateOperationalAlert(`📢 ${statusText.toUpperCase()} | ${actionText}`, alertColor);
+            window.emitVoiceAlert(voiceMessage);
+
+            const newBip = {
+                trackingNumber: barcode,
+                statusOriginal: statusText,
+                destinationHub: destHub,
+                locationType: locType, 
+                action: actionText,
+                origin: originLabel,
+                encontrado: isFound,
+                alertClass: alertColor,
+                timestampBip: new Date().toISOString()
+            };
+
+            window.firebaseActions.updateData('bips_triagem/' + barcode, newBip);
+        }
+
+        window.updateOperationalAlert = function(msg, cssClass) {
+            const container = document.getElementById('live-operational-alert');
+            if (container) {
+                container.className = `operational-alert-container ${cssClass}`;
+                container.innerHTML = msg;
+            }
+        };
+    </script>
+</head>
+<body>
+
+    <div id="loading-screen" class="loading-overlay">
+        <div class="spinner"></div>
+        <div id="loading-text">Processando e estruturando registros operacionais...</div>
+    </div>
+
+    <div class="navbar">
+        <div class="brand">
+            Parcel Sweeper Management <span>/</span> <strong>Dashboard Executivo de Controle de Triagem Realtime</strong>
+        </div>
+        <div class="user-profile">
+            <span>👤 Operador: helder.alves</span>
+        </div>
+    </div>
+
+    <div class="tab-nav">
+        <button class="tab-btn" onclick="switchTab('import')">1. Importação de Bases</button>
+        <button class="tab-btn active" onclick="switchTab('dashboard')">2. Monitor de Bipagem Realtime</button>
+        <button class="tab-btn" onclick="switchTab('report')">3. Relatório Executivo Diário</button>
+    </div>
+
+    <div id="tab-import" class="tab-content">
+        <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px;">
+            <div>
+                <h2 style="font-size: 22px; font-weight: 700; color: #0f172a;">Carregamento Massivo de Dados</h2>
+                <p style="font-size: 14px; color: #64748b; margin-top: 4px;">Selecione os arquivos brutos (.csv) exportados ou arquivos compactados (.zip).</p>
+            </div>
+            
+            <div class="import-grid">
+                <div>
+                    <h3 style="font-size: 14px; margin-bottom: 12px; font-weight: 600; color: #475569;">Fluxo Forward (Base 1 - Procurada Primeiro)</h3>
+                    <div id="box-file-1" class="import-box" onclick="document.getElementById('csv-file-1').click()">
+                        <div id="icon-file-1" style="font-size: 36px; margin-bottom: 12px; color: #3b82f6;">📥</div>
+                        <span id="label-file-1" style="font-size: 13px; font-weight: 600; color: #334155;">Selecionar Bases Forward (.csv ou .zip)</span>
+                        <input type="file" id="csv-file-1" accept=".csv,.zip" multiple style="display: none;" onchange="handleFileSelectUnified(event, 1)">
+                    </div>
+                </div>
+
+                <div>
+                    <h3 style="font-size: 14px; margin-bottom: 12px; font-weight: 600; color: #475569;">Fluxo Receive Task (Base 2 - Mapeamento)</h3>
+                    <div id="box-file-2" class="import-box" onclick="document.getElementById('csv-file-2').click()">
+                        <div id="icon-file-2" style="font-size: 36px; margin-bottom: 12px; color: #0284c7;">📥</div>
+                        <span id="label-file-2" style="font-size: 13px; font-weight: 600; color: #334155;">Selecionar Bases Receive Task (.csv ou .zip)</span>
+                        <input type="file" id="csv-file-2" accept=".csv,.zip" multiple style="display: none;" onchange="handleFileSelectUnified(event, 2)">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" id="import-summary-card" style="display: none; border-left: 4px solid #10b981;">
+                <h4 style="color: #065f46; font-size: 16px;">✔ Sistema Sincronizado e Conectado em Rede</h4>
+                <div style="font-size: 13px; margin-top: 8px; color: #374151; line-height: 1.6;" id="import-summary-text"></div>
+                
+                <div style="margin-top: 20px; display: flex; flex-wrap: wrap; gap: 12px;">
+                    <button style="padding: 12px 24px; background-color: #2563eb; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer;" onclick="switchTab('dashboard')">Iniciar Monitoramento →</button>
+                    <button style="padding: 12px 16px; background-color: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;" onclick="clearDatabaseNode('planilha_base1')">Resetar Apenas Base 1</button>
+                    <button style="padding: 12px 16px; background-color: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;" onclick="clearDatabaseNode('planilha_base2')">Resetar Apenas Base 2</button>
+                    <button style="padding: 12px 16px; background-color: #fef2f2; color: #991b1b; border: 1px solid #fee2e2; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;" onclick="clearOnlyBases()">Limpar Banco de Dados</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-dashboard" class="tab-content active">
+        <div class="dashboard-layout">
+            
+            <div class="sidebar">
+                <div class="chart-box">
+                    <svg width="180" height="180" viewBox="0 0 170 170">
+                        <circle class="circle-bg" cx="85" cy="85" r="70"/>
+                        <circle class="circle-progress" id="progress-circle" cx="85" cy="85" r="70"/>
+                    </svg>
+                    <div class="chart-text">
+                        <div class="chart-percentage" id="ui-percentage">0.00%</div>
+                        <div class="chart-label">Produtividade</div>
+                    </div>
+                </div>
+                <div class="stats-list">
+                    <div class="stat-item"><span>Carga em Rede</span><span class="value" id="ui-total-esperado">0</span></div>
+                    <div class="stat-item"><span>Volumetria Base 1</span><span class="value" id="ui-b1-count">0</span></div>
+                    <div class="stat-item"><span>Volumetria Base 2</span><span class="value" id="ui-b2-count">0</span></div>
+                    <div class="stat-item"><span>Processados (Realtime)</span><span class="value" id="ui-total-bipado">0</span></div>
+                </div>
+            </div>
+
+            <div class="work-area" style="flex: 1; min-width: 0;">
+                
+                <div id="live-operational-alert" class="operational-alert-container alert-idle">
+                    Aguardando leitura do primeiro pacote para atualizar o status operacional...
+                </div>
+
+                <div class="card" style="padding: 20px;">
+                    <div class="scanner-container">
+                        <span class="scanner-label">ENTRADA DO LEITOR (BR):</span>
+                        <input type="text" id="main-barcode-scanner" class="scanner-input" placeholder="Passe o leitor de código de barras corporativo..." disabled>
+                    </div>
+                </div>
+
+                <div class="table-container" style="margin-top: 24px;">
+                    <div class="table-header">
+                        <strong style="font-size: 16px; font-weight: 700; color: #0f172a;">Malha Operacional de Triagem</strong>
+                        
+                        <div class="actions-group">
+                            <input type="text" id="table-search" class="table-search-input" placeholder="🔎 Pesquisar por ID, status ou hub..." oninput="handleSearch()">
+                            <button class="export-btn" onclick="exportToExcelXLSX()">
+                                <span>📥</span> Exportar Dados
+                            </button>
+                            <button class="reset-btn" style="padding: 10px 14px; font-size: 12px;" onclick="clearOnlyScans()">
+                                Zerar Registros
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-scroll">
+                        <table id="operational-table">
+                            <thead>
+                                <tr>
+                                    <th>Tracking ID</th>
+                                    <th>Status na Base</th>
+                                    <th>Hub Destino</th>
+                                    <th style="text-align: center;">Office / Home</th>
+                                    <th style="text-align: center;">Próxima Ação</th>
+                                    <th style="text-align: center;">Origem</th>
+                                    <th style="text-align: center;">Validação</th>
+                                </tr>
+                            </thead>
+                            <tbody id="live-table-body">
+                                <tr>
+                                    <td colspan="7" style="text-align: center; color: #94a3b8; padding: 48px; font-style: italic;">
+                                        Nenhum registro processado nesta sessão de triagem.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pagination-container" id="pagination-bar" style="display: none;">
+                        <div id="pagination-info-text">Exibindo 0-0 de 0</div>
+                        <div class="pagination-buttons">
+                            <button class="page-btn" id="btn-show-all" onclick="toggleShowAll()">Ver Tudo</button>
+                            <button class="page-btn" id="btn-page-prev" onclick="changePage(-1)">Anterior</button>
+                            <button class="page-btn" id="btn-page-current" disabled>1</button>
+                            <button class="page-btn" id="btn-page-next" onclick="changePage(1)">Próximo</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="tab-report" class="tab-content">
+        <div style="max-width: 1100px; margin: 0 auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px;">
+                <div>
+                    <h2 style="font-size: 26px; color: #0f172a; font-weight: 800; letter-spacing: -0.5px;">Performance Report</h2>
+                    <p style="font-size: 14px; color: #6b7280; margin-top: 4px;">Sumário executivo corporativo para consolidação e volumetria diária</p>
+                </div>
+                <button class="pdf-btn" onclick="window.print()">
+                    <span>🖨️</span> Imprimir Relatório (PDF)
+                </button>
+            </div>
+
+            <div class="report-grid">
+                <div class="report-card report-card-blue">
+                    <div class="report-card-title">Volume Total Processado</div>
+                    <div class="report-card-value" id="rep-total">0</div>
+                </div>
+                <div class="report-card report-card-purple" style="border-top-color: #10b981;">
+                    <div class="report-card-title">Sucesso (Manter Fluxo)</div>
+                    <div class="report-card-value" style="color: #059669;" id="rep-fluxo">0</div>
+                </div>
+                <div class="report-card report-card-purple" style="border-top-color: #f59e0b;">
+                    <div class="report-card-title">Estação Incorreta</div>
+                    <div class="report-card-value" style="color: #d97706;" id="rep-estacao">0</div>
+                </div>
+                <div class="report-card report-card-purple" style="border-top-color: #ef4444;">
+                    <div class="report-card-title">Área de Tratativa</div>
+                    <div class="report-card-value" style="color: #dc2626;" id="rep-tratativa">0</div>
+                </div>
+            </div>
+
+            <div class="card" style="padding: 32px;">
+                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 20px; color: #0f172a;">Distribuição Detalhada de Ações por Erro de Destino</h3>
+                <div id="report-details-container" style="display: flex; flex-direction: column; gap: 12px; font-size: 14px; color: #4b5563;">
+                    Aguardando processamento de dados realtime para consolidação do relatório...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        const rowsPerPage = 50;
+        let showAllRows = false;
+        let filteredList = [];
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            const btnIndex = tabId === 'import' ? 0 : (tabId === 'dashboard' ? 1 : 2);
+            document.querySelectorAll('.tab-btn')[btnIndex].classList.add('active');
+        }
+
+        window.emitVoiceAlert = function(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'pt-BR';
+                utterance.rate = 1.1;
+                window.speechSynthesis.speak(utterance);
+            }
+        };
+
+        window.refreshDashboardUI = function() {
+            document.getElementById('ui-b1-count').innerText = window.totalB1Count.toLocaleString();
+            document.getElementById('ui-b2-count').innerText = window.totalB2Count.toLocaleString();
+            
+            const totalEsperado = window.totalB1Count + window.totalB2Count;
+            document.getElementById('ui-total-esperado').innerText = totalEsperado.toLocaleString();
+
+            const totalBipado = window.scannedItemsList.length;
+            document.getElementById('ui-total-bipado').innerText = totalBipado.toLocaleString();
+
+            let percentage = 0;
+            if (totalEsperado > 0) {
+                percentage = (totalBipado / totalEsperado) * 100;
+            }
+            if(percentage > 100) percentage = 100;
+
+            document.getElementById('ui-percentage').innerText = percentage.toFixed(2) + '%';
+            
+            const offset = 440 - (440 * percentage) / 100;
+            document.getElementById('progress-circle').style.strokeDashoffset = offset;
+
+            applySearchAndPaginationFilter();
+        };
+
+        function applySearchAndPaginationFilter() {
+            const query = document.getElementById('table-search').value.toLowerCase().trim();
+            
+            if (!query) {
+                filteredList = [...window.scannedItemsList];
+            } else {
+                filteredList = window.scannedItemsList.filter(item => {
+                    return (item.trackingNumber && item.trackingNumber.toLowerCase().includes(query)) ||
+                           (item.statusOriginal && item.statusOriginal.toLowerCase().includes(query)) ||
+                           (item.destinationHub && item.destinationHub.toLowerCase().includes(query)) ||
+                           (item.action && item.action.toLowerCase().includes(query));
+                });
+            }
+
+            renderOperationalTable();
+        }
+
+        function handleSearch() {
+            currentPage = 1;
+            applySearchAndPaginationFilter();
+        }
+
+        function toggleShowAll() {
+            showAllRows = !showAllRows;
+            document.getElementById('btn-show-all').innerText = showAllRows ? "Paginar" : "Ver Tudo";
+            renderOperationalTable();
+        }
+
+        function changePage(step) {
+            currentPage += step;
+            renderOperationalTable();
+        }
+
+        function renderOperationalTable() {
+            const tbody = document.getElementById('live-table-body');
+            const pagBar = document.getElementById('pagination-bar');
+            
+            if (!tbody) return;
+
+            if (filteredList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #94a3b8; padding: 48px; font-style: italic;">Nenhum registro correspondente encontrado.</td></tr>`;
+                pagBar.style.display = 'none';
+                return;
+            }
+
+            pagBar.style.display = 'flex';
+            
+            let start = (currentPage - 1) * rowsPerPage;
+            let end = start + rowsPerPage;
+            
+            if (showAllRows) {
+                start = 0;
+                end = filteredList.length;
+            }
+
+            if (start >= filteredList.length && filteredList.length > 0) {
+                currentPage = 1;
+                start = 0;
+                end = rowsPerPage;
+            }
+
+            const pageItems = filteredList.slice(start, end);
+            
+            document.getElementById('pagination-info-text').innerText = `Exibindo ${start + 1}-${Math.min(end, filteredList.length)} de ${filteredList.length}`;
+            document.getElementById('btn-page-current').innerText = currentPage;
+            document.getElementById('btn-page-prev').disabled = (currentPage === 1 || showAllRows);
+            document.getElementById('btn-page-next').disabled = (end >= filteredList.length || showAllRows);
+
+            let html = '';
+            pageItems.forEach(item => {
+                const validationBadge = item.encontrado === 'SIM' 
+                    ? `<span class="badge" style="background-color: #e0f2fe; color: #0369a1; border-color: #bae6fd;">OK</span>`
+                    : `<span class="badge" style="background-color: #fef2f2; color: #991b1b; border-color: #fee2e2;">FALHA</span>`;
+
+                const originBadge = `<span class="badge">${item.origin || 'N/A'}</span>`;
+                const locBadge = `<span class="badge" style="background-color: #f8fafc;">${item.locationType || '-'}</span>`;
+
+                html += `
+                    <tr>
+                        <td><strong>${item.trackingNumber}</strong></td>
+                        <td><span style="color: #64748b; font-weight: 500;">${item.statusOriginal || 'N/A'}</span></td>
+                        <td>${item.destinationHub || 'N/A'}</td>
+                        <td style="text-align: center;">${locBadge}</td>
+                        <td style="text-align: center;">
+                            <div class="action-tarja ${item.alertClass || 'alert-red'}">
+                                ${item.action || 'IR PARA ÁREA DE TRATATIVA'}
+                            </div>
+                        </td>
+                        <td style="text-align: center;">${originBadge}</td>
+                        <td style="text-align: center;">${validationBadge}</td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        window.calculateAndRenderReport = function() {
+            let total = window.scannedItemsList.length;
+            let fluxo = 0, estacao = 0, tratativa = 0;
+            let hubCountMap = {};
+
+            window.scannedItemsList.forEach(item => {
+                const action = item.action || '';
+                if (action.includes('MANTER FLUXO')) fluxo++;
+                else if (action.includes('ESTAÇÃO CORRETA')) estacao++;
+                else tratativa++;
+
+                const hub = item.destinationHub || 'NÃO ENCONTRADO';
+                if (!hubCountMap[hub]) hubCountMap[hub] = { total: 0, tratativa: 0, fluxo: 0, estacao: 0 };
+                hubCountMap[hub].total++;
+                if (action.includes('MANTER FLUXO')) hubCountMap[hub].fluxo++;
+                else if (action.includes('ESTAÇÃO CORRETA')) hubCountMap[hub].estacao++;
+                else hubCountMap[hub].tratativa++;
+            });
+
+            document.getElementById('rep-total').innerText = total;
+            document.getElementById('rep-fluxo').innerText = fluxo;
+            document.getElementById('rep-estacao').innerText = estacao;
+            document.getElementById('rep-tratativa').innerText = tratativa;
+
+            const container = document.getElementById('report-details-container');
+            if (!container) return;
+
+            if (total === 0) {
+                container.innerHTML = 'Aguardando processamento de dados realtime para consolidação do relatório...';
+                return;
+            }
+
+            let html = '';
+            for (let hub in hubCountMap) {
+                const stats = hubCountMap[hub];
+                html += `
+                    <div style="padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px; background-color: #f8fafc;">
+                        <strong style="color: #1f2937; font-size: 15px;">📍 Hub: ${hub}</strong>
+                        <div style="display: flex; gap: 24px; margin-top: 8px; font-size: 13px;">
+                            <span>📦 Total no Hub: <strong>${stats.total}</strong></span>
+                            <span style="color: #059669;">✔ Fluxo Correto: <strong>${stats.fluxo}</strong></span>
+                            <span style="color: #d97706;">⚠ Estação Errada: <strong>${stats.estacao}</strong></span>
+                            <span style="color: #dc2626;">❌ Tratativa: <strong>${stats.tratativa}</strong></span>
+                        </div>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        };
+
+        function parseRFC4180CSV(text) {
+            let lines = [];
+            let row = [""];
+            let inQuotes = false;
+
+            for (let i = 0; i < text.length; i++) {
+                let c = text[i];
+                let next = text[i+1];
+
+                if (c === '"') {
+                    if (inQuotes && next === '"') {
+                        row[row.length - 1] += '"';
+                        i++;
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (c === ',' && !inQuotes) {
+                    row.push("");
+                } else if ((c === '\r' || c === '\n') && !inQuotes) {
+                    if (c === '\r' && next === '\n') { i++; }
+                    lines.push(row);
+                    row = [""];
+                } else {
+                    row[row.length - 1] += c;
+                }
+            }
+            if (row.length > 1 || row[0] !== "") {
+                lines.push(row);
+            }
+            return lines;
+        }
+
+        window.handleFileSelectUnified = function(event, baseNum) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
+            showLoading(true, "Lendo e interpretando pacotes de dados de triagem...");
+
+            let filePromises = [];
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (file.name.toLowerCase().endsWith('.zip')) {
+                    const p = file.arrayBuffer().then(buf => {
+                        return JSZip.loadAsync(buf).then(zip => {
+                            let zipPromises = [];
+                            zip.forEach((relativePath, zipEntry) => {
+                                if (!zipEntry.dir && relativePath.toLowerCase().endsWith('.csv')) {
+                                    const zp = zipEntry.async("string").then(csvText => {
+                                        processCsvContentText(csvText, baseNum);
+                                    });
+                                    zipPromises.push(zp);
+                                }
+                            });
+                            return Promise.all(zipPromises);
+                        });
+                    });
+                    filePromises.push(p);
+                } else {
+                    const p = new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            processCsvContentText(e.target.result, baseNum);
+                            resolve();
+                        };
+                        reader.readAsText(file, "UTF-8");
+                    });
+                    filePromises.push(p);
+                }
+            }
+
+            Promise.all(filePromises).then(() => {
+                showLoading(false);
+                event.target.value = ''; 
+            }).catch(err => {
+                showLoading(false);
+                alert("Erro crítico no processamento das bases: " + err);
+                event.target.value = '';
+            });
+        };
+
+        function processCsvContentText(text, baseNum) {
+            const rows = parseRFC4180CSV(text);
+            if (rows.length < 2) return;
+
+            const headerRow = rows[0].map(h => h.trim().replace(/^\uFEFF/, '').replace(/^"|"$/g, ''));
+            
+            let trackingIdx = headerRow.indexOf('SLS Tracking Number');
+            if (trackingIdx === -1) trackingIdx = headerRow.indexOf('Tracking Number');
+            if (trackingIdx === -1) trackingIdx = 1; 
+
+            let statusIdx = headerRow.indexOf('Status');
+            if (statusIdx === -1) statusIdx = 22; 
+
+            let hubIdx = headerRow.indexOf('Destination Hub');
+            if (hubIdx === -1) hubIdx = 44; 
+
+            let locTypeIdx = headerRow.indexOf('Location Type');
+            if (locTypeIdx === -1) locTypeIdx = 10; 
+
+            let chunkUpdates = {};
+            let countCount = 0;
+
+            for (let i = 1; i < rows.length; i++) {
+                const columns = rows[i];
+                if (columns.length <= Math.max(trackingIdx, statusIdx, hubIdx)) continue;
+
+                const trackingNumber = columns[trackingIdx] ? columns[trackingIdx].trim() : '';
+                if (!trackingNumber || trackingNumber === 'SLS Tracking Number' || trackingNumber === 'Tracking Number') continue;
+
+                const statusVal = columns[statusIdx] ? columns[statusIdx].trim() : 'N/A';
+                const destinationHub = columns[hubIdx] ? columns[hubIdx].trim() : 'N/A';
+                const locationType = columns[locTypeIdx] ? columns[locTypeIdx].trim() : '-';
+
+                chunkUpdates[trackingNumber] = {
+                    status: statusVal,
+                    destinationHub: destinationHub,
+                    locationType: locationType
+                };
+                countCount++;
+            }
+
+            if (countCount > 0) {
+                const nodeName = baseNum === 1 ? 'planilha_base1' : 'planilha_base2';
+                window.firebaseActions.updateData(nodeName, chunkUpdates);
+            }
+        }
+
+        function showLoading(show, message = "") {
+            const screen = document.getElementById('loading-screen');
+            const txt = document.getElementById('loading-text');
+            if(screen) screen.style.display = show ? 'flex' : 'none';
+            if(txt && message) txt.innerText = message;
+        }
+
+        window.clearDatabaseNode = function(node) {
+            if(confirm(`Deseja limpar todos os registros de ${node}?`)) {
+                window.firebaseActions.removeNode(node);
+            }
+        };
+
+        window.exportToExcelXLSX = function() {
+            if (!window.scannedItemsList || window.scannedItemsList.length === 0) return;
+            let csvContent = "Tracking ID;Status;Hub;Office-Home;Acao;Origem;Validacao\n";
+            window.scannedItemsList.forEach(item => {
+                csvContent += `${item.trackingNumber};${item.statusOriginal};${item.destinationHub};${item.locationType};${item.action};${item.origin};${item.encontrado}\n`;
+            });
+            let blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: "text/csv;charset=utf-8;" });
+            let link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.setAttribute("download", `Triagem_Consolidada_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+
+        window.clearOnlyScans = function() { if(confirm("Zerar histórico de bips realtime?")) window.firebaseActions.removeNode('bips_triagem'); };
+        window.clearOnlyBases = function() { if(confirm("Limpar dados das duas planilhas na nuvem?")) { window.firebaseActions.removeNode('planilha_base1'); window.firebaseActions.removeNode('planilha_base2'); } };
+    </script>
+</body>
+</html>ca, Arial, sans-serif;
         }
 
         body {

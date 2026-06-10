@@ -23,7 +23,7 @@
             min-height: 100vh;
         }
 
-        /* BARRA DE ALERTA DINÂMICA PREMIUM (PERSISTENTE) */
+        /* BARRA DE ALERTA DINÂMICA (POSICIONAMENTO CORRIGIDO) */
         .top-alert-bar {
             padding: 16px 24px;
             font-size: 20px;
@@ -33,9 +33,9 @@
             display: none;
             letter-spacing: -0.3px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            z-index: 10;
         }
         /* Definição de Cores da Tarja Superior */
         .alert-green { background: linear-gradient(135deg, #10b981, #059669) !important; }
@@ -44,6 +44,7 @@
         .alert-purple { background: linear-gradient(135deg, #7c3aed, #6d28d9) !important; }
         .alert-blue { background: linear-gradient(135deg, #2563eb, #1d4ed8) !important; }
         .alert-pink { background: linear-gradient(135deg, #ec4899, #db2777) !important; }
+        .alert-yellow { background: linear-gradient(135deg, #eab308, #ca8a04) !important; color: #ffffff !important; }
 
         /* Top Navbar */
         .navbar {
@@ -382,7 +383,13 @@
                         statusText = `LMHub_Received_${locType}`;
                     }
 
-                    if (statusText.startsWith('LMHub_Assigning') || statusLower.includes('assigning')) {
+                    if (statusLower.startsWith('return') && !isUberaba && !isXPT) {
+                        actionText = 'IR PARA ÁREA DE TRATATIVA';
+                    }
+                    else if (statusLower.includes('delivering') || statusLower.includes('delivered')) {
+                        actionText = 'IR PARA ÁREA DE TRATATIVA';
+                    }
+                    else if (statusText.startsWith('LMHub_Assigning') || statusLower.includes('assigning')) {
                         actionText = 'DIRECIONAR A ROTA CORRETA';
                     }
                     else if (isXPT) {
@@ -479,7 +486,19 @@
                     statusText = `LMHub_Received_${locType}`;
                 }
 
-                if (statusText.startsWith('LMHub_Assigning') || statusLower.includes('assigning')) {
+                // NOVA VALIDAÇÃO: Força cor amarela para pacotes que começam com "return" (não pertencentes a Uberaba, Monte Carmelo ou Catalão)
+                if (statusLower.startsWith('return') && !isUberaba && !isXPT) {
+                    actionText = 'IR PARA ÁREA DE TRATATIVA';
+                    alertColor = 'alert-yellow';
+                    voiceMessage = 'Devolução, direcionar para área de tratativa';
+                }
+                // Força cor roxa para pacotes Delivering / Delivered
+                else if (statusLower.includes('delivering') || statusLower.includes('delivered')) {
+                    actionText = 'IR PARA ÁREA DE TRATATIVA';
+                    alertColor = 'alert-purple';
+                    voiceMessage = 'Pacote já em rota ou entregue, ir para área de tratativa';
+                }
+                else if (statusText.startsWith('LMHub_Assigning') || statusLower.includes('assigning')) {
                     actionText = 'DIRECIONAR A ROTA CORRETA';
                     alertColor = 'alert-blue';
                     voiceMessage = 'Direcionar a rota correta';
@@ -498,12 +517,7 @@
                     actionText = 'MANTER FLUXO';
                     alertColor = 'alert-green';
                     voiceMessage = 'Manter fluxo';
-                }
-                else if (statusLower.includes('delivering') || statusLower.includes('delivered')) {
-                    actionText = 'IR PARA ÁREA DE TRATATIVA';
-                    alertColor = 'alert-red';
-                    voiceMessage = 'Pacote já em rota ou entregue, ir para área de tratativa';
-                }
+                } 
                 else {
                     actionText = 'IR PARA ÁREA DE TRATATIVA';
                     alertColor = 'alert-red';
@@ -548,8 +562,6 @@
         <div class="spinner"></div>
         <div id="loading-text">Processando e estruturando registros operacionais...</div>
     </div>
-
-    <div id="master-top-alert" class="top-alert-bar"></div>
 
     <div class="navbar">
         <div class="brand">
@@ -633,6 +645,8 @@
                 <div class="voice-banner">
                     <span>⚡</span> <span><strong>Controle de Status Ativo:</strong> Layout corrigido para ler colunas por índice rígido absoluto com parser RFC-4180.</span>
                 </div>
+
+                <div id="master-top-alert" class="top-alert-bar"></div>
 
                 <div class="card" style="padding: 20px;">
                     <div class="scanner-container">
@@ -788,7 +802,6 @@
             }
         }
 
-        /* PARSER RFC-4180 COMPLETO: Analisa aspas e ignora separadores internos */
         function parseCSVLineRobust(line, separator) {
             let fields = [];
             let currentField = '';
@@ -797,7 +810,7 @@
             for (let i = 0; i < line.length; i++) {
                 let char = line[i];
                 if (char === '"') {
-                    inQuotes = !inQuotes; // Inverte o estado se encontrar aspas
+                    inQuotes = !inQuotes;
                 } else if (char === separator && !inQuotes) {
                     fields.push(currentField.trim());
                     currentField = '';
@@ -867,7 +880,6 @@
                 
                 const headers = parseCSVLineRobust(lines[0], separator).map(h => h.replace(/^\ufeff/, '').trim().toLowerCase());
                 
-                // Mapeamento preciso para os padrões das planilhas Shopee
                 const trackingIdx = headers.findIndex(h => h === 'sls tracking number' || h === 'forward_order_id' || h === 'tracking_number' || h.includes('tracking') || h === 'id' || h.includes('number'));
                 const statusIdx = headers.findIndex(h => h === 'status' || h === 'order status' || h.includes('status'));
                 const hubIdx = headers.findIndex(h => h === 'destination hub' || h === 'destination_hub' || h === 'destination_hub_name' || h.includes('destination hub') || h.includes('destino'));
@@ -890,7 +902,7 @@
                     if (id && id.length <= 15) {
                         let hubValue = 'N/A';
                         if (hubIdx !== -1 && columns[hubIdx]) {
-                            hubValue = columns[hubIdx].replace(/^["']|["']$/g, '').trim(); // Remove aspas residuais se houver
+                            hubValue = columns[hubIdx].replace(/^["']|["']$/g, '').trim();
                         }
 
                         let locValue = '-';

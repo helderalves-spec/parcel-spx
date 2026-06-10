@@ -826,48 +826,45 @@
             const files = event.target.files;
             if (!files || files.length === 0) return;
 
-            showLoading(true, "Limpando registros antigos e estruturando nova carga...");
-            const nodeName = baseIndex === 1 ? 'planilha_base1' : 'planilha_base2';
+            showLoading(true, "Mesclando novos registros e atualizando carga atual...");
 
-            window.firebaseActions.removeNode(nodeName).then(() => {
-                Array.from(files).forEach(file => {
-                    const extension = file.name.split('.').pop().toLowerCase();
-                    
-                    if (extension === 'zip') {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            JSZip.loadAsync(e.target.result).then(function(zip) {
-                                let promises = [];
-                                zip.forEach(function(relativePath, zipEntry) {
-                                    if (!zipEntry.dir && zipEntry.name.endsWith('.csv')) {
-                                        promises.push(zipEntry.async("string").then(content => {
-                                            return parseAndStoreCSVInChunks(content, baseIndex);
-                                        }));
-                                    }
-                                });
-                                Promise.all(promises).then(() => { 
-                                    showLoading(false); 
-                                    event.target.value = ''; 
-                                })
-                                .catch(err => { console.error(err); showLoading(false); alert("Erro ao extrair ZIP."); });
+            Array.from(files).forEach(file => {
+                const extension = file.name.split('.').pop().toLowerCase();
+                
+                if (extension === 'zip') {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        JSZip.loadAsync(e.target.result).then(function(zip) {
+                            let promises = [];
+                            zip.forEach(function(relativePath, zipEntry) {
+                                if (!zipEntry.dir && zipEntry.name.endsWith('.csv')) {
+                                    promises.push(zipEntry.async("string").then(content => {
+                                        return parseAndStoreCSVInChunks(content, baseIndex);
+                                    }));
+                                }
                             });
-                        };
-                        reader.readAsArrayBuffer(file);
-                    } else if (extension === 'csv') {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            parseAndStoreCSVInChunks(e.target.result, baseIndex).then(() => { 
+                            Promise.all(promises).then(() => { 
                                 showLoading(false); 
                                 event.target.value = ''; 
-                            });
-                        };
-                        reader.readAsText(file, "UTF-8");
-                    } else {
-                        alert("Selecione arquivos .csv ou .zip");
-                        showLoading(false);
-                        event.target.value = '';
-                    }
-                });
+                            })
+                            .catch(err => { console.error(err); showLoading(false); alert("Erro ao extrair ZIP."); });
+                        });
+                    };
+                    reader.readAsArrayBuffer(file);
+                } else if (extension === 'csv') {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        parseAndStoreCSVInChunks(e.target.result, baseIndex).then(() => { 
+                            showLoading(false); 
+                            event.target.value = ''; 
+                        });
+                    };
+                    reader.readAsText(file, "UTF-8");
+                } else {
+                    alert("Selecione arquivos .csv ou .zip");
+                    showLoading(false);
+                    event.target.value = '';
+                }
             });
         };
 
@@ -927,7 +924,7 @@
 
                 function sendNextChunk() {
                     if (currentOffset >= rowsToProcess.length) {
-                        window.showAlertTop(`✔ ${rowsToProcess.length} registros estruturados na nuvem com sucesso!`, 'alert-green');
+                        window.showAlertTop(`✔ Carga incremental concluída! Registros mesclados sem duplicação.`, 'alert-green');
                         resolve();
                         return;
                     }

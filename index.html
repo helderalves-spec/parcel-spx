@@ -383,7 +383,7 @@
                         statusText = `LMHub_Received_${locType}`;
                     }
 
-                    if (statusLower.startsWith('return') && !isUberaba && !isXPT) {
+                    if (statusLower.startsWith('return')) {
                         actionText = 'IR PARA ÁREA DE TRATATIVA';
                     }
                     else if (statusLower.includes('delivering') || statusLower.includes('delivered')) {
@@ -487,7 +487,7 @@
                 }
 
                 // NOVA VALIDAÇÃO: Força cor amarela para pacotes que começam com "return" (não pertencentes a Uberaba, Monte Carmelo ou Catalão)
-                if (statusLower.startsWith('return') && !isUberaba && !isXPT) {
+                if (statusLower.startsWith('return')) {
                     actionText = 'IR PARA ÁREA DE TRATATIVA';
                     alertColor = 'alert-yellow';
                     voiceMessage = 'Devolução, direcionar para área de tratativa';
@@ -557,6 +557,11 @@
     </script>
 </head>
 <body>
+    <!-- MARCA D'ÁGUA CENTRALIZADA E ESTILIZADA NO PLANO DE FUNDO (SPX) -->
+    <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-12deg); font-size: 9vw; font-weight: 900; font-style: italic; color: rgba(238, 77, 45, 0.12); font-family: 'Inter', -apple-system, sans-serif; pointer-events: none; user-select: none; z-index: 0; letter-spacing: 4px; text-transform: uppercase; text-align: center; width: 100%; white-space: nowrap;">
+        Shopee Xpress
+    </div>
+
 
     <div id="loading-screen" class="loading-overlay">
         <div class="spinner"></div>

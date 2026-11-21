@@ -236,6 +236,78 @@
         .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); color: white; font-size: 18px; font-weight: bold; display: none; align-items: center; justify-content: center; flex-direction: column; z-index: 9999; text-align: center; padding: 20px; }
         .spinner { border: 4px solid rgba(255, 255, 255, 0.1); width: 55px; height: 55px; border-radius: 50%; border-left-color: #38bdf8; animation: spin 1s linear infinite; margin-bottom: 18px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* ===== MELHORIAS v1 ===== */
+        .conn-status { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 20px; background: #1e293b; border: 1px solid #334155; color: #cbd5e1; }
+        .conn-dot { width: 10px; height: 10px; border-radius: 50%; background: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,0.2); }
+        .conn-status.online .conn-dot { background: #10b981; box-shadow: 0 0 0 3px rgba(16,185,129,0.2); }
+        .conn-status.offline .conn-dot { background: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.2); }
+        .nav-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
+        .rebip-tag { display: inline-block; margin-left: 6px; padding: 2px 6px; border-radius: 4px; background: #fef3c7; color: #92400e; font-size: 10px; font-weight: 700; vertical-align: middle; }
+        .last-scan-time { font-size: 12px; color: #64748b; margin-top: 10px; text-align: right; min-height: 16px; }
+        .progress-bar-wrap { width: 320px; max-width: 80vw; height: 8px; background: rgba(255,255,255,0.15); border-radius: 4px; margin-top: 16px; overflow: hidden; display: none; }
+        .progress-bar-fill { height: 100%; width: 0%; background: #38bdf8; transition: width 0.2s; }
+
+        /* ===== MELHORIAS v2 ===== */
+        .nav-pill { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 20px; background: #1e293b; border: 1px solid #334155; color: #e2e8f0; }
+        .nav-pill button { background: none; border: none; color: #38bdf8; font-weight: 700; cursor: pointer; font-size: 12px; }
+
+        .day-bar { background: #ffffff; border-bottom: 1px solid #e5e7eb; padding: 12px 32px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 13px; color: #334155; }
+        .day-bar input[type=date] { padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; font-weight: 600; }
+        .day-bar .small-btn { padding: 7px 12px; border: 1px solid #cbd5e1; background: #fff; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+        .history-tag { display: none; background: #fef3c7; color: #92400e; border: 1px solid #fde68a; padding: 5px 10px; border-radius: 6px; font-weight: 700; font-size: 12px; }
+
+        .stale-banner { display: none; background: #fff7ed; border: 1px solid #fdba74; color: #9a3412; padding: 12px 18px; border-radius: 8px; font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+        .base-meta { font-size: 12px; color: #64748b; margin-top: 8px; line-height: 1.5; }
+        .base-meta.stale { color: #c2410c; font-weight: 700; }
+
+        .sound-toggles { display: flex; gap: 16px; margin-top: 12px; font-size: 13px; color: #334155; font-weight: 600; flex-wrap: wrap; align-items: center; }
+        .sound-toggles label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+        .sound-toggles .last-scan-time { margin: 0 0 0 auto; }
+
+        .chips { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 16px; }
+        .chip { border-radius: 8px; padding: 10px 12px; color: #fff; cursor: pointer; border: 3px solid transparent; transition: transform 0.1s; user-select: none; }
+        .chip:hover { transform: translateY(-1px); }
+        .chip.selected { border-color: #0f172a; }
+        .chip .chip-num { font-size: 24px; font-weight: 800; line-height: 1.1; }
+        .chip .chip-lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; opacity: 0.95; }
+
+        .modal-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); display: none; align-items: center; justify-content: center; z-index: 9000; padding: 20px; }
+        .modal { background: #fff; border-radius: 12px; padding: 28px; width: 420px; max-width: 100%; box-shadow: 0 20px 40px rgba(0,0,0,0.25); }
+        .modal h3 { font-size: 20px; color: #0f172a; margin-bottom: 6px; }
+        .modal p { font-size: 13px; color: #64748b; margin-bottom: 18px; }
+        .modal label { display: block; font-size: 12px; font-weight: 700; color: #334155; margin: 12px 0 6px; text-transform: uppercase; letter-spacing: 0.4px; }
+        .modal input { width: 100%; padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; }
+        .modal .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
+        .btn-primary { padding: 11px 20px; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 14px; }
+        .btn-secondary { padding: 11px 16px; background: #f3f4f6; color: #374151; border: 1px solid #e5e7eb; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px; }
+
+        .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 16px; }
+        .settings-grid label { font-size: 12px; font-weight: 700; color: #334155; display: block; margin-bottom: 6px; }
+        .settings-grid input[type=number] { width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
+        .settings-grid .hint { font-size: 11px; color: #64748b; margin-top: 4px; }
+
+        .filter-select { padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 13px; background: #f9fafb; }
+
+        /* Tabelas simples (relatório, faltantes) sem as larguras fixas do monitor */
+        .plain-table th, .plain-table td { width: auto !important; white-space: normal; }
+
+        @media (max-width: 900px) {
+            .dashboard-layout { flex-direction: column; }
+            .sidebar { width: 100%; }
+            .import-grid { grid-template-columns: 1fr; }
+            .table-search-input { width: 100%; }
+            .navbar { flex-direction: column; gap: 12px; align-items: flex-start; }
+            .tab-nav { overflow-x: auto; }
+        }
+
+        @media print {
+            .navbar, .tab-nav, .day-bar, .pdf-btn, #tab-import, #tab-dashboard, #tab-missing, .loading-overlay, .modal-backdrop { display: none !important; }
+            #tab-report { display: block !important; padding: 0; }
+            body { background: #ffffff; }
+            .table-scroll { max-height: none; overflow: visible; }
+            .report-card, .table-container { box-shadow: none; break-inside: avoid; }
+        }
     </style>
 
     <script type="module">
@@ -254,200 +326,226 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
+        try { getAnalytics(app); } catch (e) { /* analytics é opcional */ }
         const database = getDatabase(app);
 
         window.firebaseActions = {
             updateData: (path, data) => update(ref(database, path), data),
-            removeNode: (path) => remove(ref(database, path))
+            removeNode: (path) => remove(ref(database, path)),
+            subscribe: (path, cb) => onValue(ref(database, path), (snap) => cb(snap.val()))
         };
 
-        window.base1Map = {};
-        window.base2Map = {};
-        window.totalB1Count = 0;
-        window.totalB2Count = 0;
-        window.scannedItemsList = [];
+        onValue(ref(database, '.info/connected'), (snap) => window.setConnectionStatus(snap.val() === true));
 
         onValue(ref(database, 'planilha_base1'), (snapshot) => {
             window.base1Map = snapshot.val() || {};
             window.totalB1Count = Object.keys(window.base1Map).length;
-            updateImportVisuals(1, window.totalB1Count);
-            checkAndUnlockScanner();
-            triggerRetroactiveRecalculate();
+            window.onBasesChanged();
         });
 
         onValue(ref(database, 'planilha_base2'), (snapshot) => {
             window.base2Map = snapshot.val() || {};
             window.totalB2Count = Object.keys(window.base2Map).length;
-            updateImportVisuals(2, window.totalB2Count);
-            checkAndUnlockScanner();
-            triggerRetroactiveRecalculate();
+            window.onBasesChanged();
         });
 
-        onValue(ref(database, 'bips_triagem'), (snapshot) => {
-            const data = snapshot.val() || {};
-            const items = Object.keys(data).map(key => data[key]);
-            items.sort((a, b) => new Date(b.timestampBip) - new Date(a.timestampBip));
-            window.scannedItemsList = items;
-            window.refreshDashboardUI();
-            window.calculateAndRenderReport(); 
+        onValue(ref(database, 'meta_bases'), (snapshot) => {
+            window.baseMeta = snapshot.val() || {};
+            window.renderBaseFreshness();
         });
 
-        function updateImportVisuals(baseNum, count) {
-            const box = document.getElementById(`box-file-${baseNum}`);
-            const icon = document.getElementById(`icon-file-${baseNum}`);
-            const label = document.getElementById(`label-file-${baseNum}`);
-            if(!box || !icon || !label) return;
+        window.appReady();
+    </script>
 
-            if (count > 0) {
-                box.classList.add('loaded');
-                icon.innerText = '✔';
-                label.innerText = `Base ${baseNum}: ${count} ordens salvas na nuvem`;
-            } else {
-                box.classList.remove('loaded');
-                icon.innerText = '📥';
-                label.innerText = baseNum === 1 ? "Selecionar Bases Forward (.csv ou .zip)" : "Selecionar Bases Receive Task (.csv ou .zip)";
-            }
+    <script>
+        /* =========================================================
+           ESTADO GLOBAL
+        ========================================================= */
+        window.base1Map = {};
+        window.base2Map = {};
+        window.baseMeta = {};
+        window.totalB1Count = 0;
+        window.totalB2Count = 0;
+        window.uniqueTotalCount = 0;
+        window.scannedItemsList = [];
+        window.scannedIndex = new Map();
+        window.filteredItemsList = [];
+        window.currentPage = 1;
+        window.itemsPerPage = 50;
+        window.showAllItems = false;
+        window.currentSearchQuery = "";
+        window.categoryFilter = null;
+        window.isUploading = false;
+        window.selectedDay = null;
+        window.followToday = true;
+        window.missingList = [];
+        window.missingPage = 1;
+        window.missingCategory = '';
+        let unsubscribeDay = null;
+
+        /* =========================================================
+           PREFERÊNCIAS LOCAIS (por computador)
+        ========================================================= */
+        const DEFAULT_SETTINGS = { voz: true, bipe: true, horasAlerta: 4, inicioDia: 0 };
+        function loadJSON(key, fallback) {
+            try { const v = localStorage.getItem(key); return v ? { ...fallback, ...JSON.parse(v) } : { ...fallback }; }
+            catch (e) { return { ...fallback }; }
+        }
+        function saveJSON(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {} }
+
+        window.settings = loadJSON('parcel_settings', DEFAULT_SETTINGS);
+        window.operador = loadJSON('parcel_operador', { nome: '', posto: '' });
+
+        /* =========================================================
+           UTILITÁRIOS
+        ========================================================= */
+        function esc(v) {
+            return String(v == null ? '' : v)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+        function debounce(fn, ms) { let t = null; return function(...a) { clearTimeout(t); t = setTimeout(() => fn.apply(this, a), ms); }; }
+        function isValidKey(id) { return !/[.#$\[\]\/]/.test(id); }
+        function formatNumber(n) { return Number(n || 0).toLocaleString('pt-BR'); }
+        function pad(n) { return String(n).padStart(2, '0'); }
+        function $(id) { return document.getElementById(id); }
+
+        function operationalDayKey(d = new Date()) {
+            const x = new Date(d.getTime() - (Number(window.settings.inicioDia) || 0) * 3600000);
+            return `${x.getFullYear()}-${pad(x.getMonth() + 1)}-${pad(x.getDate())}`;
+        }
+        function isViewingToday() { return window.selectedDay === operationalDayKey(); }
+        function dayLabel(key) { const [y, m, d] = key.split('-'); return `${d}/${m}/${y}`; }
+
+        function timeAgo(iso) {
+            const mins = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
+            if (mins < 1) return 'agora';
+            if (mins < 60) return `há ${mins} min`;
+            const h = Math.floor(mins / 60), m = mins % 60;
+            if (h < 24) return `há ${h}h${m ? pad(m) : ''}`;
+            return `há ${Math.floor(h / 24)} dia(s)`;
         }
 
-        function checkAndUnlockScanner() {
-            const totalRecords = window.totalB1Count + window.totalB2Count;
-            const scannerInput = document.getElementById('main-barcode-scanner');
-            const summaryCard = document.getElementById('import-summary-card');
-            const summaryText = document.getElementById('import-summary-text');
-
-            if (scannerInput) {
-                if (totalRecords > 0) {
-                    scannerInput.disabled = false;
-                    scannerInput.placeholder = "Passe o leitor de código de barras corporativo...";
-                    if(summaryCard) summaryCard.style.display = 'block';
-                    if(summaryText) {
-                        summaryText.innerHTML = `
-                            <strong>Base 1 (Forward):</strong> ${window.totalB1Count} registros na nuvem.<br>
-                            <strong>Base 2 (Receive Task):</strong> ${window.totalB2Count} registros na nuvem.<br>
-                            <strong>Total Consolidado:</strong> ${totalRecords} ordens ativas para cruzamento prioritário.
-                        `;
-                    }
-                } else {
-                    scannerInput.disabled = true;
-                    scannerInput.placeholder = "Aguardando sincronização segura das bases com a nuvem...";
-                    if(summaryCard) summaryCard.style.display = 'none';
-                }
-            }
-            window.refreshDashboardUI();
+        function csvCell(v) {
+            const s = String(v == null ? '' : v);
+            return /[;"\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+        }
+        function downloadCSV(filename, header, rows) {
+            const lines = [header.map(csvCell).join(';')].concat(rows.map(r => r.map(csvCell).join(';')));
+            const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), lines.join('\r\n')], { type: "text/csv;charset=utf-8;" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.setAttribute("download", filename);
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            setTimeout(() => URL.revokeObjectURL(link.href), 1000);
         }
 
-        function triggerRetroactiveRecalculate() {
-            if (!window.scannedItemsList || window.scannedItemsList.length === 0) return;
-            
-            let updates = {};
-            let mudouAlgo = false;
+        /* =========================================================
+           CATEGORIAS (cores dos alertas) — usadas nos contadores
+        ========================================================= */
+        const CATEGORIES = [
+            { cor: 'alert-green',  label: 'Manter fluxo',            bg: '#059669' },
+            { cor: 'alert-orange', label: 'Estação correta',         bg: '#d97706' },
+            { cor: 'alert-blue',   label: 'Rota correta',            bg: '#1d4ed8' },
+            { cor: 'alert-pink',   label: 'XPT',                     bg: '#db2777' },
+            { cor: 'alert-purple', label: 'Tratativa · rota/entregue', bg: '#6d28d9' },
+            { cor: 'alert-yellow', label: 'Tratativa · devolução',   bg: '#ca8a04' },
+            { cor: 'alert-red',    label: 'Tratativa · não encontrado/outros', bg: '#dc2626' }
+        ];
+        const CATEGORY_LABEL = Object.fromEntries(CATEGORIES.map(c => [c.cor, c.label]));
 
-            window.scannedItemsList.forEach(item => {
-                const barcode = item.trackingNumber;
-                if(!barcode) return;
-
-                let b1Data = window.base1Map ? window.base1Map[barcode] : null;
-                let b2Data = window.base2Map ? window.base2Map[barcode] : null;
-
-                let originLabel = 'NÃO ENCONTRADO';
-                let isFound = 'NÃO';
-                let statusText = 'NÃO ENCONTRADO';
-                let destHub = 'N/A';
-                let locType = '-'; 
-                let actionText = 'IR PARA ÁREA DE TRATATIVA';
-
-                if (b1Data) {
-                    isFound = 'SIM';
-                    originLabel = b2Data ? 'Ambas' : 'Base 1';
-                    statusText = b2Data ? (b2Data.status || b1Data.status || 'N/A') : (b1Data.status || 'N/A');
-                    destHub = b1Data.destinationHub || 'N/A';
-                    locType = b1Data.locationType || (b2Data ? b2Data.locationType : '-');
-                } 
-                else if (b2Data) {
-                    isFound = 'SIM';
-                    originLabel = 'Base 2';
-                    statusText = b2Data.status || 'N/A';
-                    destHub = b2Data.destinationHub || 'N/A';
-                    locType = b2Data.locationType || '-';
-                }
-
-                if (isFound === 'SIM') {
-                    const hubLower = destHub.toLowerCase();
-                    const statusLower = statusText.toLowerCase();
-                    
-                    const isUberaba = hubLower.includes('uberaba');
-                    const isXPT = hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
-
-                    if (isUberaba && (statusText === 'LMHub_Received' || statusLower === 'lmhub_received' || statusLower.includes('received'))) {
-                        statusText = `LMHub_Received_${locType}`;
-                    }
-
-                    if (statusLower.startsWith('return') && !isUberaba && !isXPT) {
-                        actionText = 'IR PARA ÁREA DE TRATATIVA';
-                    }
-                    else if (statusLower.includes('delivering') || statusLower.includes('delivered')) {
-                        actionText = 'IR PARA ÁREA DE TRATATIVA';
-                    }
-                    else if (statusText.startsWith('LMHub_Assigning') || statusLower.includes('assigning')) {
-                        actionText = 'DIRECIONAR A ROTA CORRETA';
-                    }
-                    else if (isXPT) {
-                        actionText = 'DIRECIONAR AO XPT';
-                    }
-                    else if (!isUberaba) {
-                        actionText = 'DIRECIONAR A ESTAÇÃO CORRETA';
-                    }
-                    else if (statusText.startsWith('LMHub_Received')) {
-                        actionText = 'MANTER FLUXO';
-                    } 
-                    else {
-                        actionText = 'IR PARA ÁREA DE TRATATIVA';
-                    }
-                }
-
-                if (item.statusOriginal !== statusText || item.destinationHub !== destHub || item.action !== actionText || item.encontrado !== isFound) {
-                    updates[barcode] = {
-                        ...item,
-                        statusOriginal: statusText,
-                        destinationHub: destHub,
-                        locationType: locType,
-                        action: actionText,
-                        origin: originLabel,
-                        encontrado: isFound
-                    };
-                    mudouAlgo = true;
-                }
-            });
-
-            if (mudouAlgo) {
-                window.firebaseActions.updateData('bips_triagem', updates);
-            }
+        function itemCategory(item) {
+            if (item.alertColor) return item.alertColor;
+            const a = item.action || '';
+            if (a === 'MANTER FLUXO') return 'alert-green';
+            if (a === 'DIRECIONAR A ESTAÇÃO CORRETA') return 'alert-orange';
+            if (a === 'DIRECIONAR A ROTA CORRETA') return 'alert-blue';
+            if (a === 'DIRECIONAR AO XPT') return 'alert-pink';
+            return 'alert-red';
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const scannerInput = document.getElementById('main-barcode-scanner');
-            if (scannerInput) {
-                scannerInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        const code = this.value.trim();
-                        if (code) {
-                            if (code.length > 15) {
-                                window.showAlertTop(`❌ ERRO: CÓDIGO INVÁLIDO (${code.length} DÍGITOS). BIPAGEM NÃO PERMITIDA!`, 'alert-red');
-                                window.emitVoiceAlert('Código inválido');
-                                this.value = ''; 
-                                e.preventDefault();
-                                return;
-                            }
-                            processBarcodeBip(code);
-                            this.value = ''; 
-                        }
-                    }
+        function renderChips(containerId, counts, selected, onClickName) {
+            const el = $(containerId);
+            if (!el) return;
+            el.innerHTML = CATEGORIES.map(c => `
+                <div class="chip ${selected === c.cor ? 'selected' : ''}" style="background:${c.bg}" onclick="${onClickName}('${c.cor}')" title="Clique para filtrar">
+                    <div class="chip-num">${formatNumber(counts[c.cor] || 0)}</div>
+                    <div class="chip-lbl">${esc(c.label)}</div>
+                </div>`).join('');
+        }
+
+        /* =========================================================
+           SOM: BIPE POR COR + VOZ
+        ========================================================= */
+        let audioCtx = null;
+        const BEEP_PATTERNS = {
+            'alert-green':  [[880, 0.12]],
+            'alert-blue':   [[1050, 0.08], [1050, 0.08]],
+            'alert-pink':   [[1250, 0.06], [1250, 0.06], [1250, 0.06]],
+            'alert-orange': [[620, 0.13], [620, 0.13]],
+            'alert-yellow': [[500, 0.32]],
+            'alert-purple': [[360, 0.45]],
+            'alert-red':    [[220, 0.15], [220, 0.15], [220, 0.15]]
+        };
+        function playBeep(color) {
+            try {
+                audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                let t = audioCtx.currentTime + 0.01;
+                (BEEP_PATTERNS[color] || BEEP_PATTERNS['alert-red']).forEach(([freq, dur]) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'square';
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.0001, t);
+                    gain.gain.exponentialRampToValueAtTime(0.25, t + 0.01);
+                    gain.gain.setValueAtTime(0.25, t + dur - 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+                    osc.connect(gain).connect(audioCtx.destination);
+                    osc.start(t); osc.stop(t + dur + 0.01);
+                    t += dur + 0.06;
                 });
-            }
-        });
+                return t - audioCtx.currentTime;
+            } catch (e) { return 0; }
+        }
 
-        function processBarcodeBip(barcode) {
+        window.emitVoiceAlert = function(messageText, delaySec = 0) {
+            if (!window.settings.voz) return;
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const speak = () => {
+                    let utterance = new SpeechSynthesisUtterance(messageText);
+                    utterance.lang = 'pt-BR';
+                    window.speechSynthesis.speak(utterance);
+                };
+                if (delaySec > 0) setTimeout(speak, delaySec * 1000); else speak();
+            }
+        };
+
+        function feedback(color, voiceMessage) {
+            const dur = window.settings.bipe ? playBeep(color) : 0;
+            window.emitVoiceAlert(voiceMessage, dur);
+        }
+
+        window.showAlertTop = function(msg, cssClass) {
+            const bar = $('master-top-alert');
+            if (bar) { bar.className = `top-alert-bar ${cssClass}`; bar.innerText = msg; bar.style.display = 'block'; }
+        };
+
+        window.setConnectionStatus = function(online) {
+            const el = $('conn-status'), txt = $('conn-text');
+            if (!el) return;
+            el.classList.remove('online', 'offline');
+            el.classList.add(online ? 'online' : 'offline');
+            txt.innerText = online ? 'Online' : 'Sem conexão';
+            const h = $('import-summary-title');
+            if (h) h.innerText = online ? '✔ Sistema Sincronizado e Conectado em Rede' : '⚠ Sem conexão com a nuvem — aguardando reconexão';
+        };
+
+        /* =========================================================
+           REGRAS DE TRIAGEM (IDÊNTICAS AO ORIGINAL)
+        ========================================================= */
+        window.classifyParcel = function(barcode) {
             let b1Data = window.base1Map ? window.base1Map[barcode] : null;
             let b2Data = window.base2Map ? window.base2Map[barcode] : null;
 
@@ -455,7 +553,7 @@
             let isFound = 'NÃO';
             let statusText = 'NÃO ENCONTRADO';
             let destHub = 'N/A';
-            let locType = '-'; 
+            let locType = '-';
             let actionText = 'IR PARA ÁREA DE TRATATIVA';
             let alertColor = 'alert-red';
             let voiceMessage = 'Não encontrado, ir para área de tratativa';
@@ -466,7 +564,7 @@
                 statusText = b2Data ? (b2Data.status || b1Data.status || 'N/A') : (b1Data.status || 'N/A');
                 destHub = b1Data.destinationHub || 'N/A';
                 locType = b1Data.locationType || (b2Data ? b2Data.locationType : '-');
-            } 
+            }
             else if (b2Data) {
                 isFound = 'SIM';
                 originLabel = 'Base 2';
@@ -478,7 +576,7 @@
             if (isFound === 'SIM') {
                 const hubLower = destHub.toLowerCase();
                 const statusLower = statusText.toLowerCase();
-                
+
                 const isUberaba = hubLower.includes('uberaba');
                 const isXPT = hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
 
@@ -486,13 +584,11 @@
                     statusText = `LMHub_Received_${locType}`;
                 }
 
-                // NOVA VALIDAÇÃO: Força cor amarela para pacotes que começam com "return" (não pertencentes a Uberaba, Monte Carmelo ou Catalão)
                 if (statusLower.startsWith('return') && !isUberaba && !isXPT) {
                     actionText = 'IR PARA ÁREA DE TRATATIVA';
                     alertColor = 'alert-yellow';
                     voiceMessage = 'Devolução, direcionar para área de tratativa';
                 }
-                // Força cor roxa para pacotes Delivering / Delivered
                 else if (statusLower.includes('delivering') || statusLower.includes('delivered')) {
                     actionText = 'IR PARA ÁREA DE TRATATIVA';
                     alertColor = 'alert-purple';
@@ -517,43 +613,791 @@
                     actionText = 'MANTER FLUXO';
                     alertColor = 'alert-green';
                     voiceMessage = 'Manter fluxo';
-                } 
+                }
                 else {
                     actionText = 'IR PARA ÁREA DE TRATATIVA';
                     alertColor = 'alert-red';
                     voiceMessage = 'Verificar status na tratativa';
                 }
-            } else {
-                actionText = 'IR PARA ÁREA DE TRATATIVA';
-                alertColor = 'alert-red';
-                voiceMessage = 'Não encontrado, ir para área de tratativa';
             }
 
-            window.showAlertTop(`📢 ${statusText.toUpperCase()} | ${actionText}`, alertColor);
-            window.emitVoiceAlert(voiceMessage);
+            return { originLabel, isFound, statusText, destHub, locType, actionText, alertColor, voiceMessage };
+        };
+
+        /* =========================================================
+           HISTÓRICO POR DIA
+        ========================================================= */
+        function dayPath(day) { return 'bips_por_dia/' + day; }
+
+        function subscribeDay(day) {
+            if (unsubscribeDay) { try { unsubscribeDay(); } catch (e) {} unsubscribeDay = null; }
+            window.selectedDay = day;
+            window.scannedItemsList = [];
+            window.scannedIndex = new Map();
+            window.currentPage = 1;
+            updateDayBar();
+            window.scheduleUIRefresh();
+
+            unsubscribeDay = window.firebaseActions.subscribe(dayPath(day), (data) => {
+                if (day !== window.selectedDay) return;
+                data = data || {};
+                const items = Object.keys(data).map(k => data[k]);
+                items.sort((a, b) => new Date(b.timestampBip) - new Date(a.timestampBip));
+                window.scannedItemsList = items;
+                window.scannedIndex = new Map(items.map(i => [i.trackingNumber, i]));
+                debouncedRetro();
+                window.scheduleUIRefresh();
+            });
+        }
+
+        function updateDayBar() {
+            const input = $('day-picker');
+            if (input) { input.value = window.selectedDay; input.max = operationalDayKey(); }
+            const today = isViewingToday();
+            const tag = $('history-tag');
+            if (tag) tag.style.display = today ? 'none' : 'inline-block';
+            const lbl = $('day-label');
+            if (lbl) lbl.innerText = today ? `Hoje (${dayLabel(window.selectedDay)})` : dayLabel(window.selectedDay);
+            const zerar = $('btn-zerar');
+            if (zerar) zerar.innerText = today ? 'Zerar Registros do Dia' : 'Excluir Registros deste Dia';
+            checkAndUnlockScanner();
+        }
+
+        window.onDayPicked = function(value) {
+            if (!value) return;
+            window.followToday = value === operationalDayKey();
+            subscribeDay(value);
+        };
+        window.goToday = function() { window.followToday = true; subscribeDay(operationalDayKey()); };
+
+        // Virada do dia operacional: quem está em "hoje" passa automaticamente para o novo dia
+        setInterval(() => {
+            if (window.followToday && window.selectedDay && window.selectedDay !== operationalDayKey()) {
+                subscribeDay(operationalDayKey());
+                window.showAlertTop('📅 NOVO DIA OPERACIONAL INICIADO — CONTAGEM REINICIADA', 'alert-blue');
+            }
+            window.renderBaseFreshness();
+        }, 60000);
+
+        window.appReady = function() { subscribeDay(operationalDayKey()); };
+
+        /* =========================================================
+           OPERADOR / POSTO
+        ========================================================= */
+        window.openOperatorModal = function() {
+            $('op-nome').value = window.operador.nome || '';
+            $('op-posto').value = window.operador.posto || '';
+            $('operator-modal').style.display = 'flex';
+            setTimeout(() => $('op-nome').focus(), 50);
+        };
+        window.saveOperator = function() {
+            const nome = $('op-nome').value.trim();
+            const posto = $('op-posto').value.trim();
+            if (!nome) { $('op-nome').focus(); return; }
+            window.operador = { nome, posto: posto || '-' };
+            saveJSON('parcel_operador', window.operador);
+            $('operator-modal').style.display = 'none';
+            renderOperator();
+            checkAndUnlockScanner();
+            focusScanner();
+        };
+        window.cancelOperator = function() {
+            if (!window.operador.nome) return; // obrigatório na primeira vez
+            $('operator-modal').style.display = 'none';
+        };
+        function renderOperator() {
+            const el = $('operator-pill-text');
+            if (el) el.innerText = window.operador.nome ? `👷 ${window.operador.nome} · Posto ${window.operador.posto}` : '👷 Sem operador';
+        }
+
+        /* =========================================================
+           BIPAGEM
+        ========================================================= */
+        function processBarcodeBip(barcode) {
+            const r = window.classifyParcel(barcode);
+            const previous = window.scannedIndex.get(barcode);
+            const jaBipado = !!previous;
+
+            window.showAlertTop(`📢 ${r.statusText.toUpperCase()} | ${r.actionText}${jaBipado ? '  ·  ⚠ JÁ BIPADO ANTES' : ''}`, r.alertColor);
+            feedback(r.alertColor, r.voiceMessage);
+
+            const now = new Date();
+            const lastEl = $('last-scan-time');
+            if (lastEl) lastEl.innerText = `Último bip: ${barcode} às ${now.toLocaleTimeString('pt-BR')}`;
 
             const newBip = {
                 trackingNumber: barcode,
-                statusOriginal: statusText,
-                destinationHub: destHub,
-                locationType: locType, 
-                action: actionText,
-                origin: originLabel,
-                encontrado: isFound,
-                timestampBip: new Date().toISOString()
+                statusOriginal: r.statusText,
+                destinationHub: r.destHub,
+                locationType: r.locType,
+                action: r.actionText,
+                alertColor: r.alertColor,
+                origin: r.originLabel,
+                encontrado: r.isFound,
+                timestampBip: now.toISOString(),
+                primeiroBip: previous ? (previous.primeiroBip || previous.timestampBip) : now.toISOString(),
+                qtdBips: (previous ? (previous.qtdBips || 1) : 0) + 1,
+                operador: window.operador.nome,
+                posto: window.operador.posto
             };
 
-            window.firebaseActions.updateData('bips_triagem/' + barcode, newBip);
+            // atualização local imediata (o contador não espera a nuvem)
+            window.scannedIndex.set(barcode, newBip);
+
+            window.firebaseActions.updateData(dayPath(window.selectedDay) + '/' + barcode, newBip)
+                .catch(err => {
+                    console.error(err);
+                    window.showAlertTop('❌ FALHA AO SALVAR O BIP NA NUVEM. VERIFIQUE A CONEXÃO.', 'alert-red');
+                });
         }
 
-        window.showAlertTop = function(msg, cssClass) {
-            const bar = document.getElementById('master-top-alert');
-            if (bar) {
-                bar.className = `top-alert-bar ${cssClass}`;
-                bar.innerText = msg;
-                bar.style.display = 'block';
+        function handleScannerEnter(inputEl) {
+            const code = inputEl.value.trim().toUpperCase();
+            inputEl.value = '';
+            if (!code) return;
+            if (!isViewingToday()) {
+                window.showAlertTop('📅 VOCÊ ESTÁ VENDO UM DIA ANTERIOR. VOLTE PARA HOJE PARA BIPAR.', 'alert-red');
+                return;
+            }
+            if (code.length > 15) {
+                window.showAlertTop(`❌ ERRO: CÓDIGO INVÁLIDO (${code.length} DÍGITOS). BIPAGEM NÃO PERMITIDA!`, 'alert-red');
+                feedback('alert-red', 'Código inválido');
+                return;
+            }
+            if (!isValidKey(code)) {
+                window.showAlertTop(`❌ ERRO: CÓDIGO COM CARACTERE INVÁLIDO (${code}).`, 'alert-red');
+                feedback('alert-red', 'Código inválido');
+                return;
+            }
+            processBarcodeBip(code);
+        }
+
+        /* =========================================================
+           RECÁLCULO RETROATIVO (só no dia atual; dias anteriores
+           ficam congelados como foram bipados)
+        ========================================================= */
+        function triggerRetroactiveRecalculate() {
+            if (window.isUploading || !isViewingToday()) return;
+            if (!window.scannedItemsList || window.scannedItemsList.length === 0) return;
+            if (window.totalB1Count + window.totalB2Count === 0) return;
+
+            let updates = {};
+            let mudouAlgo = false;
+
+            window.scannedItemsList.forEach(item => {
+                const barcode = item.trackingNumber;
+                if (!barcode) return;
+                const r = window.classifyParcel(barcode);
+
+                if (item.statusOriginal !== r.statusText || item.destinationHub !== r.destHub || item.action !== r.actionText || item.encontrado !== r.isFound || item.alertColor !== r.alertColor) {
+                    updates[barcode] = {
+                        ...item,
+                        statusOriginal: r.statusText,
+                        destinationHub: r.destHub,
+                        locationType: r.locType,
+                        action: r.actionText,
+                        alertColor: r.alertColor,
+                        origin: r.originLabel,
+                        encontrado: r.isFound
+                    };
+                    mudouAlgo = true;
+                }
+            });
+
+            if (mudouAlgo) window.firebaseActions.updateData(dayPath(window.selectedDay), updates);
+        }
+        const debouncedRetro = debounce(triggerRetroactiveRecalculate, 600);
+
+        function recomputeUniqueTotal() {
+            const s = new Set(Object.keys(window.base1Map || {}));
+            Object.keys(window.base2Map || {}).forEach(k => s.add(k));
+            window.uniqueTotalCount = s.size;
+        }
+
+        const debouncedBasesWork = debounce(() => {
+            recomputeUniqueTotal();
+            updateImportVisuals(1, window.totalB1Count);
+            updateImportVisuals(2, window.totalB2Count);
+            window.renderBaseFreshness();
+            checkAndUnlockScanner();
+            triggerRetroactiveRecalculate();
+        }, 400);
+        window.onBasesChanged = function() { debouncedBasesWork(); };
+
+        function updateImportVisuals(baseNum, count) {
+            const box = $(`box-file-${baseNum}`), icon = $(`icon-file-${baseNum}`), label = $(`label-file-${baseNum}`);
+            if (!box || !icon || !label) return;
+            if (count > 0) {
+                box.classList.add('loaded');
+                icon.innerText = '✔';
+                label.innerText = `Base ${baseNum}: ${formatNumber(count)} ordens salvas na nuvem (clique para adicionar mais)`;
+            } else {
+                box.classList.remove('loaded');
+                icon.innerText = '📥';
+                label.innerText = baseNum === 1 ? "Selecionar Bases Forward (.csv ou .zip)" : "Selecionar Bases Receive Task (.csv ou .zip)";
+            }
+        }
+
+        /* =========================================================
+           BASE DESATUALIZADA
+        ========================================================= */
+        function baseAgeHours(n) {
+            const m = window.baseMeta && window.baseMeta['base' + n];
+            if (!m || !m.atualizadoEm) return null;
+            return (Date.now() - new Date(m.atualizadoEm).getTime()) / 3600000;
+        }
+
+        window.renderBaseFreshness = function() {
+            const limite = Number(window.settings.horasAlerta) || 4;
+            const avisos = [];
+            [1, 2].forEach(n => {
+                const count = n === 1 ? window.totalB1Count : window.totalB2Count;
+                const m = window.baseMeta && window.baseMeta['base' + n];
+                const metaEl = $('base-meta-' + n);
+                const sideEl = $('ui-b' + n + '-age');
+                let txt = '', stale = false, side = '';
+
+                if (count > 0 && m && m.atualizadoEm) {
+                    const h = baseAgeHours(n);
+                    stale = h > limite;
+                    const dt = new Date(m.atualizadoEm);
+                    txt = `Última carga: ${dt.toLocaleDateString('pt-BR')} às ${dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} (${timeAgo(m.atualizadoEm)})`
+                        + (m.operador ? ` por ${esc(m.operador)}` : '')
+                        + (m.arquivos ? `<br>Arquivos: ${esc(m.arquivos)}` : '');
+                    side = timeAgo(m.atualizadoEm);
+                    if (stale) avisos.push(`Base ${n} carregada ${timeAgo(m.atualizadoEm)}`);
+                } else if (count > 0) {
+                    txt = 'Carregada sem registro de horário (versão anterior do sistema).';
+                    side = 'sem horário';
+                }
+                if (metaEl) { metaEl.innerHTML = txt; metaEl.className = 'base-meta' + (stale ? ' stale' : ''); }
+                if (sideEl) { sideEl.innerText = side; sideEl.style.color = stale ? '#c2410c' : '#64748b'; }
+            });
+
+            const banner = $('stale-banner');
+            if (banner) {
+                if (avisos.length && isViewingToday()) {
+                    banner.innerText = `⚠ ${avisos.join(' · ')} — passou do limite de ${limite}h. Atualize as bases para evitar direcionamento errado.`;
+                    banner.style.display = 'block';
+                } else banner.style.display = 'none';
             }
         };
+
+        function checkAndUnlockScanner() {
+            const totalRecords = window.totalB1Count + window.totalB2Count;
+            const scannerInput = $('main-barcode-scanner');
+            const summaryCard = $('import-summary-card');
+            const summaryText = $('import-summary-text');
+
+            if (summaryCard) summaryCard.style.display = totalRecords > 0 ? 'block' : 'none';
+            if (summaryText && totalRecords > 0) {
+                summaryText.innerHTML = `
+                    <strong>Base 1 (Forward):</strong> ${formatNumber(window.totalB1Count)} registros na nuvem.<br>
+                    <strong>Base 2 (Receive Task):</strong> ${formatNumber(window.totalB2Count)} registros na nuvem.<br>
+                    <strong>Total Consolidado (pacotes únicos):</strong> ${formatNumber(window.uniqueTotalCount)} ordens ativas para cruzamento prioritário.`;
+            }
+
+            if (scannerInput) {
+                let reason = '';
+                if (totalRecords === 0) reason = 'Aguardando sincronização segura das bases com a nuvem...';
+                else if (!window.operador.nome) reason = 'Informe o operador para começar a bipar...';
+                else if (!isViewingToday()) reason = `Visualizando ${dayLabel(window.selectedDay)} (histórico) — clique em "Hoje" para bipar`;
+                scannerInput.disabled = !!reason;
+                scannerInput.placeholder = reason || 'Passe o leitor de código de barras corporativo...';
+            }
+            window.scheduleUIRefresh();
+        }
+
+        /* =========================================================
+           ABAS E LOADING
+        ========================================================= */
+        const TABS = ['import', 'dashboard', 'report', 'missing'];
+        window.switchTab = function(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn')[TABS.indexOf(tabId)].classList.add('active');
+            $('tab-' + tabId).classList.add('active');
+            if (tabId === 'dashboard') focusScanner();
+            if (tabId === 'report') window.calculateAndRenderReport();
+            if (tabId === 'missing') window.computeMissing();
+        };
+        function activeTab() { const el = document.querySelector('.tab-content.active'); return el ? el.id.replace('tab-', '') : ''; }
+
+        function focusScanner() {
+            const inputEl = $('main-barcode-scanner');
+            setTimeout(() => { if (inputEl && !inputEl.disabled && $('operator-modal').style.display !== 'flex') inputEl.focus(); }, 100);
+        }
+
+        function showLoading(show, message = "", progress = null) {
+            const overlay = $('loading-screen'), txt = $('loading-text');
+            const wrap = $('loading-progress-wrap'), fill = $('loading-progress-fill');
+            if (!overlay) return;
+            if (message) txt.innerText = message;
+            if (progress === null) wrap.style.display = 'none';
+            else { wrap.style.display = 'block'; fill.style.width = Math.min(100, Math.max(0, progress)) + '%'; }
+            overlay.style.display = show ? 'flex' : 'none';
+        }
+
+        /* =========================================================
+           LEITURA DE CSV (RFC-4180)
+        ========================================================= */
+        function parseCSVText(text, separator) {
+            const rows = []; let row = []; let field = ''; let inQuotes = false; const n = text.length;
+            for (let i = 0; i < n; i++) {
+                const ch = text[i];
+                if (inQuotes) {
+                    if (ch === '"') { if (text[i + 1] === '"') { field += '"'; i++; } else inQuotes = false; }
+                    else field += ch;
+                } else {
+                    if (ch === '"') inQuotes = true;
+                    else if (ch === separator) { row.push(field.trim()); field = ''; }
+                    else if (ch === '\n' || ch === '\r') {
+                        if (ch === '\r' && text[i + 1] === '\n') i++;
+                        row.push(field.trim()); field = ''; rows.push(row); row = [];
+                    } else field += ch;
+                }
+            }
+            if (field !== '' || row.length > 0) { row.push(field.trim()); rows.push(row); }
+            return rows;
+        }
+
+        function extractRowsFromCSV(text) {
+            text = text.replace(/^﻿/, '');
+            const firstLineEnd = text.search(/\r?\n/);
+            const firstLine = firstLineEnd === -1 ? text : text.slice(0, firstLineEnd);
+            const separator = firstLine.includes(',') && !firstLine.includes(';') ? ',' : ';';
+
+            const all = parseCSVText(text, separator);
+            if (all.length < 1) return { error: 'Arquivo vazio.' };
+            const headers = all[0].map(h => h.replace(/^﻿/, '').trim().toLowerCase());
+
+            const trackingIdx = headers.findIndex(h => h === 'sls tracking number' || h === 'forward_order_id' || h === 'tracking_number' || h.includes('tracking') || h === 'id' || h.includes('number'));
+            const statusIdx = headers.findIndex(h => h === 'status' || h === 'order status' || h.includes('status'));
+            const hubIdx = headers.findIndex(h => h === 'destination hub' || h === 'destination_hub' || h === 'destination_hub_name' || h.includes('destination hub') || h.includes('destino'));
+            const locationIdx = headers.findIndex(h => h === 'location type' || h === 'location_type' || h.includes('location type') || h.includes('office'));
+
+            if (trackingIdx === -1) return { error: 'Coluna de rastreamento (Tracking Number) não identificada no arquivo.' };
+
+            const rows = []; let ignored = 0;
+            for (let i = 1; i < all.length; i++) {
+                const columns = all[i];
+                if (columns.length === 1 && !columns[0]) continue;
+                const id = (columns[trackingIdx] || '').trim();
+                if (id && id.length <= 15 && isValidKey(id)) {
+                    let hubValue = 'N/A';
+                    if (hubIdx !== -1 && columns[hubIdx]) hubValue = columns[hubIdx].replace(/^["']|["']$/g, '').trim();
+                    let locValue = '-';
+                    if (locationIdx !== -1 && columns[locationIdx]) locValue = columns[locationIdx];
+                    rows.push({ id, status: statusIdx !== -1 ? (columns[statusIdx] || 'N/A') : 'N/A', hub: hubValue, loc: locValue });
+                } else ignored++;
+            }
+            return { rows, ignored };
+        }
+
+        async function readFileAsCSVTexts(file) {
+            const extension = file.name.split('.').pop().toLowerCase();
+            if (extension === 'csv') return [{ name: file.name, text: await file.text() }];
+            if (extension === 'zip') {
+                const zip = await JSZip.loadAsync(await file.arrayBuffer());
+                const entries = [];
+                zip.forEach((p, entry) => { if (!entry.dir && entry.name.toLowerCase().endsWith('.csv')) entries.push(entry); });
+                const out = [];
+                for (const entry of entries) out.push({ name: entry.name, text: await entry.async('string') });
+                if (out.length === 0) throw new Error(`O arquivo ${file.name} não contém nenhum .csv`);
+                return out;
+            }
+            throw new Error(`Formato não suportado: ${file.name}. Selecione .csv ou .zip`);
+        }
+
+        window.handleFileSelectUnified = async function(event, baseIndex) {
+            const files = Array.from(event.target.files || []);
+            event.target.value = '';
+            if (files.length === 0) return;
+
+            const nodeName = baseIndex === 1 ? 'planilha_base1' : 'planilha_base2';
+            window.isUploading = true;
+            showLoading(true, 'Lendo arquivos...', 0);
+
+            try {
+                const merged = new Map(); let ignoredTotal = 0;
+                for (let f = 0; f < files.length; f++) {
+                    showLoading(true, `Lendo arquivo ${f + 1} de ${files.length}: ${files[f].name}`, 0);
+                    const texts = await readFileAsCSVTexts(files[f]);
+                    for (const t of texts) {
+                        const result = extractRowsFromCSV(t.text);
+                        if (result.error) throw new Error(`${t.name}: ${result.error}`);
+                        ignoredTotal += result.ignored;
+                        result.rows.forEach(r => merged.set(r.id, r));
+                    }
+                }
+                const rowsToProcess = Array.from(merged.values());
+                if (rowsToProcess.length === 0) throw new Error('Nenhum registro válido encontrado nos arquivos.');
+
+                const chunkSize = 2000;
+                for (let offset = 0; offset < rowsToProcess.length; offset += chunkSize) {
+                    const chunkObject = {};
+                    const limit = Math.min(offset + chunkSize, rowsToProcess.length);
+                    for (let k = offset; k < limit; k++) {
+                        const row = rowsToProcess[k];
+                        chunkObject[row.id] = { trackingNumber: row.id, status: row.status, destinationHub: row.hub, locationType: row.loc };
+                    }
+                    showLoading(true, `Enviando Base ${baseIndex} para a nuvem: ${formatNumber(limit)} de ${formatNumber(rowsToProcess.length)}`, (limit / rowsToProcess.length) * 100);
+                    await window.firebaseActions.updateData(nodeName, chunkObject);
+                }
+
+                await window.firebaseActions.updateData('meta_bases/base' + baseIndex, {
+                    atualizadoEm: new Date().toISOString(),
+                    registrosCarga: rowsToProcess.length,
+                    arquivos: files.map(f => f.name).join(', ').slice(0, 500),
+                    operador: window.operador.nome || ''
+                });
+
+                window.showAlertTop(`✔ Base ${baseIndex}: ${formatNumber(rowsToProcess.length)} registros carregados de ${files.length} arquivo(s)${ignoredTotal ? ` · ${formatNumber(ignoredTotal)} linhas ignoradas (ID inválido)` : ''}. Sem duplicação.`, 'alert-green');
+            } catch (err) {
+                console.error(err);
+                alert('Erro na importação: ' + (err && err.message ? err.message : err));
+            } finally {
+                window.isUploading = false;
+                showLoading(false);
+                window.onBasesChanged();
+            }
+        };
+
+        /* =========================================================
+           RELATÓRIO
+        ========================================================= */
+        function pctRow(label, qtd, total) {
+            return `<tr>
+                <td style="font-weight: 600; color: #1f2937; padding-left: 24px;">${esc(label)}</td>
+                <td style="text-align: center; font-weight: 700; color: #111827;">${formatNumber(qtd)}</td>
+                <td style="text-align: center; font-weight: 700; color: #2563eb;">${((qtd / total) * 100).toFixed(2)}%</td>
+            </tr>`;
+        }
+
+        window.calculateAndRenderReport = function() {
+            const list = window.scannedItemsList || [];
+            const totalBipados = list.length;
+            $('report-total-bipados').innerText = formatNumber(totalBipados);
+            $('report-date').innerText = `Dia operacional: ${dayLabel(window.selectedDay)} · Gerado em ${new Date().toLocaleString('pt-BR')}`;
+
+            const tbody = $('report-table-body'), tbodyAction = $('report-action-body'), tbodyOp = $('report-operator-body');
+            const empty = (cols) => `<tr><td colspan="${cols}" style="text-align: center; color: #94a3b8; padding: 48px; font-style: italic;">Aguardando pacotes.</td></tr>`;
+
+            if (totalBipados === 0) {
+                tbody.innerHTML = empty(3); tbodyAction.innerHTML = empty(3); tbodyOp.innerHTML = empty(6);
+                $('report-total-status').innerText = 0;
+                $('report-total-notfound').innerText = 0;
+                return;
+            }
+
+            let statusMap = {}, catMap = {}, opMap = {}, notFound = 0;
+            list.forEach(item => {
+                let status = item.statusOriginal || 'N/A';
+                let hub = (item.destinationHub || '').toLowerCase();
+                const pertencerRegiaoAtiva = hub.includes('uberaba') || hub.includes('carmelo') || hub.includes('catalao') || hub.includes('catalão');
+                if (status.startsWith('LMHub_Received') && !pertencerRegiaoAtiva) status = 'LMHub_Received (Outros Hubs)';
+                else if (status === 'LMHub_Received_Office' || status === 'LMHub_Received_office' || status === 'LMHub_Received_-') status = 'LMHub_Received_office / -';
+                statusMap[status] = (statusMap[status] || 0) + 1;
+
+                const cat = itemCategory(item);
+                catMap[cat] = (catMap[cat] || 0) + 1;
+                if (item.encontrado !== 'SIM') notFound++;
+
+                const opKey = item.operador || '(sem operador)';
+                const o = opMap[opKey] || (opMap[opKey] = { bips: 0, postos: new Set(), first: null, last: null });
+                o.bips++;
+                if (item.posto) o.postos.add(item.posto);
+                const t = new Date(item.timestampBip).getTime();
+                const t0 = new Date(item.primeiroBip || item.timestampBip).getTime();
+                if (!o.first || t0 < o.first) o.first = t0;
+                if (!o.last || t > o.last) o.last = t;
+            });
+
+            const statusKeys = Object.keys(statusMap).sort((a, b) => a.localeCompare(b));
+            $('report-total-status').innerText = statusKeys.length;
+            $('report-total-notfound').innerText = formatNumber(notFound);
+            tbody.innerHTML = statusKeys.map(k => pctRow(k, statusMap[k], totalBipados)).join('');
+
+            tbodyAction.innerHTML = CATEGORIES.filter(c => catMap[c.cor]).sort((a, b) => catMap[b.cor] - catMap[a.cor])
+                .map(c => pctRow(c.label, catMap[c.cor], totalBipados)).join('');
+
+            const hhmm = (ms) => new Date(ms).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            tbodyOp.innerHTML = Object.keys(opMap).sort((a, b) => opMap[b].bips - opMap[a].bips).map(k => {
+                const o = opMap[k];
+                const horas = Math.max((o.last - o.first) / 3600000, 1 / 60);
+                const porHora = o.bips > 1 ? Math.round(o.bips / horas) : '-';
+                return `<tr>
+                    <td style="font-weight: 600; color: #1f2937; padding-left: 24px;">${esc(k)}</td>
+                    <td style="text-align: center;">${esc([...o.postos].join(', ') || '-')}</td>
+                    <td style="text-align: center; font-weight: 700;">${formatNumber(o.bips)}</td>
+                    <td style="text-align: center;">${hhmm(o.first)}</td>
+                    <td style="text-align: center;">${hhmm(o.last)}</td>
+                    <td style="text-align: center; font-weight: 700; color: #2563eb;">${porHora}</td>
+                </tr>`;
+            }).join('');
+        };
+
+        /* =========================================================
+           PAINEL, CONTADORES E TABELA
+        ========================================================= */
+        window.refreshDashboardUI = function() {
+            const tExpected = window.uniqueTotalCount || 0;
+            const tScanned = window.scannedItemsList ? window.scannedItemsList.length : 0;
+            const set = (id, v) => { const el = $(id); if (el) el.innerText = v; };
+            set('ui-total-esperado', formatNumber(tExpected));
+            set('ui-b1-count', formatNumber(window.totalB1Count || 0));
+            set('ui-b2-count', formatNumber(window.totalB2Count || 0));
+            set('ui-total-bipado', formatNumber(tScanned));
+
+            let percentage = tExpected > 0 ? (tScanned / tExpected) * 100 : 0;
+            set('ui-percentage', percentage.toFixed(2) + '%');
+            let circumference = 2 * Math.PI * 70;
+            let offset = circumference - (Math.min(percentage, 100) / 100) * circumference;
+            const circle = $('progress-circle');
+            if (circle) circle.style.strokeDashoffset = Math.max(0, offset);
+
+            const counts = {};
+            (window.scannedItemsList || []).forEach(i => { const c = itemCategory(i); counts[c] = (counts[c] || 0) + 1; });
+            renderChips('live-chips', counts, window.categoryFilter, 'toggleCategoryFilter');
+
+            renderTableData();
+        };
+
+        window.toggleCategoryFilter = function(cor) {
+            window.categoryFilter = window.categoryFilter === cor ? null : cor;
+            window.currentPage = 1;
+            window.refreshDashboardUI();
+        };
+
+        let uiRefreshPending = false;
+        window.scheduleUIRefresh = function() {
+            if (uiRefreshPending) return;
+            uiRefreshPending = true;
+            requestAnimationFrame(() => {
+                uiRefreshPending = false;
+                window.refreshDashboardUI();
+                const t = activeTab();
+                if (t === 'report') window.calculateAndRenderReport();
+                if (t === 'missing') debouncedMissing();
+            });
+        };
+
+        function renderTableData() {
+            const query = window.currentSearchQuery ? window.currentSearchQuery.toLowerCase() : "";
+            let list = window.scannedItemsList || [];
+            if (window.categoryFilter) list = list.filter(i => itemCategory(i) === window.categoryFilter);
+            if (query) list = list.filter(item =>
+                (item.trackingNumber || '').toLowerCase().includes(query) ||
+                (item.statusOriginal || '').toLowerCase().includes(query) ||
+                (item.destinationHub || '').toLowerCase().includes(query) ||
+                (item.action || '').toLowerCase().includes(query) ||
+                (item.operador || '').toLowerCase().includes(query));
+            window.filteredItemsList = list;
+
+            const tbody = $('live-table-body');
+            if (!tbody) return;
+            const paginationBar = $('pagination-bar');
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #94a3b8; padding: 48px;">Nenhum registro encontrado.</td></tr>`;
+                if (paginationBar) paginationBar.style.display = 'none';
+                return;
+            }
+            if (paginationBar) paginationBar.style.display = 'flex';
+            const totalItems = list.length;
+            const totalPages = Math.max(1, Math.ceil(totalItems / window.itemsPerPage));
+            window.currentPage = Math.min(Math.max(1, window.currentPage), totalPages);
+            const start = window.showAllItems ? 0 : (window.currentPage - 1) * window.itemsPerPage;
+            const end = window.showAllItems ? totalItems : Math.min(start + window.itemsPerPage, totalItems);
+
+            $('pagination-info-text').innerText = `Exibindo ${formatNumber(start + 1)}-${formatNumber(end)} de ${formatNumber(totalItems)} registros`;
+            $('btn-page-prev').disabled = window.currentPage === 1 || window.showAllItems;
+            $('btn-page-next').disabled = window.currentPage >= totalPages || window.showAllItems;
+            $('btn-page-current').innerText = window.showAllItems ? 'Tudo' : `${window.currentPage} / ${totalPages}`;
+            $('btn-show-all').innerText = window.showAllItems ? 'Paginar' : 'Ver Tudo';
+
+            tbody.innerHTML = list.slice(start, end).map(item => {
+                let originText = 'Base 1';
+                if (item.origin === 'Base 2') originText = 'Base 2';
+                if (item.origin === 'Ambas') originText = 'Ambas';
+                if (item.origin === 'NÃO ENCONTRADO') originText = 'Nenhuma';
+                const rebip = item.qtdBips > 1 ? `<span class="rebip-tag" title="Bipado ${item.qtdBips} vezes">${item.qtdBips}x</span>` : '';
+                const hora = item.timestampBip ? new Date(item.timestampBip).toLocaleTimeString('pt-BR') : '';
+                const quem = item.operador ? ` · ${item.operador}${item.posto ? ' (posto ' + item.posto + ')' : ''}` : '';
+                return `<tr>
+                    <td style="font-weight:700; color: #111827;" title="${esc('Bipado às ' + hora + quem)}">${esc(item.trackingNumber)}${rebip}</td>
+                    <td><span class="badge">${esc(item.statusOriginal || 'N/A')}</span></td>
+                    <td style="font-weight: 700; color: #0284c7;">${esc(item.destinationHub || 'N/A')}</td>
+                    <td style="font-weight:600; color: #475569; text-align: center;">${esc(item.locationType || '-')}</td>
+                    <td><span class="badge">${esc(item.action || 'TRATATIVA')}</span></td>
+                    <td style="text-align: center;"><span class="badge">${originText}</span></td>
+                    <td>${item.encontrado === 'SIM' ? '<span class="badge">Sincronizado</span>' : '<span class="badge">Divergente</span>'}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        const debouncedSearch = debounce(() => {
+            window.currentSearchQuery = $('table-search').value;
+            window.currentPage = 1;
+            renderTableData();
+        }, 200);
+        window.handleSearch = function() { debouncedSearch(); };
+        window.changePage = function(amount) { window.currentPage += amount; renderTableData(); };
+        window.toggleShowAll = function() { window.showAllItems = !window.showAllItems; window.currentPage = 1; renderTableData(); };
+
+        window.exportToExcelXLSX = function() {
+            const list = (window.currentSearchQuery || window.categoryFilter) ? window.filteredItemsList : window.scannedItemsList;
+            if (!list || list.length === 0) { alert('Não há registros para exportar.'); return; }
+            downloadCSV(`Triagem_Consolidada_${window.selectedDay}.csv`,
+                ['Tracking ID', 'Status', 'Hub', 'Office-Home', 'Acao', 'Categoria', 'Origem', 'Validacao', 'Data/Hora Bip', 'Qtd Bips', 'Operador', 'Posto'],
+                list.map(item => [item.trackingNumber, item.statusOriginal, item.destinationHub, item.locationType, item.action,
+                    CATEGORY_LABEL[itemCategory(item)] || '', item.origin, item.encontrado,
+                    item.timestampBip ? new Date(item.timestampBip).toLocaleString('pt-BR') : '', item.qtdBips || 1, item.operador || '', item.posto || '']));
+        };
+
+        /* =========================================================
+           FALTANTES (na base e ainda não bipados no dia)
+        ========================================================= */
+        window.computeMissing = function() {
+            const ids = new Set(Object.keys(window.base1Map || {}));
+            Object.keys(window.base2Map || {}).forEach(k => ids.add(k));
+            const scanned = window.scannedIndex;
+            const out = [];
+            ids.forEach(id => {
+                if (scanned.has(id)) return;
+                const r = window.classifyParcel(id);
+                out.push({ trackingNumber: id, statusOriginal: r.statusText, destinationHub: r.destHub, locationType: r.locType, action: r.actionText, alertColor: r.alertColor, origin: r.originLabel });
+            });
+            window.missingList = out;
+            renderMissing();
+        };
+        const debouncedMissing = debounce(() => window.computeMissing(), 500);
+
+        window.toggleMissingCategory = function(cor) {
+            window.missingCategory = window.missingCategory === cor ? '' : cor;
+            const sel = $('missing-category'); if (sel) sel.value = window.missingCategory;
+            window.missingPage = 1; renderMissing();
+        };
+        window.onMissingFilter = debounce(() => { window.missingCategory = $('missing-category').value; window.missingPage = 1; renderMissing(); }, 200);
+        window.changeMissingPage = function(d) { window.missingPage += d; renderMissing(); };
+
+        function filteredMissing() {
+            const q = ($('missing-search') ? $('missing-search').value : '').toLowerCase();
+            let list = window.missingList;
+            if (window.missingCategory) list = list.filter(i => i.alertColor === window.missingCategory);
+            if (q) list = list.filter(i => i.trackingNumber.toLowerCase().includes(q) || (i.statusOriginal || '').toLowerCase().includes(q) || (i.destinationHub || '').toLowerCase().includes(q));
+            return list;
+        }
+
+        function renderMissing() {
+            const counts = {};
+            window.missingList.forEach(i => counts[i.alertColor] = (counts[i.alertColor] || 0) + 1);
+            renderChips('missing-chips', counts, window.missingCategory, 'toggleMissingCategory');
+            $('missing-total').innerText = formatNumber(window.missingList.length);
+
+            const list = filteredMissing();
+            const per = 50, totalPages = Math.max(1, Math.ceil(list.length / per));
+            window.missingPage = Math.min(Math.max(1, window.missingPage), totalPages);
+            const start = (window.missingPage - 1) * per, end = Math.min(start + per, list.length);
+            $('missing-info').innerText = list.length ? `Exibindo ${formatNumber(start + 1)}-${formatNumber(end)} de ${formatNumber(list.length)}` : 'Nenhum pacote faltante neste filtro';
+            $('missing-prev').disabled = window.missingPage === 1;
+            $('missing-next').disabled = window.missingPage >= totalPages;
+            $('missing-page').innerText = `${window.missingPage} / ${totalPages}`;
+
+            $('missing-body').innerHTML = list.length === 0
+                ? `<tr><td colspan="6" style="text-align:center; color:#94a3b8; padding:48px;">${window.missingList.length ? 'Nenhum resultado para o filtro.' : 'Nenhuma base carregada ou todos os pacotes já foram bipados.'}</td></tr>`
+                : list.slice(start, end).map(i => `<tr>
+                    <td style="font-weight:700; color:#111827;">${esc(i.trackingNumber)}</td>
+                    <td><span class="badge">${esc(i.statusOriginal)}</span></td>
+                    <td style="font-weight:700; color:#0284c7;">${esc(i.destinationHub)}</td>
+                    <td style="text-align:center;">${esc(i.locationType)}</td>
+                    <td><span class="badge">${esc(i.action)}</span></td>
+                    <td style="text-align:center;"><span class="badge">${esc(i.origin)}</span></td>
+                </tr>`).join('');
+        }
+
+        window.exportMissing = function() {
+            const list = filteredMissing();
+            if (!list.length) { alert('Não há faltantes para exportar.'); return; }
+            downloadCSV(`Faltantes_${window.selectedDay}.csv`,
+                ['Tracking ID', 'Status', 'Hub', 'Office-Home', 'Acao Prevista', 'Categoria', 'Origem'],
+                list.map(i => [i.trackingNumber, i.statusOriginal, i.destinationHub, i.locationType, i.action, CATEGORY_LABEL[i.alertColor] || '', i.origin]));
+        };
+
+        /* =========================================================
+           LIMPEZA
+        ========================================================= */
+        window.clearOnlyScans = function() {
+            const n = window.scannedItemsList.length;
+            const msg = `Excluir ${formatNumber(n)} bips do dia ${dayLabel(window.selectedDay)}?\n\nDica: exporte os dados antes. Os outros dias não são afetados.`;
+            if (confirm(msg)) window.firebaseActions.removeNode(dayPath(window.selectedDay));
+        };
+        window.clearOnlyBases = function() {
+            if (confirm("Limpar dados das duas planilhas na nuvem?")) {
+                window.firebaseActions.removeNode('planilha_base1');
+                window.firebaseActions.removeNode('planilha_base2');
+                window.firebaseActions.removeNode('meta_bases');
+            }
+        };
+        window.clearDatabaseNode = function(nodeName) {
+            if (confirm("Limpar este nó do banco de dados?")) {
+                window.firebaseActions.removeNode(nodeName);
+                window.firebaseActions.removeNode('meta_bases/' + nodeName.replace('planilha_', ''));
+            }
+        };
+
+        /* =========================================================
+           CONFIGURAÇÕES
+        ========================================================= */
+        function applySettingsToUI() {
+            $('set-voz').checked = !!window.settings.voz;
+            $('set-bipe').checked = !!window.settings.bipe;
+            $('set-horas').value = window.settings.horasAlerta;
+            $('set-inicio').value = window.settings.inicioDia;
+            $('quick-bipe').checked = !!window.settings.bipe;
+            $('quick-voz').checked = !!window.settings.voz;
+        }
+        window.onSettingsChange = function() {
+            const oldInicio = window.settings.inicioDia;
+            window.settings = {
+                voz: $('set-voz').checked,
+                bipe: $('set-bipe').checked,
+                horasAlerta: Math.max(1, Number($('set-horas').value) || 4),
+                inicioDia: Math.min(23, Math.max(0, Number($('set-inicio').value) || 0))
+            };
+            saveJSON('parcel_settings', window.settings);
+            applySettingsToUI();
+            window.renderBaseFreshness();
+            if (oldInicio !== window.settings.inicioDia && window.followToday) subscribeDay(operationalDayKey());
+        };
+        window.testBeeps = function() {
+            let delay = 0;
+            CATEGORIES.forEach(c => { setTimeout(() => playBeep(c.cor), delay); delay += 700; });
+        };
+
+        /* =========================================================
+           INICIALIZAÇÃO
+        ========================================================= */
+        document.addEventListener('DOMContentLoaded', () => {
+            const scannerInput = $('main-barcode-scanner');
+            scannerInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') { e.preventDefault(); handleScannerEnter(this); }
+            });
+
+            $('tab-dashboard').addEventListener('click', (e) => {
+                if (e.target.closest('input, button, select, textarea, a, .chip')) return;
+                if (window.getSelection && String(window.getSelection())) return;
+                focusScanner();
+            });
+
+            ['op-nome', 'op-posto'].forEach(id => $(id).addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); window.saveOperator(); } }));
+
+            applySettingsToUI();
+            renderOperator();
+            window.setConnectionStatus(navigator.onLine);
+            if (!window.operador.nome) window.openOperatorModal();
+            window.scheduleUIRefresh();
+            focusScanner();
+        });
     </script>
 </head>
 <body>
@@ -561,14 +1405,34 @@
     <div id="loading-screen" class="loading-overlay">
         <div class="spinner"></div>
         <div id="loading-text">Processando e estruturando registros operacionais...</div>
+        <div class="progress-bar-wrap" id="loading-progress-wrap"><div class="progress-bar-fill" id="loading-progress-fill"></div></div>
+    </div>
+
+    <div class="modal-backdrop" id="operator-modal">
+        <div class="modal">
+            <h3>👷 Identificação do operador</h3>
+            <p>Os bips deste computador ficarão registrados com esse nome e posto, para o relatório de produtividade.</p>
+            <label for="op-nome">Nome do operador</label>
+            <input id="op-nome" type="text" placeholder="Ex.: João Silva" autocomplete="off">
+            <label for="op-posto">Posto / bancada</label>
+            <input id="op-posto" type="text" placeholder="Ex.: 3" autocomplete="off">
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="cancelOperator()">Cancelar</button>
+                <button class="btn-primary" onclick="saveOperator()">Começar</button>
+            </div>
+        </div>
     </div>
 
     <div class="navbar">
         <div class="brand">
             <strong style="font-size: 26px; color: #f8fafc;">Pré Tratativa Parcel</strong>
         </div>
-        <div class="user-profile" style="font-size: 16px; padding: 8px 16px;">
-            <span>👤 Criador: Helder Alves</span>
+        <div class="nav-right">
+            <div class="nav-pill"><span id="operator-pill-text">👷 Sem operador</span><button onclick="openOperatorModal()">trocar</button></div>
+            <div class="conn-status" id="conn-status"><span class="conn-dot"></span><span id="conn-text">Conectando...</span></div>
+            <div class="user-profile" style="font-size: 16px; padding: 8px 16px;">
+                <span>👤 Criador: Helder Alves</span>
+            </div>
         </div>
     </div>
 
@@ -576,15 +1440,24 @@
         <button class="tab-btn" onclick="switchTab('import')">1. Importação de Bases</button>
         <button class="tab-btn active" onclick="switchTab('dashboard')">2. Monitor de Bipagem Realtime</button>
         <button class="tab-btn" onclick="switchTab('report')">3. Relatório Executivo Diário</button>
+        <button class="tab-btn" onclick="switchTab('missing')">4. Faltantes</button>
+    </div>
+
+    <div class="day-bar">
+        <span>📅 Dia operacional:</span>
+        <strong id="day-label">—</strong>
+        <input type="date" id="day-picker" onchange="onDayPicked(this.value)">
+        <button class="small-btn" onclick="goToday()">Hoje</button>
+        <span class="history-tag" id="history-tag">Visualizando histórico — somente leitura</span>
     </div>
 
     <div id="tab-import" class="tab-content">
         <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px;">
             <div>
                 <h2 style="font-size: 22px; font-weight: 700; color: #0f172a;">Carregamento Massivo de Dados</h2>
-                <p style="font-size: 14px; color: #64748b; margin-top: 4px;">Selecione os arquivos brutos (.csv) exportados ou arquivos compactados (.zip).</p>
+                <p style="font-size: 14px; color: #64748b; margin-top: 4px;">Selecione os arquivos brutos (.csv) exportados ou arquivos compactados (.zip). Você pode selecionar vários arquivos de uma vez.</p>
             </div>
-            
+
             <div class="import-grid">
                 <div>
                     <h3 style="font-size: 14px; margin-bottom: 12px; font-weight: 600; color: #475569;">Fluxo Forward (Base 1 - Procurada Primeiro)</h3>
@@ -593,6 +1466,8 @@
                         <span id="label-file-1" style="font-size: 13px; font-weight: 600; color: #334155;">Selecionar Bases Forward (.csv ou .zip)</span>
                         <input type="file" id="csv-file-1" accept=".csv,.zip" multiple style="display: none;" onchange="handleFileSelectUnified(event, 1)">
                     </div>
+                    <p style="font-size: 12px; color: #64748b; margin-top: 8px;">Arquivos: <strong>export_forward_order</strong> e <strong>export_return_order</strong> (.zip)</p>
+                    <div class="base-meta" id="base-meta-1"></div>
                 </div>
 
                 <div>
@@ -602,13 +1477,14 @@
                         <span id="label-file-2" style="font-size: 13px; font-weight: 600; color: #334155;">Selecionar Bases Receive Task (.csv ou .zip)</span>
                         <input type="file" id="csv-file-2" accept=".csv,.zip" multiple style="display: none;" onchange="handleFileSelectUnified(event, 2)">
                     </div>
+                    <p style="font-size: 12px; color: #64748b; margin-top: 8px;">Arquivo: <strong>export_receive_task</strong></p>
+                    <div class="base-meta" id="base-meta-2"></div>
                 </div>
             </div>
 
             <div class="card" id="import-summary-card" style="display: none; border-left: 4px solid #10b981;">
-                <h4 style="color: #065f46; font-size: 16px;">✔ Sistema Sincronizado e Conectado em Rede</h4>
+                <h4 style="color: #065f46; font-size: 16px;" id="import-summary-title">✔ Sistema Sincronizado e Conectado em Rede</h4>
                 <div style="font-size: 13px; margin-top: 8px; color: #374151; line-height: 1.6;" id="import-summary-text"></div>
-                
                 <div style="margin-top: 20px; display: flex; flex-wrap: wrap; gap: 12px;">
                     <button style="padding: 12px 24px; background-color: #2563eb; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer;" onclick="switchTab('dashboard')">Iniciar Monitoramento →</button>
                     <button style="padding: 12px 16px; background-color: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;" onclick="clearDatabaseNode('planilha_base1')">Resetar Apenas Base 1</button>
@@ -616,12 +1492,33 @@
                     <button style="padding: 12px 16px; background-color: #fef2f2; color: #991b1b; border: 1px solid #fee2e2; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;" onclick="clearOnlyBases()">Limpar Banco de Dados</button>
                 </div>
             </div>
+
+            <div class="card">
+                <h4 style="font-size: 16px; color: #0f172a;">⚙ Configurações deste computador</h4>
+                <div class="settings-grid">
+                    <div>
+                        <label><input type="checkbox" id="set-voz" onchange="onSettingsChange()"> Falar a mensagem (voz)</label>
+                        <label><input type="checkbox" id="set-bipe" onchange="onSettingsChange()"> Bipe sonoro por cor</label>
+                        <button class="btn-secondary" style="padding: 7px 12px; font-size: 12px; margin-top: 6px;" onclick="testBeeps()">🔔 Testar bipes</button>
+                    </div>
+                    <div>
+                        <label for="set-horas">Alertar base desatualizada após (horas)</label>
+                        <input type="number" id="set-horas" min="1" max="72" onchange="onSettingsChange()">
+                        <div class="hint">Mostra aviso no monitor quando a última carga passar desse tempo.</div>
+                    </div>
+                    <div>
+                        <label for="set-inicio">Início do dia operacional (hora)</label>
+                        <input type="number" id="set-inicio" min="0" max="23" onchange="onSettingsChange()">
+                        <div class="hint">Ex.: 6 = bips entre 00h e 05h59 contam no dia anterior (turno da madrugada).</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <div id="tab-dashboard" class="tab-content active">
         <div class="dashboard-layout">
-            
+
             <div class="sidebar">
                 <div class="chart-box">
                     <svg width="180" height="180" viewBox="0 0 170 170">
@@ -634,42 +1531,41 @@
                     </div>
                 </div>
                 <div class="stats-list">
-                    <div class="stat-item"><span>Carga em Rede</span><span class="value" id="ui-total-esperado">0</span></div>
-                    <div class="stat-item"><span>Volumetria Base 1</span><span class="value" id="ui-b1-count">0</span></div>
-                    <div class="stat-item"><span>Volumetria Base 2</span><span class="value" id="ui-b2-count">0</span></div>
-                    <div class="stat-item"><span>Processados (Realtime)</span><span class="value" id="ui-total-bipado">0</span></div>
+                    <div class="stat-item"><span>Carga em Rede (únicos)</span><span class="value" id="ui-total-esperado">0</span></div>
+                    <div class="stat-item"><span>Volumetria Base 1<br><small id="ui-b1-age" style="font-size: 11px;"></small></span><span class="value" id="ui-b1-count">0</span></div>
+                    <div class="stat-item"><span>Volumetria Base 2<br><small id="ui-b2-age" style="font-size: 11px;"></small></span><span class="value" id="ui-b2-count">0</span></div>
+                    <div class="stat-item"><span>Processados no dia</span><span class="value" id="ui-total-bipado">0</span></div>
                 </div>
             </div>
 
             <div class="work-area" style="flex: 1; min-width: 0;">
-                <div class="voice-banner">
-                    <span>⚡</span> <span><strong>Controle de Status Ativo:</strong> Layout corrigido para ler colunas por índice rígido absoluto com parser RFC-4180.</span>
-                </div>
+                <div class="stale-banner" id="stale-banner"></div>
 
                 <div id="master-top-alert" class="top-alert-bar"></div>
 
                 <div class="card" style="padding: 20px;">
                     <div class="scanner-container">
                         <span class="scanner-label">ENTRADA DO LEITOR (BR):</span>
-                        <input type="text" id="main-barcode-scanner" class="scanner-input" placeholder="Aguardando inicialização..." disabled>
+                        <input type="text" id="main-barcode-scanner" class="scanner-input" placeholder="Aguardando inicialização..." autocomplete="off" spellcheck="false" disabled>
                     </div>
+                    <div class="sound-toggles">
+                        <label><input type="checkbox" onchange="$('set-bipe').checked = this.checked; onSettingsChange();" id="quick-bipe"> 🔔 Bipe</label>
+                        <label><input type="checkbox" onchange="$('set-voz').checked = this.checked; onSettingsChange();" id="quick-voz"> 🗣 Voz</label>
+                        <div class="last-scan-time" id="last-scan-time"></div>
+                    </div>
+                    <div class="chips" id="live-chips"></div>
                 </div>
 
                 <div class="table-container" style="margin-top: 24px;">
                     <div class="table-header">
                         <strong style="font-size: 16px; font-weight: 700; color: #0f172a;">Malha Operacional de Triagem</strong>
-                        
                         <div class="actions-group">
-                            <input type="text" id="table-search" class="table-search-input" placeholder="🔎 Pesquisar por ID, status ou hub..." oninput="handleSearch()">
-                            <button class="export-btn" onclick="exportToExcelXLSX()">
-                                <span>📥</span> Exportar Dados
-                            </button>
-                            <button class="reset-btn" style="padding: 10px 14px; font-size: 12px;" onclick="clearOnlyScans()">
-                                Zerar Registros
-                            </button>
+                            <input type="text" id="table-search" class="table-search-input" placeholder="🔎 Pesquisar por ID, status, hub, ação ou operador..." oninput="handleSearch()">
+                            <button class="export-btn" onclick="exportToExcelXLSX()"><span>📥</span> Exportar Dados</button>
+                            <button class="reset-btn" id="btn-zerar" style="padding: 10px 14px; font-size: 12px;" onclick="clearOnlyScans()">Zerar Registros do Dia</button>
                         </div>
                     </div>
-                    
+
                     <div class="table-scroll">
                         <table id="operational-table">
                             <thead>
@@ -684,11 +1580,7 @@
                                 </tr>
                             </thead>
                             <tbody id="live-table-body">
-                                <tr>
-                                    <td colspan="7" style="text-align: center; color: #94a3b8; padding: 48px; font-style: italic;">
-                                        Nenhum registro processado nesta sessão de triagem.
-                                    </td>
-                                </tr>
+                                <tr><td colspan="7" style="text-align: center; color: #94a3b8; padding: 48px; font-style: italic;">Nenhum registro processado nesta sessão de triagem.</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -702,10 +1594,8 @@
                             <button class="page-btn" id="btn-page-next" onclick="changePage(1)">Próximo</button>
                         </div>
                     </div>
-
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -715,10 +1605,9 @@
                 <div>
                     <h2 style="font-size: 26px; color: #0f172a; font-weight: 800; letter-spacing: -0.5px;">Performance Report</h2>
                     <p style="font-size: 14px; color: #6b7280; margin-top: 4px;">Sumário executivo corporativo para consolidação e volumetria diária</p>
+                    <p style="font-size: 12px; color: #9ca3af; margin-top: 4px;" id="report-date"></p>
                 </div>
-                <button class="pdf-btn" onclick="window.print()">
-                    <span>🖨️</span> Imprimir Relatório (PDF)
-                </button>
+                <button class="pdf-btn" onclick="window.print()"><span>🖨️</span> Imprimir Relatório (PDF)</button>
             </div>
 
             <div class="report-grid">
@@ -730,382 +1619,110 @@
                     <div class="report-card-title">Clusters de Status Identificados</div>
                     <div class="report-card-value" id="report-total-status">0</div>
                 </div>
+                <div class="report-card" style="border-top: 4px solid #ef4444;">
+                    <div class="report-card-title">Não Encontrados nas Bases</div>
+                    <div class="report-card-value" id="report-total-notfound">0</div>
+                </div>
             </div>
 
             <div class="table-container">
-                <div class="table-header" style="background-color: #ffffff; padding: 24px;">
-                    <strong style="font-size: 16px; color: #0f172a; font-weight: 700;">Distribuição Proporcional da Carga de Trabalho</strong>
-                </div>
+                <div class="table-header" style="padding: 24px;"><strong style="font-size: 16px; color: #0f172a;">Distribuição Proporcional da Carga de Trabalho</strong></div>
                 <div class="table-scroll">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="width: 50%; padding-left: 24px;">Status Identificado (Rastreabilidade)</th>
-                                <th style="text-align: center; width: 25%;">Volume Absoluto</th>
-                                <th style="text-align: center; width: 25%;">Representatividade na Malha</th>
-                            </tr>
-                        </thead>
-                        <tbody id="report-table-body">
-                            <tr>
-                                <td colspan="3" style="text-align: center; color: #94a3b8; padding: 48px; font-style: italic;">
-                                    Aguardando processamento inicial de pacotes para cálculo estatístico.
-                                </td>
-                            </tr>
-                        </tbody>
+                    <table class="plain-table">
+                        <thead><tr>
+                            <th style="width: 50% !important; padding-left: 24px;">Status Identificado (Rastreabilidade)</th>
+                            <th style="text-align: center;">Volume Absoluto</th>
+                            <th style="text-align: center;">Representatividade na Malha</th>
+                        </tr></thead>
+                        <tbody id="report-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="table-container" style="margin-top: 24px;">
+                <div class="table-header" style="padding: 24px;"><strong style="font-size: 16px; color: #0f172a;">Distribuição por Próxima Ação</strong></div>
+                <div class="table-scroll">
+                    <table class="plain-table">
+                        <thead><tr>
+                            <th style="width: 50% !important; padding-left: 24px;">Ação Direcionada</th>
+                            <th style="text-align: center;">Volume Absoluto</th>
+                            <th style="text-align: center;">Representatividade na Malha</th>
+                        </tr></thead>
+                        <tbody id="report-action-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="table-container" style="margin-top: 24px;">
+                <div class="table-header" style="padding: 24px;"><strong style="font-size: 16px; color: #0f172a;">Produtividade por Operador</strong></div>
+                <div class="table-scroll">
+                    <table class="plain-table">
+                        <thead><tr>
+                            <th style="padding-left: 24px;">Operador</th>
+                            <th style="text-align: center;">Posto(s)</th>
+                            <th style="text-align: center;">Pacotes Bipados</th>
+                            <th style="text-align: center;">Primeiro Bip</th>
+                            <th style="text-align: center;">Último Bip</th>
+                            <th style="text-align: center;">Pacotes / Hora</th>
+                        </tr></thead>
+                        <tbody id="report-operator-body"></tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
 
-    <script>
-        window.filteredItemsList = [];
-        window.currentPage = 1;
-        window.itemsPerPage = 50;
-        window.showAllItems = false;
-        window.currentSearchQuery = "";
+    <div id="tab-missing" class="tab-content">
+        <div style="max-width: 1300px; margin: 0 auto;">
+            <div style="margin-bottom: 20px;">
+                <h2 style="font-size: 22px; font-weight: 700; color: #0f172a;">Pacotes Faltantes — <span id="missing-total">0</span></h2>
+                <p style="font-size: 14px; color: #64748b; margin-top: 4px;">Pacotes que estão nas bases mas ainda não foram bipados no dia selecionado. Clique numa cor para filtrar pela ação prevista.</p>
+            </div>
+            <div class="chips" id="missing-chips" style="margin-bottom: 20px;"></div>
 
-        window.emitVoiceAlert = function(messageText) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                let utterance = new SpeechSynthesisUtterance(messageText);
-                utterance.lang = 'pt-BR';
-                window.speechSynthesis.speak(utterance);
-            }
-        };
+            <div class="table-container">
+                <div class="table-header">
+                    <strong style="font-size: 16px; color: #0f172a;">Lista de Faltantes</strong>
+                    <div class="actions-group">
+                        <select id="missing-category" class="filter-select" onchange="onMissingFilter()">
+                            <option value="">Todas as ações</option>
+                            <option value="alert-green">Manter fluxo</option>
+                            <option value="alert-orange">Estação correta</option>
+                            <option value="alert-blue">Rota correta</option>
+                            <option value="alert-pink">XPT</option>
+                            <option value="alert-purple">Tratativa · rota/entregue</option>
+                            <option value="alert-yellow">Tratativa · devolução</option>
+                            <option value="alert-red">Tratativa · outros</option>
+                        </select>
+                        <input type="text" id="missing-search" class="table-search-input" placeholder="🔎 Pesquisar por ID, status ou hub..." oninput="onMissingFilter()">
+                        <button class="export-btn" onclick="exportMissing()"><span>📥</span> Exportar Faltantes</button>
+                        <button class="export-btn" onclick="computeMissing()">🔄 Atualizar</button>
+                    </div>
+                </div>
+                <div class="table-scroll">
+                    <table class="plain-table">
+                        <thead><tr>
+                            <th>Tracking ID</th>
+                            <th>Status na Base</th>
+                            <th>Hub Destino</th>
+                            <th style="text-align: center;">Office / Home</th>
+                            <th style="text-align: center;">Ação Prevista</th>
+                            <th style="text-align: center;">Origem</th>
+                        </tr></thead>
+                        <tbody id="missing-body"></tbody>
+                    </table>
+                </div>
+                <div class="pagination-container">
+                    <div id="missing-info"></div>
+                    <div class="pagination-buttons">
+                        <button class="page-btn" id="missing-prev" onclick="changeMissingPage(-1)">Anterior</button>
+                        <button class="page-btn" id="missing-page" disabled>1</button>
+                        <button class="page-btn" id="missing-next" onclick="changeMissingPage(1)">Próximo</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        window.switchTab = function(tabId) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
-            if(tabId === 'import') {
-                document.querySelectorAll('.tab-btn')[0].classList.add('active');
-                document.getElementById('tab-import').classList.add('active');
-            } else if (tabId === 'dashboard') {
-                document.querySelectorAll('.tab-btn')[1].classList.add('active');
-                document.getElementById('tab-dashboard').classList.add('active');
-                const inputEl = document.getElementById('main-barcode-scanner');
-                setTimeout(() => { if(inputEl && !inputEl.disabled) inputEl.focus(); }, 100);
-            } else if (tabId === 'report') {
-                document.querySelectorAll('.tab-btn')[2].classList.add('active');
-                document.getElementById('tab-report').classList.add('active');
-                window.calculateAndRenderReport();
-            }
-        };
-
-        function showLoading(show, message = "") {
-            const overlay = document.getElementById('loading-screen');
-            const txt = document.getElementById('loading-text');
-            if (overlay) {
-                if(message) txt.innerText = message;
-                overlay.style.display = show ? 'flex' : 'none';
-            }
-        }
-
-        function parseCSVLineRobust(line, separator) {
-            let fields = [];
-            let currentField = '';
-            let inQuotes = false;
-            
-            for (let i = 0; i < line.length; i++) {
-                let char = line[i];
-                if (char === '"') {
-                    inQuotes = !inQuotes;
-                } else if (char === separator && !inQuotes) {
-                    fields.push(currentField.trim());
-                    currentField = '';
-                } else {
-                    currentField += char;
-                }
-            }
-            fields.push(currentField.trim());
-            return fields;
-        }
-
-        window.handleFileSelectUnified = function(event, baseIndex) {
-            const files = event.target.files;
-            if (!files || files.length === 0) return;
-
-            showLoading(true, "Mesclando novos registros e atualizando carga atual...");
-
-            Array.from(files).forEach(file => {
-                const extension = file.name.split('.').pop().toLowerCase();
-                
-                if (extension === 'zip') {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        JSZip.loadAsync(e.target.result).then(function(zip) {
-                            let promises = [];
-                            zip.forEach(function(relativePath, zipEntry) {
-                                if (!zipEntry.dir && zipEntry.name.endsWith('.csv')) {
-                                    promises.push(zipEntry.async("string").then(content => {
-                                        return parseAndStoreCSVInChunks(content, baseIndex);
-                                    }));
-                                }
-                            });
-                            Promise.all(promises).then(() => { 
-                                showLoading(false); 
-                                event.target.value = ''; 
-                            })
-                            .catch(err => { console.error(err); showLoading(false); alert("Erro ao extrair ZIP."); });
-                        });
-                    };
-                    reader.readAsArrayBuffer(file);
-                } else if (extension === 'csv') {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        parseAndStoreCSVInChunks(e.target.result, baseIndex).then(() => { 
-                            showLoading(false); 
-                            event.target.value = ''; 
-                        });
-                    };
-                    reader.readAsText(file, "UTF-8");
-                } else {
-                    alert("Selecione arquivos .csv ou .zip");
-                    showLoading(false);
-                    event.target.value = '';
-                }
-            });
-        };
-
-        function parseAndStoreCSVInChunks(text, baseIndex) {
-            return new Promise((resolve) => {
-                const lines = text.split(/\r?\n/);
-                if (lines.length < 1) { resolve(); return; }
-
-                let separator = lines[0].includes(',') && !lines[0].includes(';') ? ',' : ';';
-                
-                const headers = parseCSVLineRobust(lines[0], separator).map(h => h.replace(/^\ufeff/, '').trim().toLowerCase());
-                
-                const trackingIdx = headers.findIndex(h => h === 'sls tracking number' || h === 'forward_order_id' || h === 'tracking_number' || h.includes('tracking') || h === 'id' || h.includes('number'));
-                const statusIdx = headers.findIndex(h => h === 'status' || h === 'order status' || h.includes('status'));
-                const hubIdx = headers.findIndex(h => h === 'destination hub' || h === 'destination_hub' || h === 'destination_hub_name' || h.includes('destination hub') || h.includes('destino'));
-                const locationIdx = headers.findIndex(h => h === 'location type' || h === 'location_type' || h.includes('location type') || h.includes('office'));
-
-                if (trackingIdx === -1) {
-                    showLoading(false);
-                    alert("Coluna de rastreamento (Tracking Number) não identificada no arquivo.");
-                    resolve();
-                    return;
-                }
-
-                let rowsToProcess = [];
-                for (let i = 1; i < lines.length; i++) {
-                    if (!lines[i].trim()) continue;
-                    
-                    const columns = parseCSVLineRobust(lines[i], separator);
-                    const id = columns[trackingIdx];
-                    
-                    if (id && id.length <= 15) {
-                        let hubValue = 'N/A';
-                        if (hubIdx !== -1 && columns[hubIdx]) {
-                            hubValue = columns[hubIdx].replace(/^["']|["']$/g, '').trim();
-                        }
-
-                        let locValue = '-';
-                        if (locationIdx !== -1 && columns[locationIdx]) {
-                            locValue = columns[locationIdx];
-                        }
-
-                        rowsToProcess.push({
-                            id: id,
-                            status: statusIdx !== -1 ? (columns[statusIdx] || 'N/A') : 'N/A',
-                            hub: hubValue,
-                            loc: locValue
-                        });
-                    }
-                }
-
-                if (rowsToProcess.length === 0) { resolve(); return; }
-
-                const chunkSize = 500;
-                let currentOffset = 0;
-                const nodeName = baseIndex === 1 ? 'planilha_base1' : 'planilha_base2';
-
-                function sendNextChunk() {
-                    if (currentOffset >= rowsToProcess.length) {
-                        window.showAlertTop(`✔ Carga incremental concluída! Registros mesclados sem duplicação.`, 'alert-green');
-                        resolve();
-                        return;
-                    }
-                    
-                    let chunkObject = {};
-                    let limit = Math.min(currentOffset + chunkSize, rowsToProcess.length);
-                    for (let k = currentOffset; k < limit; k++) {
-                        const row = rowsToProcess[k];
-                        chunkObject[row.id] = {
-                            trackingNumber: row.id,
-                            status: row.status,
-                            destinationHub: row.hub,
-                            locationType: row.loc
-                        };
-                    }
-
-                    window.firebaseActions.updateData(nodeName, chunkObject)
-                        .then(() => { currentOffset += chunkSize; sendNextChunk(); })
-                        .catch(err => { console.error(err); resolve(); });
-                }
-                sendNextChunk();
-            });
-        }
-
-        window.calculateAndRenderReport = function() {
-            const totalBipados = window.scannedItemsList ? window.scannedItemsList.length : 0;
-            const totalBipadosEl = document.getElementById('report-total-bipados');
-            if(totalBipadosEl) totalBipadosEl.innerText = totalBipados;
-
-            const tbody = document.getElementById('report-table-body');
-            if(!tbody) return;
-
-            if (totalBipados === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 48px; font-style: italic;">Aguardando pacotes.</td></tr>`;
-                if(document.getElementById('report-total-status')) document.getElementById('report-total-status').innerText = 0;
-                return;
-            }
-
-            let statusMap = {};
-            window.scannedItemsList.forEach(item => {
-                let status = item.statusOriginal || 'N/A';
-                let hub = (item.destinationHub || '').toLowerCase();
-                
-                const pertencerRegiaoAtiva = hub.includes('uberaba') || hub.includes('carmelo') || hub.includes('catalao') || hub.includes('catalão');
-
-                if (status.startsWith('LMHub_Received') && !pertencerRegiaoAtiva) {
-                    status = 'LMHub_Received (Outros Hubs)';
-                } else {
-                    if (status === 'LMHub_Received_Office' || status === 'LMHub_Received_office' || status === 'LMHub_Received_-') {
-                        status = 'LMHub_Received_office / -';
-                    }
-                }
-                
-                statusMap[status] = (statusMap[status] || 0) + 1;
-            });
-
-            let statusSortedKeys = Object.keys(statusMap).sort((a, b) => a.localeCompare(b));
-            if(document.getElementById('report-total-status')) document.getElementById('report-total-status').innerText = statusSortedKeys.length;
-
-            tbody.innerHTML = "";
-            statusSortedKeys.forEach(statusKey => {
-                let qtd = statusMap[statusKey];
-                let percent = ((qtd / totalBipados) * 100).toFixed(2);
-                let row = document.createElement('tr');
-                row.innerHTML = `
-                    <td style="font-weight: 600; color: #1f2937; padding-left: 24px;">${statusKey}</td>
-                    <td style="text-align: center; font-weight: 700; color: #111827;">${qtd}</td>
-                    <td style="text-align: center; font-weight: 700; color: #2563eb;">${percent}%</td>
-                `;
-                tbody.appendChild(row);
-            });
-        };
-
-        window.refreshDashboardUI = function() {
-            const tExpected = (window.totalB1Count || 0) + (window.totalB2Count || 0);
-            const tScanned = window.scannedItemsList ? window.scannedItemsList.length : 0;
-
-            if(document.getElementById('ui-total-esperado')) document.getElementById('ui-total-esperado').innerText = tExpected;
-            if(document.getElementById('ui-b1-count')) document.getElementById('ui-b1-count').innerText = window.totalB1Count || 0;
-            if(document.getElementById('ui-b2-count')) document.getElementById('ui-b2-count').innerText = window.totalB2Count || 0;
-            if(document.getElementById('ui-total-bipado')) document.getElementById('ui-total-bipado').innerText = tScanned;
-
-            let percentage = tExpected > 0 ? (tScanned / tExpected) * 100 : 0;
-            if(document.getElementById('ui-percentage')) document.getElementById('ui-percentage').innerText = percentage.toFixed(2) + '%';
-
-            let circumference = 2 * Math.PI * 70;
-            let offset = circumference - (percentage / 100) * circumference;
-            if(offset < 0) offset = 0;
-            if(document.getElementById('progress-circle')) document.getElementById('progress-circle').style.strokeDashoffset = offset;
-
-            renderTableData();
-        };
-
-        function renderTableData() {
-            let query = window.currentSearchQuery ? window.currentSearchQuery.toLowerCase() : "";
-            if(window.scannedItemsList) {
-                window.filteredItemsList = query ? window.scannedItemsList.filter(item => 
-                    (item.trackingNumber || '').toLowerCase().includes(query) ||
-                    (item.statusOriginal || '').toLowerCase().includes(query) ||
-                    (item.destinationHub || '').toLowerCase().includes(query)
-                ) : [...window.scannedItemsList];
-            } else { window.filteredItemsList = []; }
-
-            const tbody = document.getElementById('live-table-body');
-            if(!tbody) return;
-            tbody.innerHTML = "";
-
-            const paginationBar = document.getElementById('pagination-bar');
-            if (window.filteredItemsList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #94a3b8; padding: 48px;">Nenhum registro encontrado.</td></tr>`;
-                if(paginationBar) paginationBar.style.display = 'none';
-                return;
-            }
-
-            if(paginationBar) paginationBar.style.display = 'flex';
-            let totalItems = window.filteredItemsList.length;
-            let totalPages = Math.ceil(totalItems / window.itemsPerPage);
-            
-            let start = (window.currentPage - 1) * window.itemsPerPage;
-            let end = start + window.itemsPerPage;
-            let sliceItems = window.showAllItems ? window.filteredItemsList : window.filteredItemsList.slice(start, end);
-
-            if(document.getElementById('pagination-info-text')) {
-                document.getElementById('pagination-info-text').innerText = `Exibindo ${start + 1}-${Math.min(end, totalItems)} de ${totalItems} registros`;
-            }
-
-            if(document.getElementById('btn-page-prev')) document.getElementById('btn-page-prev').disabled = window.currentPage === 1 || window.showAllItems;
-            if(document.getElementById('btn-page-next')) document.getElementById('btn-page-next').disabled = window.currentPage === totalPages || window.showAllItems;
-            if(document.getElementById('btn-page-current')) document.getElementById('btn-page-current').innerText = window.currentPage;
-
-            sliceItems.forEach(item => {
-                let row = document.createElement('tr');
-                let st = item.statusOriginal || 'N/A';
-                let hub = item.destinationHub || 'N/A';
-                
-                let badgeAction = item.action || "TRATATIVA";
-                let bScanned = item.encontrado === 'SIM' ? `<span class="badge">Sincronizado</span>` : `<span class="badge">Divergente</span>`;
-                let bOrigin = `<span class="badge">Base 1</span>`;
-                if(item.origin === 'Base 2') bOrigin = `<span class="badge">Base 2</span>`;
-                if(item.origin === 'Ambas') bOrigin = `<span class="badge">Ambas</span>`;
-
-                row.innerHTML = `
-                    <td style="font-weight:700; color: #111827;">${item.trackingNumber}</td>
-                    <td><span class="badge">${st}</span></td>
-                    <td style="font-weight: 700; color: #0284c7;">${hub}</td>
-                    <td style="font-weight:600; color: #475569; text-align: center;">${item.locationType || '-'}</td>
-                    <td><span class="badge">${badgeAction}</span></td>
-                    <td style="text-align: center;">${bOrigin}</td>
-                    <td>${bScanned}</td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        window.handleSearch = function() {
-            window.currentSearchQuery = document.getElementById('table-search') ? document.getElementById('table-search').value : "";
-            window.currentPage = 1;
-            renderTableData();
-        };
-
-        window.changePage = function(amount) { window.currentPage += amount; renderTableData(); };
-        window.toggleShowAll = function() { window.showAllItems = !window.showAllItems; renderTableData(); };
-
-        window.exportToExcelXLSX = function() {
-            if (!window.scannedItemsList || window.scannedItemsList.length === 0) return;
-            let csvContent = "Tracking ID;Status;Hub;Office-Home;Acao;Origem;Validacao\n";
-            window.scannedItemsList.forEach(item => {
-                csvContent += `${item.trackingNumber};${item.statusOriginal};${item.destinationHub};${item.locationType};${item.action};${item.origin};${item.encontrado}\n`;
-            });
-            let blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: "text/csv;charset=utf-8;" });
-            let link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.setAttribute("download", `Triagem_Consolidada_${new Date().toISOString().slice(0,10)}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        };
-
-        window.clearOnlyScans = function() { if(confirm("Zerar histórico de bips realtime?")) window.firebaseActions.removeNode('bips_triagem'); };
-        window.clearOnlyBases = function() { if(confirm("Limpar dados das duas planilhas na nuvem?")) { window.firebaseActions.removeNode('planilha_base1'); window.firebaseActions.removeNode('planilha_base2'); } };
-        window.clearDatabaseNode = function(nodeName) { if(confirm("Limpar este nó do banco de dados?")) window.firebaseActions.removeNode(nodeName); };
-    </script>
 </body>
 </html>

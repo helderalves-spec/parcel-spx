@@ -554,7 +554,7 @@
            - xpt: hubs atendidos via XPT (antes fixo carmelo / catalão).
            Fica na nuvem em "config_estacao" e vale para todos os computadores.
         ========================================================= */
-        const STATION_DEFAULT = { nome: 'Uberaba', xpt: 'Carmelo, Catalão', fonte: 'padrão' };
+        const STATION_DEFAULT = { nome: 'Uberaba', xpt: 'Carmelo, Catalão', soRecebidos: true, fonte: 'padrão' };
         window.stationConfig = { ...STATION_DEFAULT };
 
         function normTxt(s) {
@@ -585,6 +585,7 @@
             const inNome = $('station-nome'), inXpt = $('station-xpt');
             if (inNome && document.activeElement !== inNome) inNome.value = c.nome || '';
             if (inXpt && document.activeElement !== inXpt) inXpt.value = c.xpt || '';
+            const cb = $('station-so-recebidos'); if (cb) cb.checked = c.soRecebidos !== false;
             const info = $('station-info');
             if (info) {
                 let quando = '';
@@ -598,7 +599,8 @@
             const nome = $('station-nome').value.trim();
             const xpt = $('station-xpt').value.trim();
             if (!nome) { alert('Informe o nome da estação.'); $('station-nome').focus(); return; }
-            const dados = { nome, xpt, fonte: 'manual', operador: window.operador.nome || '', em: new Date().toISOString() };
+            const soRecebidos = $('station-so-recebidos').checked;
+            const dados = { nome, xpt, soRecebidos, fonte: 'manual', operador: window.operador.nome || '', em: new Date().toISOString() };
             window.firebaseActions.updateData('config_estacao', dados)
                 .then(() => window.showAlertTop(`📍 ESTAÇÃO DEFINIDA: ${nome.toUpperCase()}`, 'alert-blue'))
                 .catch(err => alert('Não foi possível salvar a estação: ' + (err && err.message ? err.message : err)));
@@ -1042,24 +1044,44 @@
             const statusIdx = headers.findIndex(h => h === 'status' || h === 'order status' || h.includes('status'));
             const hubIdx = headers.findIndex(h => h === 'destination hub' || h === 'destination_hub' || h === 'destination_hub_name' || h.includes('destination hub') || h.includes('destino'));
             const locationIdx = headers.findIndex(h => h === 'location type' || h === 'location_type' || h.includes('location type') || h.includes('office'));
+            // Colunas que dizem se o pacote JÁ FOI RECEBIDO e EM QUAL ESTAÇÃO ele está agora
+            const curStationIdx = headers.findIndex(h => h === 'current station' || h === 'current_station' || h === 'current station name');
+            const curRecvIdx = headers.findIndex(h => h === 'current station received time' || h === 'current_station_received_time');
+            const recvIdx = headers.findIndex(h => h === 'received time' || h === 'received_time');
 
             if (trackingIdx === -1) return { error: 'Coluna de rastreamento (Tracking Number) não identificada no arquivo.' };
 
-            const rows = []; let ignored = 0;
+            const filtrar = window.stationConfig.soRecebidos !== false;
+            const temColunaRecebido = curRecvIdx !== -1 || recvIdx !== -1;
+            const rows = []; let ignored = 0, naoRecebidos = 0, outraEstacao = 0;
             for (let i = 1; i < all.length; i++) {
                 const columns = all[i];
                 if (columns.length === 1 && !columns[0]) continue;
                 const id = (columns[trackingIdx] || '').trim();
                 if (id && id.length <= 15 && isValidKey(id)) {
+                    const status = statusIdx !== -1 ? (columns[statusIdx] || 'N/A') : 'N/A';
+                    const curStation = curStationIdx !== -1 ? (columns[curStationIdx] || '').trim() : '';
+
+                    if (filtrar) {
+                        // 1) só pacotes já recebidos (tem horário de recebimento e status não é "criado/cancelado")
+                        const tempo = (curRecvIdx !== -1 && columns[curRecvIdx]) || (recvIdx !== -1 && columns[recvIdx]);
+                        const recebido = (statusIdx === -1 || !STATUS_NAO_RECEBIDO.has(normTxt(status))) && (!temColunaRecebido || !!String(tempo || '').trim());
+                        if (!recebido) { naoRecebidos++; continue; }
+                        // 2) só pacotes que estão (estação atual) na minha estação
+                        if (curStationIdx !== -1 && !isMyStation(curStation)) { outraEstacao++; continue; }
+                    }
+
                     let hubValue = 'N/A';
                     if (hubIdx !== -1 && columns[hubIdx]) hubValue = columns[hubIdx].replace(/^["']|["']$/g, '').trim();
                     let locValue = '-';
                     if (locationIdx !== -1 && columns[locationIdx]) locValue = columns[locationIdx];
-                    rows.push({ id, status: statusIdx !== -1 ? (columns[statusIdx] || 'N/A') : 'N/A', hub: hubValue, loc: locValue });
+                    rows.push({ id, status, hub: hubValue, loc: locValue, cur: curStation });
                 } else ignored++;
             }
-            return { rows, ignored };
+            return { rows, ignored, naoRecebidos, outraEstacao, filtrou: filtrar, temColunaEstacao: curStationIdx !== -1 };
         }
+        // Status que significam "ainda não chegou em nenhuma estação"
+        const STATUS_NAO_RECEBIDO = new Set(['created', 'dop created', 'cancelled', 'canceled', 'pending', 'pickup pending', 'pending pickup', 'awaiting pickup', 'n/a', '']);
 
         async function readFileAsCSVTexts(file) {
             const extension = file.name.split('.').pop().toLowerCase();
@@ -1086,7 +1108,7 @@
             showLoading(true, 'Lendo arquivos...', 0);
 
             try {
-                const merged = new Map(); let ignoredTotal = 0;
+                const merged = new Map(); let ignoredTotal = 0, naoRecebidosTotal = 0, outraEstacaoTotal = 0, filtrou = false;
                 for (let f = 0; f < files.length; f++) {
                     showLoading(true, `Lendo arquivo ${f + 1} de ${files.length}: ${files[f].name}`, 0);
                     const texts = await readFileAsCSVTexts(files[f]);
@@ -1094,11 +1116,21 @@
                         const result = extractRowsFromCSV(t.text);
                         if (result.error) throw new Error(`${t.name}: ${result.error}`);
                         ignoredTotal += result.ignored;
+                        naoRecebidosTotal += result.naoRecebidos || 0;
+                        outraEstacaoTotal += result.outraEstacao || 0;
+                        filtrou = filtrou || result.filtrou;
                         result.rows.forEach(r => merged.set(r.id, r));
                     }
                 }
                 const rowsToProcess = Array.from(merged.values());
-                if (rowsToProcess.length === 0) throw new Error('Nenhum registro válido encontrado nos arquivos.');
+                const resumoFiltro = filtrou
+                    ? `${formatNumber(naoRecebidosTotal)} ainda não recebidos e ${formatNumber(outraEstacaoTotal)} de outras estações foram ignorados`
+                    : '';
+                if (rowsToProcess.length === 0) {
+                    throw new Error(filtrou
+                        ? `Nenhum pacote recebido na sua estação (${window.stationConfig.nome}) nesse arquivo. ${resumoFiltro}.\n\nSe isso estiver errado, confira a estação na aba 1 ou desligue "Importar só pacotes recebidos na minha estação".`
+                        : 'Nenhum registro válido encontrado nos arquivos.');
+                }
 
                 const chunkSize = 2000;
                 for (let offset = 0; offset < rowsToProcess.length; offset += chunkSize) {
@@ -1107,6 +1139,7 @@
                     for (let k = offset; k < limit; k++) {
                         const row = rowsToProcess[k];
                         chunkObject[row.id] = { trackingNumber: row.id, status: row.status, destinationHub: row.hub, locationType: row.loc };
+                        if (row.cur) chunkObject[row.id].currentStation = row.cur;
                     }
                     showLoading(true, `Enviando Base ${baseIndex} para a nuvem: ${formatNumber(limit)} de ${formatNumber(rowsToProcess.length)}`, (limit / rowsToProcess.length) * 100);
                     await window.firebaseActions.updateData(nodeName, chunkObject);
@@ -1119,7 +1152,7 @@
                     operador: window.operador.nome || ''
                 });
 
-                window.showAlertTop(`✔ Base ${baseIndex}: ${formatNumber(rowsToProcess.length)} registros carregados de ${files.length} arquivo(s)${ignoredTotal ? ` · ${formatNumber(ignoredTotal)} linhas ignoradas (ID inválido)` : ''}. Sem duplicação.`, 'alert-green');
+                window.showAlertTop(`✔ Base ${baseIndex}: ${formatNumber(rowsToProcess.length)} registros carregados de ${files.length} arquivo(s)${resumoFiltro ? ` · ${resumoFiltro}` : ''}${ignoredTotal ? ` · ${formatNumber(ignoredTotal)} linhas ignoradas (ID inválido)` : ''}. Sem duplicação.`, 'alert-green');
             } catch (err) {
                 console.error(err);
                 alert('Erro na importação: ' + (err && err.message ? err.message : err));
@@ -1580,6 +1613,10 @@
                         <button class="btn-primary" onclick="saveStationConfig()">Salvar estação</button>
                     </div>
                 </div>
+                <label style="display: flex; gap: 8px; align-items: flex-start; margin-top: 14px; font-size: 13px; color: #334155; cursor: pointer;">
+                    <input type="checkbox" id="station-so-recebidos" style="margin-top: 3px;">
+                    <span><strong>Importar só pacotes recebidos na minha estação</strong> — ao importar o CSV, ignora pacotes ainda não recebidos (Created, Cancelled, sem horário de recebimento) e os que estão em outra estação (coluna <em>Current Station</em>). Deixa a base bem menor e mais rápida.<br><small style="color:#64748b;">Atenção: pacote a caminho que ainda não foi recebido na SPX vai aparecer como "não encontrado" se for bipado antes da próxima importação.</small></span>
+                </label>
                 <div class="base-meta" id="station-info" style="margin-top: 12px;"></div>
             </div>
 

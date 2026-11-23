@@ -354,6 +354,11 @@
             window.renderBaseFreshness();
         });
 
+        // Estação de trabalho (definida à mão aqui no sistema ou enviada pela extensão da SPX)
+        onValue(ref(database, 'config_estacao'), (snapshot) => {
+            window.onStationConfig(snapshot.val());
+        });
+
         window.appReady();
     </script>
 
@@ -543,7 +548,69 @@
         };
 
         /* =========================================================
-           REGRAS DE TRIAGEM (IDÊNTICAS AO ORIGINAL)
+           ESTAÇÃO DE TRABALHO (configurável)
+           - nome: estação(ões) deste hub. Pacote com hub destino contendo
+             esse nome = "minha estação" (antes era fixo "uberaba").
+           - xpt: hubs atendidos via XPT (antes fixo carmelo / catalão).
+           Fica na nuvem em "config_estacao" e vale para todos os computadores.
+        ========================================================= */
+        const STATION_DEFAULT = { nome: 'Uberaba', xpt: 'Carmelo, Catalão', fonte: 'padrão' };
+        window.stationConfig = { ...STATION_DEFAULT };
+
+        function normTxt(s) {
+            return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
+                .toLowerCase().replace(/[\s_\-]+/g, ' ').trim();
+        }
+        function termsOf(txt) { return String(txt || '').split(',').map(normTxt).filter(Boolean); }
+        function hubMatches(hub, terms) { const h = normTxt(hub); return !!h && terms.some(t => h.includes(t)); }
+        function isMyStation(hub) { return hubMatches(hub, termsOf(window.stationConfig.nome)); }
+        function isXptHub(hub) { return hubMatches(hub, termsOf(window.stationConfig.xpt)); }
+
+        window.onStationConfig = function(val) {
+            const antes = JSON.stringify([window.stationConfig.nome, window.stationConfig.xpt]);
+            window.stationConfig = { ...STATION_DEFAULT, ...(val || {}) };
+            if (!String(window.stationConfig.nome || '').trim()) window.stationConfig.nome = STATION_DEFAULT.nome;
+            renderStationUI();
+            if (antes !== JSON.stringify([window.stationConfig.nome, window.stationConfig.xpt])) {
+                // reclassifica os bips de hoje e atualiza painel/faltantes com a nova estação
+                triggerRetroactiveRecalculate();
+                window.scheduleUIRefresh();
+            }
+        };
+
+        function renderStationUI() {
+            const c = window.stationConfig;
+            const pill = $('station-pill-text');
+            if (pill) pill.innerText = `📍 ${c.nome}`;
+            const inNome = $('station-nome'), inXpt = $('station-xpt');
+            if (inNome && document.activeElement !== inNome) inNome.value = c.nome || '';
+            if (inXpt && document.activeElement !== inXpt) inXpt.value = c.xpt || '';
+            const info = $('station-info');
+            if (info) {
+                let quando = '';
+                if (c.em) { const d = new Date(c.em); quando = ` em ${d.toLocaleDateString('pt-BR')} às ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`; }
+                const origem = c.fonte === 'extensao' ? '🔌 enviada pela extensão da SPX' : c.fonte === 'manual' ? `✍️ definida manualmente${c.operador ? ' por ' + esc(c.operador) : ''}` : 'padrão do sistema';
+                info.innerHTML = `Estação atual: <strong>${esc(c.nome)}</strong> · ${origem}${quando}`;
+            }
+        }
+
+        window.saveStationConfig = function() {
+            const nome = $('station-nome').value.trim();
+            const xpt = $('station-xpt').value.trim();
+            if (!nome) { alert('Informe o nome da estação.'); $('station-nome').focus(); return; }
+            const dados = { nome, xpt, fonte: 'manual', operador: window.operador.nome || '', em: new Date().toISOString() };
+            window.firebaseActions.updateData('config_estacao', dados)
+                .then(() => window.showAlertTop(`📍 ESTAÇÃO DEFINIDA: ${nome.toUpperCase()}`, 'alert-blue'))
+                .catch(err => alert('Não foi possível salvar a estação: ' + (err && err.message ? err.message : err)));
+            window.onStationConfig(dados); // aplica na hora neste computador
+        };
+        window.openStationConfig = function() {
+            window.switchTab('import');
+            setTimeout(() => { const el = $('station-card'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); $('station-nome').focus(); }, 100);
+        };
+
+        /* =========================================================
+           REGRAS DE TRIAGEM (IDÊNTICAS AO ORIGINAL, COM ESTAÇÃO CONFIGURÁVEL)
         ========================================================= */
         window.classifyParcel = function(barcode) {
             let b1Data = window.base1Map ? window.base1Map[barcode] : null;
@@ -574,11 +641,11 @@
             }
 
             if (isFound === 'SIM') {
-                const hubLower = destHub.toLowerCase();
                 const statusLower = statusText.toLowerCase();
 
-                const isUberaba = hubLower.includes('uberaba');
-                const isXPT = hubLower.includes('carmelo') || hubLower.includes('catalao') || hubLower.includes('catalão');
+                // "isUberaba" agora significa "é da minha estação" (configurável)
+                const isUberaba = isMyStation(destHub);
+                const isXPT = !isUberaba && isXptHub(destHub);
 
                 if (isUberaba && (statusText === 'LMHub_Received' || statusLower === 'lmhub_received' || statusLower.includes('received'))) {
                     statusText = `LMHub_Received_${locType}`;
@@ -1093,8 +1160,7 @@
             let statusMap = {}, catMap = {}, opMap = {}, notFound = 0;
             list.forEach(item => {
                 let status = item.statusOriginal || 'N/A';
-                let hub = (item.destinationHub || '').toLowerCase();
-                const pertencerRegiaoAtiva = hub.includes('uberaba') || hub.includes('carmelo') || hub.includes('catalao') || hub.includes('catalão');
+                const pertencerRegiaoAtiva = isMyStation(item.destinationHub) || isXptHub(item.destinationHub);
                 if (status.startsWith('LMHub_Received') && !pertencerRegiaoAtiva) status = 'LMHub_Received (Outros Hubs)';
                 else if (status === 'LMHub_Received_Office' || status === 'LMHub_Received_office' || status === 'LMHub_Received_-') status = 'LMHub_Received_office / -';
                 statusMap[status] = (statusMap[status] || 0) + 1;
@@ -1393,6 +1459,8 @@
 
             applySettingsToUI();
             renderOperator();
+            renderStationUI();
+            ['station-nome', 'station-xpt'].forEach(id => $(id).addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); window.saveStationConfig(); } }));
             window.setConnectionStatus(navigator.onLine);
             if (!window.operador.nome) window.openOperatorModal();
             window.scheduleUIRefresh();
@@ -1428,6 +1496,7 @@
             <strong style="font-size: 26px; color: #f8fafc;">Pré Tratativa Parcel</strong>
         </div>
         <div class="nav-right">
+            <div class="nav-pill" title="Estação considerada como 'minha estação' na triagem"><span id="station-pill-text">📍 Uberaba</span><button onclick="openStationConfig()">trocar</button></div>
             <div class="nav-pill"><span id="operator-pill-text">👷 Sem operador</span><button onclick="openOperatorModal()">trocar</button></div>
             <div class="conn-status" id="conn-status"><span class="conn-dot"></span><span id="conn-text">Conectando...</span></div>
             <div class="user-profile" style="font-size: 16px; padding: 8px 16px;">
@@ -1491,6 +1560,27 @@
                     <button style="padding: 12px 16px; background-color: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;" onclick="clearDatabaseNode('planilha_base2')">Resetar Apenas Base 2</button>
                     <button style="padding: 12px 16px; background-color: #fef2f2; color: #991b1b; border: 1px solid #fee2e2; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;" onclick="clearOnlyBases()">Limpar Banco de Dados</button>
                 </div>
+            </div>
+
+            <div class="card" id="station-card" style="border-left: 4px solid #2563eb;">
+                <h4 style="font-size: 16px; color: #0f172a;">📍 Estação de trabalho (vale para todos os computadores)</h4>
+                <p style="font-size: 13px; color: #64748b; margin-top: 4px;">Pacotes com <strong>Hub Destino</strong> contendo este nome são da sua estação (Manter fluxo / Rota correta). Os demais vão para "Estação correta". Também pode ser preenchida automaticamente pela extensão Parcel ⇄ SPX com a estação selecionada na SPX.</p>
+                <div class="settings-grid">
+                    <div>
+                        <label for="station-nome">Minha estação</label>
+                        <input type="text" id="station-nome" class="table-search-input" style="width: 100%; background: #fff;" placeholder="Ex.: LM Hub_MG_Uberlândia">
+                        <div class="hint">Mais de uma: separe por vírgula. Acento, maiúscula e "_" não importam.</div>
+                    </div>
+                    <div>
+                        <label for="station-xpt">Hubs atendidos via XPT</label>
+                        <input type="text" id="station-xpt" class="table-search-input" style="width: 100%; background: #fff;" placeholder="Ex.: Carmelo, Catalão">
+                        <div class="hint">Pacotes desses hubs são direcionados ao XPT.</div>
+                    </div>
+                    <div style="display: flex; align-items: flex-end;">
+                        <button class="btn-primary" onclick="saveStationConfig()">Salvar estação</button>
+                    </div>
+                </div>
+                <div class="base-meta" id="station-info" style="margin-top: 12px;"></div>
             </div>
 
             <div class="card">
